@@ -20,8 +20,9 @@ public class Game1 : Game
         Quarter = 480
     }
     
-    private Texture2D _playerTexture;
     private SpriteBatch _spriteBatch;
+
+    private Player _player;
 
     private const int TargetWidth = (int)Width.Quarter;
     private const int TargetHeight = (int)Height.Quarter;
@@ -30,10 +31,12 @@ public class Game1 : Game
     private RenderTarget2D _renderTarget;
     public Game1()
     {
+        // set up game class
         GraphicsDeviceManager graphics = new(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
 
+        // set up rendering
         graphics.PreferredBackBufferWidth = (int)Width.Half;
         graphics.PreferredBackBufferHeight = (int)Height.Half;
 
@@ -52,14 +55,15 @@ public class Game1 : Game
             GraphicsDevice.PresentationParameters.BackBufferFormat,
             DepthFormat.Depth24);
         
+        // initialize objects
+        _player = new Player(this, new Vector2(0, 0));
+        
         base.Initialize();
     }
 
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-        _playerTexture = Content.Load<Texture2D>("assets/player1");
     }
 
     protected override void Update(GameTime gameTime)
@@ -67,6 +71,8 @@ public class Game1 : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
+
+        _player.Update(gameTime);
 
         base.Update(gameTime);
     }
@@ -79,7 +85,7 @@ public class Game1 : Game
         GraphicsDevice.Clear(Color.Black);
         
         _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap);
-        _spriteBatch.Draw(_playerTexture, new Vector2(0, TargetHeight / 2f - 20), Color.White);
+        _player.Draw(_spriteBatch);
         _spriteBatch.End();
 
         // draw render target to screen
