@@ -27,6 +27,8 @@ public class Game1 : Game
     public const int TargetWidth = (int)Width.Quarter;
     public const int TargetHeight = (int)Height.Quarter;
     private readonly Matrix _scale;
+    public float ScaleX;
+    public float ScaleY;
 
     private RenderTarget2D _renderTarget;
     public Game1()
@@ -34,15 +36,14 @@ public class Game1 : Game
         // set up game class
         GraphicsDeviceManager graphics = new(this);
         Content.RootDirectory = "Content";
-        IsMouseVisible = true;
 
         // set up rendering
         graphics.PreferredBackBufferWidth = (int)Width.Half;
         graphics.PreferredBackBufferHeight = (int)Height.Half;
 
-        float scaleX = graphics.PreferredBackBufferWidth / (float)TargetWidth;
-        float scaleY = graphics.PreferredBackBufferHeight / (float)TargetHeight;
-        _scale = Matrix.CreateScale(new Vector3(scaleX, scaleY, 1));
+        ScaleX = graphics.PreferredBackBufferWidth / (float)TargetWidth;
+        ScaleY = graphics.PreferredBackBufferHeight / (float)TargetHeight;
+        _scale = Matrix.CreateScale(new Vector3(ScaleX, ScaleY, 1));
     }
 
     protected override void Initialize()
