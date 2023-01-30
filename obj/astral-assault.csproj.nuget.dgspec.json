@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Projekt\\Rider\\astral-assault\\astral-assault.csproj": {}
+    "E:\\Projekt\\rider\\astral-assault\\astral-assault.csproj": {}
   },
   "projects": {
-    "E:\\Projekt\\Rider\\astral-assault\\astral-assault.csproj": {
+    "E:\\Projekt\\rider\\astral-assault\\astral-assault.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Projekt\\Rider\\astral-assault\\astral-assault.csproj",
+        "projectUniqueName": "E:\\Projekt\\rider\\astral-assault\\astral-assault.csproj",
         "projectName": "astral-assault",
-        "projectPath": "E:\\Projekt\\Rider\\astral-assault\\astral-assault.csproj",
+        "projectPath": "E:\\Projekt\\rider\\astral-assault\\astral-assault.csproj",
         "packagesPath": "C:\\Users\\Leo\\.nuget\\packages\\",
-        "outputPath": "E:\\Projekt\\Rider\\astral-assault\\obj\\",
+        "outputPath": "E:\\Projekt\\rider\\astral-assault\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -20,14 +20,14 @@
           "C:\\Users\\Leo\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
-          "net7.0"
+          "net6.0"
         ],
         "sources": {
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net7.0": {
-            "targetAlias": "net7.0",
+          "net6.0": {
+            "targetAlias": "net6.0",
             "projectReferences": {}
           }
         },
@@ -38,8 +38,8 @@
         }
       },
       "frameworks": {
-        "net7.0": {
-          "targetAlias": "net7.0",
+        "net6.0": {
+          "targetAlias": "net6.0",
           "dependencies": {
             "MonoGame.Content.Builder.Task": {
               "target": "Package",
@@ -61,31 +61,12 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Runtime.win-x64",
-              "version": "[7.0.2, 7.0.2]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Runtime.win-x64",
-              "version": "[7.0.2, 7.0.2]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Runtime.win-x64",
-              "version": "[7.0.2, 7.0.2]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.102\\RuntimeIdentifierGraph.json"
-        }
-      },
-      "runtimes": {
-        "win-x64": {
-          "#import": []
         }
       }
     }

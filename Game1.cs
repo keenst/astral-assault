@@ -6,20 +6,52 @@ namespace astral_assault;
 
 public class Game1 : Game
 {
-    private GraphicsDeviceManager _graphics;
+    private enum Height
+    {
+        Full = 1080,
+        Half = 540,
+        Quarter = 270
+    }
+
+    private enum Width
+    {
+        Full = 1920,
+        Half = 960,
+        Quarter = 480
+    }
+    
+    private Texture2D _playerTexture;
     private SpriteBatch _spriteBatch;
 
+    private const int TargetWidth = (int)Width.Quarter;
+    private const int TargetHeight = (int)Height.Quarter;
+    private readonly Matrix _scale;
+
+    private RenderTarget2D _renderTarget;
     public Game1()
     {
-        _graphics = new GraphicsDeviceManager(this);
+        GraphicsDeviceManager graphics = new(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
+
+        graphics.PreferredBackBufferWidth = (int)Width.Half;
+        graphics.PreferredBackBufferHeight = (int)Height.Half;
+
+        float scaleX = graphics.PreferredBackBufferWidth / (float)TargetWidth;
+        float scaleY = graphics.PreferredBackBufferHeight / (float)TargetHeight;
+        _scale = Matrix.CreateScale(new Vector3(scaleX, scaleY, 1));
     }
 
     protected override void Initialize()
     {
-        // TODO: Add your initialization logic here
-
+        _renderTarget = new RenderTarget2D(
+            GraphicsDevice,
+            GraphicsDevice.PresentationParameters.BackBufferWidth,
+            GraphicsDevice.PresentationParameters.BackBufferHeight,
+            false,
+            GraphicsDevice.PresentationParameters.BackBufferFormat,
+            DepthFormat.Depth24);
+        
         base.Initialize();
     }
 
@@ -27,25 +59,40 @@ public class Game1 : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        // TODO: use this.Content to load your game content here
+        _playerTexture = Content.Load<Texture2D>("assets/player1");
     }
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
+            Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
-
-        // TODO: Add your update logic here
 
         base.Update(gameTime);
     }
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
+        // draw sprites to render target
+        GraphicsDevice.SetRenderTarget(_renderTarget);
+        
+        GraphicsDevice.Clear(Color.Black);
+        
+        _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap);
+        _spriteBatch.Draw(_playerTexture, new Vector2(0, TargetHeight / 2f - 20), Color.White);
+        _spriteBatch.End();
 
-        // TODO: Add your drawing code here
+        // draw render target to screen
+        GraphicsDevice.SetRenderTarget(null);
 
+        _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap,
+            null, null, null, _scale);
+        _spriteBatch.Draw(
+            _renderTarget,
+            new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height),
+            Color.White);
+        _spriteBatch.End();
+        
         base.Draw(gameTime);
     }
 }

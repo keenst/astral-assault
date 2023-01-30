@@ -1,1 +1,4 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"E:/Projekt/rider/astral-assault/Content/assets/player1.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/player1.xnb","TextureProcessor","Texture2DContent",506,4181,0.1298817
+"E:/Projekt/rider/astral-assault/Content/assets/player2.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/player2.xnb","TextureProcessor","Texture2DContent",573,4181,0.0011585
+"E:/Projekt/rider/astral-assault/Content/assets/player3.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/player3.xnb","TextureProcessor","Texture2DContent",557,4181,0.001025

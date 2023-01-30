@@ -23,3 +23,6 @@ E:\Projekt\rider\astral-assault\obj\Debug\net6.0\refint\astral-assault.dll
 E:\Projekt\rider\astral-assault\obj\Debug\net6.0\astral-assault.pdb
 E:\Projekt\rider\astral-assault\obj\Debug\net6.0\astral-assault.genruntimeconfig.cache
 E:\Projekt\rider\astral-assault\obj\Debug\net6.0\ref\astral-assault.dll
+E:\Projekt\rider\astral-assault\bin\Debug\net6.0\Content\assets\player1.xnb
+E:\Projekt\rider\astral-assault\bin\Debug\net6.0\Content\assets\player2.xnb
+E:\Projekt\rider\astral-assault\bin\Debug\net6.0\Content\assets\player3.xnb
