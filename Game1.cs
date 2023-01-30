@@ -24,8 +24,8 @@ public class Game1 : Game
 
     private Player _player;
 
-    private const int TargetWidth = (int)Width.Quarter;
-    private const int TargetHeight = (int)Height.Quarter;
+    public const int TargetWidth = (int)Width.Quarter;
+    public const int TargetHeight = (int)Height.Quarter;
     private readonly Matrix _scale;
 
     private RenderTarget2D _renderTarget;
@@ -56,7 +56,7 @@ public class Game1 : Game
             DepthFormat.Depth24);
         
         // initialize objects
-        _player = new Player(this, new Vector2(0, 0));
+        _player = new Player(this, new Vector2(TargetWidth / 2F, TargetHeight / 2F));
         
         base.Initialize();
     }
@@ -82,7 +82,7 @@ public class Game1 : Game
         // draw sprites to render target
         GraphicsDevice.SetRenderTarget(_renderTarget);
         
-        GraphicsDevice.Clear(Color.Black);
+        GraphicsDevice.Clear(Color.DarkGray);
         
         _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap);
         _player.Draw(_spriteBatch);
