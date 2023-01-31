@@ -100,15 +100,15 @@ public class Player
         // wrap position
         _position.X = _position.X switch
         {
-            < 0 => Game1.TargetWidth,
-            > Game1.TargetWidth => 0,
+            < -16 => Game1.TargetWidth - 16,
+            > Game1.TargetWidth + 16 => 16,
             _ => _position.X
         };
 
         _position.Y = _position.Y switch
         {
-            < 0 => Game1.TargetHeight,
-            > Game1.TargetHeight => 0,
+            < -16 => Game1.TargetHeight - 16,
+            > Game1.TargetHeight + 16 => 16,
             _ => _position.Y
         };
     }
@@ -116,7 +116,7 @@ public class Player
     public void Draw(SpriteBatch spriteBatch)
     {
         // draw player sprite
-        _sprite.Draw(spriteBatch, _position, _rotation + Pi / 2);
+        _sprite.Draw(spriteBatch, _position, _rotation + Pi / 2, true);
 
         // draw crosshair sprite
         _crosshairSprite.Draw(spriteBatch, _cursorPosition);
