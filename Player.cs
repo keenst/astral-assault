@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -14,6 +15,10 @@ public class Player
     private Vector2 _velocity;
     private Vector2 _cursorPosition;
     private float _rotation;
+    private float _spriteRot;
+    private SpriteEffects _flip;
+    
+    private readonly Texture2D[] _playerSprites = new Texture2D[3];
 
     private const float MoveSpeed = 1.0F;
     private const float TiltSpeed = 0.6F;
@@ -31,10 +36,13 @@ public class Player
 
     private void LoadContent()
     {
-        Texture2D playerSprite = _root.Content.Load<Texture2D>("assets/player1");
+        _playerSprites[0] = _root.Content.Load<Texture2D>("assets/player1");
+        _playerSprites[1] = _root.Content.Load<Texture2D>("assets/player2");
+        _playerSprites[2] = _root.Content.Load<Texture2D>("assets/player3");
+
         Texture2D crosshairSprite = _root.Content.Load<Texture2D>("assets/crosshair");
 
-        _sprite = new Sprite(playerSprite);
+        _sprite = new Sprite(_playerSprites[0]);
         _crosshairSprite = new Sprite(crosshairSprite);
     }
     
@@ -111,12 +119,107 @@ public class Player
             > Game1.TargetHeight + 16 => 16,
             _ => _position.Y
         };
+        
+        // set sprite depending on rotation
+        int rot = (int)Math.Round(_rotation / (Pi / 8));
+
+        Debug.WriteLine(rot);
+        //Debug.WriteLine(rot % 4);
+
+        _flip = SpriteEffects.None;
+        
+        if (rot % 4 == 0)
+        {
+            _sprite = new Sprite(_playerSprites[0]);
+            _spriteRot = Pi / 8 * rot;
+        }
+        else
+        {
+            switch (rot)
+            {
+                // nne
+                case -3:
+                    _sprite = new Sprite(_playerSprites[1]);
+                    _spriteRot = Pi * 1.5F;
+                    break;
+                
+                // ne
+                case -2:
+                    _sprite = new Sprite(_playerSprites[2]);
+                    _spriteRot = Pi * 1.5F;
+                    break;
+                
+                // nee
+                case -1:
+                    _sprite = new Sprite(_playerSprites[1]);
+                    _spriteRot = Pi;
+                    _flip = SpriteEffects.FlipHorizontally;
+                    break;
+                
+                // see
+                case 1:
+                    _sprite = new Sprite(_playerSprites[1]);
+                    _spriteRot = 0;
+                    break;
+                
+                // se
+                case 2:
+                    _sprite = new Sprite(_playerSprites[2]);
+                    _spriteRot = 0;
+                    break;
+                
+                // sse
+                case 3:
+                    _sprite = new Sprite(_playerSprites[1]);
+                    _spriteRot = Pi * 1.5F;
+                    _flip = SpriteEffects.FlipHorizontally;
+                    break;
+                
+                // ssw
+                case 5:
+                    _sprite = new Sprite(_playerSprites[1]);
+                    _spriteRot = Pi / 2;
+                    break;
+                
+                // sw
+                case 6:
+                    _sprite = new Sprite(_playerSprites[2]);
+                    _spriteRot = Pi / 2;
+                    break;
+                
+                // sww
+                case 7:
+                    _sprite = new Sprite(_playerSprites[1]);
+                    _spriteRot = Pi;
+                    _flip = SpriteEffects.FlipVertically;
+                    break;
+                
+                // nww
+                case -7:
+                    _sprite = new Sprite(_playerSprites[1]);
+                    _spriteRot = Pi;
+                    break;
+                
+                // nw
+                case -6:
+                    _sprite = new Sprite(_playerSprites[2]);
+                    _spriteRot = Pi;
+                    break;
+                
+                // nnw
+                case -5:
+                    _sprite = new Sprite(_playerSprites[1]);
+                    _spriteRot = Pi * 1.5F;
+                    _flip = SpriteEffects.FlipVertically;
+                    break;
+            }
+        }
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
         // draw player sprite
-        _sprite.Draw(spriteBatch, _position, _rotation + Pi / 2, true);
+        _sprite.Draw(spriteBatch, _position, _spriteRot, true, _flip);
 
         // draw crosshair sprite
         _crosshairSprite.Draw(spriteBatch, _cursorPosition);

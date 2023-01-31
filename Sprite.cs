@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Diagnostics;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace astral_assault;
@@ -19,7 +20,12 @@ public class Sprite
         _height = texture.Height;
     }
 
-    public void Draw(SpriteBatch spriteBatch, Vector2 position, float rotation = 0, bool wrap = false)
+    public void Draw(
+        SpriteBatch spriteBatch, 
+        Vector2 position, 
+        float rotation = 0, 
+        bool wrap = false, 
+        SpriteEffects effects = SpriteEffects.None)
     {
         Rectangle rectangle = new(position.ToPoint(), new Point(_width, _height));
         
@@ -30,7 +36,7 @@ public class Sprite
             Color.White, 
             rotation, 
             _origin, 
-            SpriteEffects.None, 
+            effects, 
             0);
 
         if (!wrap) return;
@@ -52,7 +58,7 @@ public class Sprite
                 Color.White,
                 rotation,
                 _origin,
-                SpriteEffects.None,
+                effects,
                 0);
         }
         
@@ -70,7 +76,7 @@ public class Sprite
                 Color.White,
                 rotation,
                 _origin,
-                SpriteEffects.None,
+                effects,
                 0);
         }
     }

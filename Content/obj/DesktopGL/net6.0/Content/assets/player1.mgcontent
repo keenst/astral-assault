@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <SourceFile>E:/Projekt/rider/astral-assault/Content/assets/player1.png</SourceFile>
-  <SourceTime>2023-01-30T14:18:10.1782458+01:00</SourceTime>
+  <SourceTime>2023-01-31T19:14:31.573408+01:00</SourceTime>
   <DestFile>E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/player1.xnb</DestFile>
-  <DestTime>2023-01-30T14:19:22.4383352+01:00</DestTime>
+  <DestTime>2023-01-31T19:15:16.9924158+01:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2022-07-26T13:44:56+02:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
