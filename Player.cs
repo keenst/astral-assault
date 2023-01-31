@@ -2,17 +2,14 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Color = Microsoft.Xna.Framework.Color;
-using Point = Microsoft.Xna.Framework.Point;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace astral_assault;
 
 public class Player
 {
     private readonly Game1 _root;
-    private Texture2D _sprite;
-    private Texture2D _crosshairSprite;
+    private Sprite _sprite;
+    private Sprite _crosshairSprite;
     private Vector2 _position;
     private Vector2 _velocity;
     private Vector2 _cursorPosition;
@@ -22,9 +19,6 @@ public class Player
     private const float TiltSpeed = 0.6F;
     private const float Friction = 0.05F;
     private const float Pi = 3.14F;
-
-    private Rectangle PositionRectangle => new(_position.ToPoint(), new Point(32, 32));
-    private Rectangle CrosshairRectangle => new(_cursorPosition.ToPoint(), new Point(16, 16));
 
     public Player(Game1 root, Vector2 position)
     {
@@ -37,8 +31,11 @@ public class Player
 
     private void LoadContent()
     {
-        _sprite = _root.Content.Load<Texture2D>("assets/player1");
-        _crosshairSprite = _root.Content.Load<Texture2D>("assets/crosshair");
+        Texture2D playerSprite = _root.Content.Load<Texture2D>("assets/player1");
+        Texture2D crosshairSprite = _root.Content.Load<Texture2D>("assets/crosshair");
+
+        _sprite = new Sprite(playerSprite);
+        _crosshairSprite = new Sprite(crosshairSprite);
     }
     
     private bool Input(Keys key)
@@ -119,25 +116,9 @@ public class Player
     public void Draw(SpriteBatch spriteBatch)
     {
         // draw player sprite
-        spriteBatch.Draw(
-            _sprite, 
-            PositionRectangle, 
-            null, 
-            Color.White, 
-            _rotation + Pi / 2, 
-            new Vector2(16, 16), 
-            SpriteEffects.None, 
-            0);
-        
+        _sprite.Draw(spriteBatch, _position, _rotation + Pi / 2);
+
         // draw crosshair sprite
-        spriteBatch.Draw(
-            _crosshairSprite,
-            CrosshairRectangle,
-            null,
-            Color.White,
-            0,
-            new Vector2(8, 8),
-            SpriteEffects.None,
-            0);
+        _crosshairSprite.Draw(spriteBatch, _cursorPosition);
     }
 }
