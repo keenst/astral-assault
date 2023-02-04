@@ -30,6 +30,10 @@ public class Game1 : Game
     public float ScaleX;
     public float ScaleY;
 
+    public bool Debug;
+
+    private KeyboardState _prevKeyState = Keyboard.GetState();
+
     private RenderTarget2D _renderTarget;
     public Game1()
     {
@@ -44,6 +48,8 @@ public class Game1 : Game
         ScaleX = graphics.PreferredBackBufferWidth / (float)TargetWidth;
         ScaleY = graphics.PreferredBackBufferHeight / (float)TargetHeight;
         _scale = Matrix.CreateScale(new Vector3(ScaleX, ScaleY, 1));
+
+        Debug = false;
     }
 
     protected override void Initialize()
@@ -72,6 +78,11 @@ public class Game1 : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
+
+        if (Keyboard.GetState().IsKeyDown(Keys.F3) && !_prevKeyState.IsKeyDown(Keys.F3))
+            Debug = !Debug;
+
+        _prevKeyState = Keyboard.GetState();
 
         _player.Update(gameTime);
 
