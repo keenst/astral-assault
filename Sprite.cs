@@ -24,8 +24,7 @@ public class Sprite
         SpriteBatch spriteBatch, 
         Vector2 position, 
         float rotation = 0, 
-        bool wrap = false, 
-        SpriteEffects effects = SpriteEffects.None)
+        bool wrap = false)
     {
         Rectangle rectangle = new(position.ToPoint(), new Point(_width, _height));
         
@@ -36,7 +35,7 @@ public class Sprite
             Color.White, 
             rotation, 
             _origin, 
-            effects, 
+            SpriteEffects.None, 
             0);
 
         if (!wrap) return;
@@ -58,7 +57,7 @@ public class Sprite
                 Color.White,
                 rotation,
                 _origin,
-                effects,
+                SpriteEffects.None,
                 0);
         }
         
@@ -76,7 +75,7 @@ public class Sprite
                 Color.White,
                 rotation,
                 _origin,
-                effects,
+                SpriteEffects.None,
                 0);
         }
     }
