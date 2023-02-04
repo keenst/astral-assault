@@ -15,6 +15,7 @@ public class Player
     private Vector2 _cursorPosition;
     private float _rotation;
     private float _spriteRot;
+    private Tuple<Vector2, Vector2> _muzzle;
 
     private readonly Texture2D[] _playerSprites = new Texture2D[4];
 
@@ -119,26 +120,55 @@ public class Player
             _ => _position.Y
         };
         
-        // sprite rotation
-        int rot = (int)Math.Round(_rotation / (Pi / 8));
+        // rotate the points for the cannon muzzles
+        Vector2 muzzle1;
+        Vector2 muzzle2;
         
-        if (rot % 4 == 0)
+        const float x =  8;
+        const float y = 10;
+
         {
-            _sprite = new Sprite(_playerSprites[0]);
-            _spriteRot = Pi / 8 * rot;
-            return;
+            float rot = Pi / 8 * (float)Math.Round(_rotation / (Pi / 8));
+
+            float x2 = (float)(x * Math.Cos(rot) - y * Math.Sin(rot));
+            float y2 = (float)(y * Math.Cos(rot) + x * Math.Sin(rot));
+
+            muzzle1 = new Vector2(_position.X + x2, _position.Y + y2);
         }
 
-        _spriteRot = _rotation switch
         {
-            >= 0         and < Pi / 2    => 0,
-            >= Pi / 2    and < Pi        => Pi / 2,
-            <= 0         and > -Pi / 2   => -Pi / 2,
-            <= -Pi / 2   and > -Pi       => -Pi,
-            _ => 0
-        };
+            float rot = Pi / 8 * (float)Math.Round(_rotation / (Pi / 8));
 
-        _sprite = new Sprite(_playerSprites[rot.Mod(4)]);
+            float x2 = (float)(x * Math.Cos(rot) + y * Math.Sin(rot));
+            float y2 = (float)(-y * Math.Cos(rot) + x * Math.Sin(rot));
+
+            muzzle2 = new Vector2(_position.X + x2, _position.Y + y2);
+        }
+
+        _muzzle = new Tuple<Vector2, Vector2>(muzzle1, muzzle2);
+        
+        // sprite rotation
+        {
+            int rot = (int)Math.Round(_rotation / (Pi / 8));
+        
+            if (rot % 4 == 0)
+            {
+                _sprite = new Sprite(_playerSprites[0]);
+                _spriteRot = Pi / 8 * rot;
+                return;
+            }
+
+            _spriteRot = _rotation switch
+            {
+                >= 0         and < Pi / 2    => 0,
+                >= Pi / 2    and < Pi        => Pi / 2,
+                <= 0         and > -Pi / 2   => -Pi / 2,
+                <= -Pi / 2   and > -Pi       => -Pi,
+                _ => 0
+            };
+
+            _sprite = new Sprite(_playerSprites[rot.Mod(4)]);
+        }
     }
 
     public void Draw(SpriteBatch spriteBatch)
@@ -148,5 +178,17 @@ public class Player
 
         // draw crosshair sprite
         _crosshairSprite.Draw(spriteBatch, _cursorPosition);
+
+        // draw debugging tools
+        if (!_root.Debug) return;
+        
+        Texture2D rect = new(_root.GraphicsDevice, 2, 2);
+        
+        Color[] data = new Color[2 * 2];
+        for(int i = 0; i < data.Length; ++i) data[i] = Color.White;
+        rect.SetData(data);
+        
+        spriteBatch.Draw(rect, _muzzle.Item1, Color.Red);
+        spriteBatch.Draw(rect, _muzzle.Item2, Color.Red);
     }
 }
