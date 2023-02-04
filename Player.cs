@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -28,7 +27,7 @@ public class Player
     private const float TiltSpeed = 1.5F;
     private const float Friction = 0.5F;
     private const float Pi = 3.14F;
-    private const float BulletSpeed = 100;
+    private const float BulletSpeed = 250;
 
     public Player(Game1 root, Vector2 position)
     {
@@ -130,7 +129,12 @@ public class Player
             float rot = (float)Math.Atan2(yDiff, xDiff);
             
             _root.Bullets.Add(
-                new Bullet(_root, _lastCannon ? _muzzle.Item1 : _muzzle.Item2, rot, BulletSpeed));
+                new Bullet(
+                    _root, 
+                    _lastCannon ? _muzzle.Item1 : _muzzle.Item2, 
+                    rot, 
+                    BulletSpeed));
+            
             _lastCannon = !_lastCannon;
         }
     }

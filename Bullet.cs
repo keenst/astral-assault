@@ -8,15 +8,14 @@ public class Bullet
 {
     private readonly Game1 _root;
     private readonly Vector2 _velocity;
-    
+
     public Vector2 Position;
 
     public Bullet(Game1 root, Vector2 position, float rotation, float speed)
     {
         _root = root;
-        
         Position = position;
-
+        
         _velocity = new Vector2(
             (float)Math.Cos(rotation),
             (float)Math.Sin(rotation)
