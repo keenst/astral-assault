@@ -16,6 +16,9 @@ public class Player
     private float _rotation;
     private float _spriteRot;
     private Tuple<Vector2, Vector2> _muzzle;
+    private bool _lastCannon;
+    
+    private MouseState _prevMouseState = Mouse.GetState();
 
     private readonly Texture2D[] _playerSprites = new Texture2D[4];
 
@@ -23,6 +26,7 @@ public class Player
     private const float TiltSpeed = 0.6F;
     private const float Friction = 0.05F;
     private const float Pi = 3.14F;
+    private const float BulletSpeed = 100;
 
     public Player(Game1 root, Vector2 position)
     {
@@ -52,6 +56,15 @@ public class Player
         return currentKeyboardState.IsKeyDown(key);
     }
 
+    private bool LeftMousePressed()
+    {
+        bool wasPressed = 
+            Mouse.GetState().LeftButton == ButtonState.Pressed && 
+            _prevMouseState.LeftButton != ButtonState.Pressed;
+        _prevMouseState = Mouse.GetState();
+        return wasPressed;
+    }
+    
     private void HandleInputs(float delta)
     {
         // acceleration and deceleration
@@ -80,9 +93,24 @@ public class Player
         Vector2 mousePos = mouseState.Position.ToVector2();
         _cursorPosition = new Vector2(mousePos.X / _root.ScaleX, mousePos.Y / _root.ScaleY);
 
-        float xDiff = _cursorPosition.X - _position.X;
-        float yDiff = _cursorPosition.Y - _position.Y;
-        _rotation = (float)Math.Atan2(yDiff, xDiff);
+        {
+            float xDiff = _cursorPosition.X - _position.X;
+            float yDiff = _cursorPosition.Y - _position.Y;
+            _rotation = (float)Math.Atan2(yDiff, xDiff);
+        }
+        
+        // shooting
+        if (LeftMousePressed())
+        {
+            float xDiff = _cursorPosition.X - (_lastCannon ? _muzzle.Item1.X : _muzzle.Item2.X);
+            float yDiff = _cursorPosition.Y - (_lastCannon ? _muzzle.Item1.Y : _muzzle.Item2.Y);
+
+            float rot = (float)Math.Atan2(yDiff, xDiff);
+            
+            _root.Bullets.Add(
+                new Bullet(_root, _lastCannon ? _muzzle.Item1 : _muzzle.Item2, rot, BulletSpeed));
+            _lastCannon = !_lastCannon;
+        }
     }
 
     public void Update(GameTime gameTime)

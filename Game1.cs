@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -23,12 +24,13 @@ public class Game1 : Game
     private SpriteBatch _spriteBatch;
 
     private Player _player;
+    public readonly List<Bullet> Bullets = new();
 
     public const int TargetWidth = (int)Width.Quarter;
     public const int TargetHeight = (int)Height.Quarter;
     private readonly Matrix _scale;
-    public float ScaleX;
-    public float ScaleY;
+    public readonly float ScaleX;
+    public readonly float ScaleY;
 
     public bool Debug;
 
@@ -85,6 +87,18 @@ public class Game1 : Game
         _prevKeyState = Keyboard.GetState();
 
         _player.Update(gameTime);
+        
+        for (int i = 0; i < Bullets.Count; i++)
+        {
+            if (Bullets[i]._position.X is > TargetWidth or < 0 ||
+                Bullets[i]._position.Y is > TargetHeight or < 0)
+            {
+                Bullets.RemoveAt(i);
+                return;
+            }
+            
+            Bullets[i].Update(gameTime);
+        }
 
         base.Update(gameTime);
     }
@@ -98,6 +112,7 @@ public class Game1 : Game
         
         _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap);
         _player.Draw(_spriteBatch);
+        foreach (Bullet bullet in Bullets) bullet.Draw(_spriteBatch);
         _spriteBatch.End();
 
         // draw render target to screen
