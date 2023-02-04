@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -22,9 +23,10 @@ public class Player
 
     private readonly Texture2D[] _playerSprites = new Texture2D[4];
 
-    private const float MoveSpeed = 1.0F;
-    private const float TiltSpeed = 0.6F;
-    private const float Friction = 0.05F;
+    private const float MoveSpeed = 2;
+    private const float MaxSpeed = 3;
+    private const float TiltSpeed = 1.5F;
+    private const float Friction = 0.5F;
     private const float Pi = 3.14F;
     private const float BulletSpeed = 100;
 
@@ -73,19 +75,39 @@ public class Player
             (float)Math.Sin(_rotation)
             ) * MoveSpeed * delta;
 
-        if (Input(Keys.W)) _velocity += forward;
-        
-        if (Input(Keys.S)) _velocity -= forward;
+        if (Input(Keys.W))
+        {
+            _velocity = new Vector2(
+                Math.Clamp(_velocity.X + forward.X, -MaxSpeed, MaxSpeed),
+                Math.Clamp(_velocity.Y + forward.Y, -MaxSpeed, MaxSpeed));
+        }
+
+        if (Input(Keys.S))
+        {
+            _velocity = new Vector2(
+                Math.Clamp(_velocity.X - forward.X, -MaxSpeed, MaxSpeed),
+                Math.Clamp(_velocity.Y - forward.Y, -MaxSpeed, MaxSpeed));
+        }
 
         // tilting
         Vector2 right = new Vector2(
             (float)Math.Cos(_rotation + Pi / 2), 
             (float)Math.Sin(_rotation + Pi / 2)
             ) * TiltSpeed * delta;
-        
-        if (Input(Keys.A)) _velocity -= right;
 
-        if (Input(Keys.D)) _velocity += right;
+        if (Input(Keys.A))
+        {
+            _velocity = new Vector2(
+                Math.Clamp(_velocity.X - right.X, -MaxSpeed, MaxSpeed),
+                Math.Clamp(_velocity.Y - right.Y, -MaxSpeed, MaxSpeed));
+        }
+
+        if (Input(Keys.D))
+        {
+            _velocity = new Vector2(
+                Math.Clamp(_velocity.X + right.X, -MaxSpeed, MaxSpeed),
+                Math.Clamp(_velocity.Y + right.Y, -MaxSpeed, MaxSpeed));
+        }
 
         // move crosshair to cursor position
         MouseState mouseState = Mouse.GetState();
