@@ -90,8 +90,8 @@ public class Game1 : Game
         
         for (int i = 0; i < Bullets.Count; i++)
         {
-            if (Bullets[i]._position.X is > TargetWidth or < 0 ||
-                Bullets[i]._position.Y is > TargetHeight or < 0)
+            if (Bullets[i].Position.X is > TargetWidth or < 0 ||
+                Bullets[i].Position.Y is > TargetHeight or < 0)
             {
                 Bullets.RemoveAt(i);
                 return;

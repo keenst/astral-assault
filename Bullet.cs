@@ -9,13 +9,13 @@ public class Bullet
     private readonly Game1 _root;
     private readonly Vector2 _velocity;
     
-    public Vector2 _position;
+    public Vector2 Position;
 
     public Bullet(Game1 root, Vector2 position, float rotation, float speed)
     {
         _root = root;
         
-        _position = position;
+        Position = position;
 
         _velocity = new Vector2(
             (float)Math.Cos(rotation),
@@ -34,7 +34,7 @@ public class Bullet
     {
         float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-        _position += _velocity * delta;
+        Position += _velocity * delta;
     }
 
     public void Draw(SpriteBatch spriteBatch)
@@ -45,6 +45,6 @@ public class Bullet
         for(int i = 0; i < data.Length; ++i) data[i] = Color.White;
         rect.SetData(data);
         
-        spriteBatch.Draw(rect, _position, Color.Green);
+        spriteBatch.Draw(rect, Position, Color.Green);
     }
 }
