@@ -5,12 +5,14 @@
   <Config />
   <SourceFiles>
     <File>E:/Projekt/rider/astral-assault/Content/assets/crosshair.png</File>
+    <File>E:/Projekt/rider/astral-assault/Content/assets/font.png</File>
     <File>E:/Projekt/rider/astral-assault/Content/assets/player1.png</File>
     <File>E:/Projekt/rider/astral-assault/Content/assets/player2.png</File>
     <File>E:/Projekt/rider/astral-assault/Content/assets/player3.png</File>
     <File>E:/Projekt/rider/astral-assault/Content/assets/player4.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
