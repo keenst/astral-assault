@@ -24,7 +24,7 @@ public class Player
     private const float MoveSpeed = 100;
     private const float MaxSpeed = 100;
     private const float TiltSpeed = 80;
-    private const float Friction = 0.5F;
+    private const float Friction = 30;
     private const float Pi = 3.14F;
     private const float BulletSpeed = 250;
     private const int   ShootSpeed = 200;
