@@ -17,8 +17,6 @@ public class Player
     private float _spriteRot;
     private Tuple<Vector2, Vector2> _muzzle;
     private bool _lastCannon;
-    
-    private MouseState _prevMouseState = Mouse.GetState();
     private long _lastLeftButton;
 
     private readonly Texture2D[] _playerSprites = new Texture2D[4];
@@ -57,15 +55,6 @@ public class Player
     {
         KeyboardState currentKeyboardState = Keyboard.GetState();
         return currentKeyboardState.IsKeyDown(key);
-    }
-
-    private bool LeftMousePressed()
-    {
-        bool wasPressed = 
-            Mouse.GetState().LeftButton == ButtonState.Pressed && 
-            _prevMouseState.LeftButton != ButtonState.Pressed;
-        _prevMouseState = Mouse.GetState();
-        return wasPressed;
     }
 
     private bool LeftMouseHeld(int interval)
