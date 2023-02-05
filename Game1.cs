@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -64,8 +65,11 @@ public class Game1 : Game
             GraphicsDevice.PresentationParameters.BackBufferFormat,
             DepthFormat.Depth24);
         
-        // initialize objects
+        // create player
         _player = new Player(this, new Vector2(TargetWidth / 2F, TargetHeight / 2F));
+        
+        // initialize font renderer
+        Text.Initialize(this);
         
         base.Initialize();
     }
@@ -113,6 +117,13 @@ public class Game1 : Game
         _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap);
         _player.Draw(_spriteBatch);
         foreach (Bullet bullet in Bullets) bullet.Draw(_spriteBatch);
+
+        if (Debug)
+        {
+            float frameRate = 1 / (float)gameTime.ElapsedGameTime.TotalSeconds;
+            _spriteBatch.Write(Math.Round(frameRate, 1).ToString(), new Vector2(0, 0), Color.Yellow);
+        }
+        
         _spriteBatch.End();
 
         // draw render target to screen
