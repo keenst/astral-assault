@@ -19,6 +19,7 @@ public class Player
     private bool _lastCannon;
     
     private MouseState _prevMouseState = Mouse.GetState();
+    private long _lastLeftButton;
 
     private readonly Texture2D[] _playerSprites = new Texture2D[4];
 
@@ -28,6 +29,7 @@ public class Player
     private const float Friction = 0.5F;
     private const float Pi = 3.14F;
     private const float BulletSpeed = 250;
+    private const int   ShootSpeed = 200;
 
     public Player(Game1 root, Vector2 position)
     {
@@ -64,6 +66,20 @@ public class Player
             _prevMouseState.LeftButton != ButtonState.Pressed;
         _prevMouseState = Mouse.GetState();
         return wasPressed;
+    }
+
+    private bool LeftMouseHeld(int interval)
+    {
+        long time = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        
+        if (_lastLeftButton + interval > time)
+            return false;
+
+        if (Mouse.GetState().LeftButton != ButtonState.Pressed) 
+            return false;
+        
+        _lastLeftButton = time;
+        return true;
     }
     
     private void HandleInputs(float delta)
@@ -121,7 +137,7 @@ public class Player
         }
         
         // shooting
-        if (LeftMousePressed())
+        if (LeftMouseHeld(ShootSpeed))
         {
             float xDiff = _cursorPosition.X - (_lastCannon ? _muzzle.Item1.X : _muzzle.Item2.X);
             float yDiff = _cursorPosition.Y - (_lastCannon ? _muzzle.Item1.Y : _muzzle.Item2.Y);
