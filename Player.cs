@@ -21,9 +21,9 @@ public class Player
 
     private readonly Texture2D[] _playerSprites = new Texture2D[4];
 
-    private const float MoveSpeed = 2;
-    private const float MaxSpeed = 3;
-    private const float TiltSpeed = 1.5F;
+    private const float MoveSpeed = 100;
+    private const float MaxSpeed = 100;
+    private const float TiltSpeed = 80;
     private const float Friction = 0.5F;
     private const float Pi = 3.14F;
     private const float BulletSpeed = 250;
@@ -151,7 +151,7 @@ public class Player
         HandleInputs(delta);
         
         // apply player velocity
-        _position += _velocity;
+        _position += _velocity * delta;
 
         // apply friction
         float sign = Math.Sign(_velocity.Length());

@@ -52,6 +52,9 @@ public class Game1 : Game
         ScaleY = graphics.PreferredBackBufferHeight / (float)TargetHeight;
         _scale = Matrix.CreateScale(new Vector3(ScaleX, ScaleY, 1));
 
+        graphics.SynchronizeWithVerticalRetrace = false;
+        IsFixedTimeStep = false;
+
         Debug = false;
     }
 
@@ -121,7 +124,7 @@ public class Game1 : Game
         if (Debug)
         {
             float frameRate = 1 / (float)gameTime.ElapsedGameTime.TotalSeconds;
-            _spriteBatch.Write(Math.Round(frameRate, 1).ToString(), new Vector2(0, 0), Color.Yellow);
+            _spriteBatch.Write(Math.Round(frameRate).ToString(), new Vector2(0, 0), Color.Yellow);
         }
         
         _spriteBatch.End();
