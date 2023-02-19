@@ -11,6 +11,8 @@ public class Bullet
 
     public Vector2 Position;
 
+    private Texture2D _rect;
+
     public Bullet(Game1 root, Vector2 position, float rotation, float speed)
     {
         _root = root;
@@ -21,12 +23,11 @@ public class Bullet
             (float)Math.Sin(rotation)
             ) * speed;
         
-        LoadContent();
-    }
-
-    private void LoadContent()
-    {
+        _rect = new Texture2D(_root.GraphicsDevice, 2, 2);
         
+        Color[] data = new Color[2 * 2];
+        for(int i = 0; i < data.Length; ++i) data[i] = Color.White;
+        _rect.SetData(data);
     }
 
     public void Update(GameTime gameTime)
@@ -38,12 +39,6 @@ public class Bullet
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        Texture2D rect = new(_root.GraphicsDevice, 2, 2);
-        
-        Color[] data = new Color[2 * 2];
-        for(int i = 0; i < data.Length; ++i) data[i] = Color.White;
-        rect.SetData(data);
-        
-        spriteBatch.Draw(rect, Position, Color.Green);
+        spriteBatch.Draw(_rect, Position, Color.Green);
     }
 }
