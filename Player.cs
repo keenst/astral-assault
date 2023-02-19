@@ -239,7 +239,7 @@ public class Player
         _crosshairSprite.Draw(spriteBatch, _cursorPosition);
 
         // draw debugging tools
-        if (!_root.Debug) return;
+        if (!_root.ShowDebug) return;
         
         Texture2D rect = new(_root.GraphicsDevice, 2, 2);
         

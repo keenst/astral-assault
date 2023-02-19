@@ -22,22 +22,29 @@ public class Game1 : Game
         Quarter = 480
     }
     
+    // render
     private SpriteBatch _spriteBatch;
+    private RenderTarget2D _renderTarget;
 
+    // entities
     private Player _player;
     public readonly List<Bullet> Bullets = new();
 
+    // display
     public const int TargetWidth = (int)Width.Quarter;
     public const int TargetHeight = (int)Height.Quarter;
     private readonly Matrix _scale;
     public readonly float ScaleX;
     public readonly float ScaleY;
 
-    public bool Debug;
-
+    // debug tools
+    public bool ShowDebug;
+    private float _frameRate;
+    private float _renderTime;
+    private long _lastStatUpdate;
+    private const int StatUpdateInterval = 300;
     private KeyboardState _prevKeyState = Keyboard.GetState();
 
-    private RenderTarget2D _renderTarget;
     public Game1()
     {
         // set up game class
@@ -55,7 +62,8 @@ public class Game1 : Game
         graphics.SynchronizeWithVerticalRetrace = false;
         IsFixedTimeStep = false;
 
-        Debug = false;
+        // set up debug tools
+        ShowDebug = false;
     }
 
     protected override void Initialize()
@@ -89,7 +97,7 @@ public class Game1 : Game
             Exit();
 
         if (Keyboard.GetState().IsKeyDown(Keys.F3) && !_prevKeyState.IsKeyDown(Keys.F3))
-            Debug = !Debug;
+            ShowDebug = !ShowDebug;
 
         _prevKeyState = Keyboard.GetState();
 
@@ -121,10 +129,27 @@ public class Game1 : Game
         _player.Draw(_spriteBatch);
         foreach (Bullet bullet in Bullets) bullet.Draw(_spriteBatch);
 
-        if (Debug)
+        if (ShowDebug)
         {
-            float frameRate = 1 / (float)gameTime.ElapsedGameTime.TotalSeconds;
-            _spriteBatch.Write(Math.Round(frameRate).ToString(), new Vector2(0, 0), Color.Yellow);
+            long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            
+            if (_lastStatUpdate + StatUpdateInterval < timeNow)
+            {
+                _frameRate = 1 / (float)gameTime.ElapsedGameTime.TotalSeconds;
+                _renderTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+
+                _lastStatUpdate = timeNow;
+            }
+            
+            _spriteBatch.Write(
+                Math.Round(_frameRate).ToString(), 
+                new Vector2(0, 0), 
+                Color.Yellow);
+            
+            _spriteBatch.Write(
+                _renderTime.ToString(), 
+                new Vector2(0, 9), 
+                Color.Yellow);
         }
         
         _spriteBatch.End();
