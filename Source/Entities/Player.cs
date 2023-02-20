@@ -129,11 +129,6 @@ public class Player : IInputEventListener
     {
         Point scale = new((int)_root.ScaleX, (int)_root.ScaleY);
         _cursorPosition = e.Position / scale;
-
-        float xDiff = _cursorPosition.X - _position.X;
-        float yDiff = _cursorPosition.Y - _position.Y;
-
-        _rotation = (float)Math.Atan2(yDiff, xDiff);
     }
 
     public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)
@@ -148,6 +143,12 @@ public class Player : IInputEventListener
     {
         _delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
+        // rotate player
+        float xDiff = _cursorPosition.X - _position.X;
+        float yDiff = _cursorPosition.Y - _position.Y;
+
+        _rotation = (float)Math.Atan2(yDiff, xDiff);
+        
         // apply player velocity
         _position += _velocity * _delta;
 
