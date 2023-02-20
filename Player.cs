@@ -2,22 +2,24 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using static astral_assault.InputEventSource;
 
 namespace astral_assault;
 
-public class Player
+public class Player : IInputEventListener
 {
     private readonly Game1 _root;
     private Sprite _sprite;
     private Sprite _crosshairSprite;
     private Vector2 _position;
     private Vector2 _velocity;
-    private Vector2 _cursorPosition;
+    private Point _cursorPosition;
     private float _rotation;
     private float _spriteRot;
     private Tuple<Vector2, Vector2> _muzzle;
     private bool _lastCannon;
-    private long _lastLeftButton;
+    private long _lastTimeFired;
+    private float _delta;
 
     private readonly Texture2D[] _playerSprites = new Texture2D[4];
 
@@ -38,6 +40,13 @@ public class Player
         LoadContent();
     }
 
+    public void StartListening(InputEventSource eventSource)
+    {
+        eventSource.KeyboardEvent += OnKeyboardEvent;
+        eventSource.MouseMoveEvent += OnMouseMoveEvent;
+        eventSource.MouseButtonEvent += OnMouseButtonEvent;
+    }
+
     private void LoadContent()
     {
         _playerSprites[0] = _root.Content.Load<Texture2D>("assets/player1");
@@ -50,108 +59,97 @@ public class Player
         _sprite = new Sprite(_playerSprites[0]);
         _crosshairSprite = new Sprite(crosshairSprite);
     }
-    
-    private bool Input(Keys key)
-    {
-        KeyboardState currentKeyboardState = Keyboard.GetState();
-        return currentKeyboardState.IsKeyDown(key);
-    }
 
-    private bool LeftMouseHeld(int interval)
-    {
-        long time = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        
-        if (_lastLeftButton + interval > time)
-            return false;
-
-        if (Mouse.GetState().LeftButton != ButtonState.Pressed) 
-            return false;
-        
-        _lastLeftButton = time;
-        return true;
-    }
-    
-    private void HandleInputs(float delta)
+    private void HandleMovement(int xAxis, int yAxis)
     {
         // acceleration and deceleration
         Vector2 forward = new Vector2(
             (float)Math.Cos(_rotation), 
             (float)Math.Sin(_rotation)
-            ) * MoveSpeed * delta;
-
-        if (Input(Keys.W))
-        {
-            _velocity = new Vector2(
-                Math.Clamp(_velocity.X + forward.X, -MaxSpeed, MaxSpeed),
-                Math.Clamp(_velocity.Y + forward.Y, -MaxSpeed, MaxSpeed));
-        }
-
-        if (Input(Keys.S))
-        {
-            _velocity = new Vector2(
-                Math.Clamp(_velocity.X - forward.X, -MaxSpeed, MaxSpeed),
-                Math.Clamp(_velocity.Y - forward.Y, -MaxSpeed, MaxSpeed));
-        }
+        ) * MoveSpeed * _delta;
+        
+        _velocity = new Vector2(
+            Math.Clamp(_velocity.X + forward.X * yAxis, -MaxSpeed, MaxSpeed),
+            Math.Clamp(_velocity.Y + forward.Y * yAxis, -MaxSpeed, MaxSpeed));
 
         // tilting
         Vector2 right = new Vector2(
             (float)Math.Cos(_rotation + Pi / 2), 
             (float)Math.Sin(_rotation + Pi / 2)
-            ) * TiltSpeed * delta;
-
-        if (Input(Keys.A))
-        {
-            _velocity = new Vector2(
-                Math.Clamp(_velocity.X - right.X, -MaxSpeed, MaxSpeed),
-                Math.Clamp(_velocity.Y - right.Y, -MaxSpeed, MaxSpeed));
-        }
-
-        if (Input(Keys.D))
-        {
-            _velocity = new Vector2(
-                Math.Clamp(_velocity.X + right.X, -MaxSpeed, MaxSpeed),
-                Math.Clamp(_velocity.Y + right.Y, -MaxSpeed, MaxSpeed));
-        }
-
-        // move crosshair to cursor position
-        MouseState mouseState = Mouse.GetState();
-
-        Vector2 mousePos = mouseState.Position.ToVector2();
-        _cursorPosition = new Vector2(mousePos.X / _root.ScaleX, mousePos.Y / _root.ScaleY);
-
-        {
-            float xDiff = _cursorPosition.X - _position.X;
-            float yDiff = _cursorPosition.Y - _position.Y;
-            _rotation = (float)Math.Atan2(yDiff, xDiff);
-        }
+        ) * TiltSpeed * _delta;
         
-        // shooting
-        if (LeftMouseHeld(ShootSpeed))
-        {
-            float xDiff = _cursorPosition.X - (_lastCannon ? _muzzle.Item1.X : _muzzle.Item2.X);
-            float yDiff = _cursorPosition.Y - (_lastCannon ? _muzzle.Item1.Y : _muzzle.Item2.Y);
+        _velocity = new Vector2(
+            Math.Clamp(_velocity.X - right.X * xAxis, -MaxSpeed, MaxSpeed),
+            Math.Clamp(_velocity.Y - right.Y * xAxis, -MaxSpeed, MaxSpeed));
+    }
 
-            float rot = (float)Math.Atan2(yDiff, xDiff);
+    private void HandleFiring()
+    {
+        long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        
+        if (_lastTimeFired + ShootSpeed > timeNow) return;
+
+        _lastTimeFired = timeNow;
+        
+        float xDiff = _cursorPosition.X - (_lastCannon ? _muzzle.Item1.X : _muzzle.Item2.X);
+        float yDiff = _cursorPosition.Y - (_lastCannon ? _muzzle.Item1.Y : _muzzle.Item2.Y);
+
+        float rot = (float)Math.Atan2(yDiff, xDiff);
             
-            _root.Bullets.Add(
-                new Bullet(
-                    _root, 
-                    _lastCannon ? _muzzle.Item1 : _muzzle.Item2, 
-                    rot, 
-                    BulletSpeed));
+        _root.Bullets.Add(
+            new Bullet(
+                _root, 
+                _lastCannon ? _muzzle.Item1 : _muzzle.Item2, 
+                rot, 
+                BulletSpeed));
             
-            _lastCannon = !_lastCannon;
+        _lastCannon = !_lastCannon;
+    }
+    
+    public void OnKeyboardEvent(object sender, KeyboardEventArgs e)
+    {
+        int xAxis = e.Key switch
+        {
+            Keys.D => 1,
+            Keys.A => -1,
+            _ => 0
+        };
+        
+        int yAxis = e.Key switch
+        {
+            Keys.W => 1,
+            Keys.S => -1,
+            _ => 0
+        };
+        
+        HandleMovement(xAxis, yAxis);
+    }
+
+    public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
+    {
+        Point scale = new((int)_root.ScaleX, (int)_root.ScaleY);
+        _cursorPosition = e.Position / scale;
+
+        float xDiff = _cursorPosition.X - _position.X;
+        float yDiff = _cursorPosition.Y - _position.Y;
+
+        _rotation = (float)Math.Atan2(yDiff, xDiff);
+    }
+
+    public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)
+    {
+        if (e.Button == MouseButtons.Left)
+        {
+            HandleFiring();
         }
     }
 
     public void Update(GameTime gameTime)
     {
-        float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
-        
-        HandleInputs(delta);
-        
+        _delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
         // apply player velocity
-        _position += _velocity * delta;
+        _position += _velocity * _delta;
 
         // apply friction
         float sign = Math.Sign(_velocity.Length());
@@ -161,7 +159,7 @@ public class Player
             float direction = (float)Math.Atan2(_velocity.Y, _velocity.X);
             
             _velocity -= 
-                new Vector2((float)Math.Cos(direction), (float)Math.Sin(direction)) * Friction * delta * sign;
+                new Vector2((float)Math.Cos(direction), (float)Math.Sin(direction)) * Friction * _delta * sign;
         }
         
         // wrap position
@@ -236,17 +234,17 @@ public class Player
         _sprite.Draw(spriteBatch, _position, _spriteRot, true);
 
         // draw crosshair sprite
-        _crosshairSprite.Draw(spriteBatch, _cursorPosition);
+        _crosshairSprite.Draw(spriteBatch, _cursorPosition.ToVector2());
 
         // draw debugging tools
         if (!_root.ShowDebug) return;
-        
+
         Texture2D rect = new(_root.GraphicsDevice, 2, 2);
-        
+
         Color[] data = new Color[2 * 2];
-        for(int i = 0; i < data.Length; ++i) data[i] = Color.White;
+        for (int i = 0; i < data.Length; ++i) data[i] = Color.White;
         rect.SetData(data);
-        
+
         spriteBatch.Draw(rect, _muzzle.Item1, Color.Red);
         spriteBatch.Draw(rect, _muzzle.Item2, Color.Red);
     }

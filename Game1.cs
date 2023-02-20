@@ -45,6 +45,8 @@ public class Game1 : Game
     private const int StatUpdateInterval = 300;
     private KeyboardState _prevKeyState = Keyboard.GetState();
 
+    private readonly InputEventSource _inputEventSource = new();
+    
     public Game1()
     {
         // set up game class
@@ -78,10 +80,11 @@ public class Game1 : Game
         
         // create player
         _player = new Player(this, new Vector2(TargetWidth / 2F, TargetHeight / 2F));
+        _player.StartListening(_inputEventSource);
         
         // initialize font renderer
         Text.Initialize(this);
-        
+
         base.Initialize();
     }
 
@@ -92,6 +95,8 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
+        _inputEventSource.Update();
+        
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
