@@ -79,8 +79,8 @@ public class Player : IInputEventListener
         ) * TiltSpeed * _delta;
         
         _velocity = new Vector2(
-            Math.Clamp(_velocity.X - right.X * xAxis, -MaxSpeed, MaxSpeed),
-            Math.Clamp(_velocity.Y - right.Y * xAxis, -MaxSpeed, MaxSpeed));
+            Math.Clamp(_velocity.X + right.X * xAxis, -MaxSpeed, MaxSpeed),
+            Math.Clamp(_velocity.Y + right.Y * xAxis, -MaxSpeed, MaxSpeed));
     }
 
     private void HandleFiring()
