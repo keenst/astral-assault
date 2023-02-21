@@ -8,9 +8,10 @@ namespace astral_assault;
 
 public class InputEventSource
 {
-    public event EventHandler<KeyboardEventArgs> 
-        KeyboardEvent, 
-        KeyboardPressedEvent;
+    public event EventHandler<KeyboardEventArgs>
+        KeyboardEvent,
+        KeyboardPressedEvent,
+        KeyboardReleasedEvent;
     
     public event EventHandler<MouseButtonEventArgs> 
         MouseButtonEvent, 
@@ -49,12 +50,17 @@ public class InputEventSource
         _prevKeysDown = _keysDown;
         _keysDown = Keyboard.GetState().GetPressedKeys().ToList();
 
+        foreach (Keys key in _prevKeysDown.Where(key => !_keysDown.Contains(key)))
+        {
+            KeyboardReleasedEvent?.Invoke(this, new KeyboardEventArgs(key));
+        }
+        
         if (_keysDown.Count == 0)
         {
             _prevKeysDown.Clear();
             return;
         }
-        
+
         foreach (Keys key in _keysDown)
         {
             KeyboardEvent?.Invoke(this, new KeyboardEventArgs(key));
