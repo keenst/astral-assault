@@ -20,6 +20,9 @@ public class Player : IInputEventListener
     private bool _lastCannon;
     private long _lastTimeFired;
     private float _delta;
+    private FlameRenderer _flameRenderer;
+    private Vector2 _thruster;
+    private bool _isThrusterOn;
 
     private readonly Texture2D[] _playerSprites = new Texture2D[4];
 
@@ -38,6 +41,8 @@ public class Player : IInputEventListener
         _rotation = Pi / 2;
         
         LoadContent();
+
+        _flameRenderer = new FlameRenderer(_root);
     }
 
     public void StartListening(InputEventSource eventSource)
@@ -45,6 +50,7 @@ public class Player : IInputEventListener
         eventSource.KeyboardEvent += OnKeyboardEvent;
         eventSource.MouseMoveEvent += OnMouseMoveEvent;
         eventSource.MouseButtonEvent += OnMouseButtonEvent;
+        eventSource.KeyboardReleasedEvent += OnKeyboardReleasedEvent;
     }
 
     private void LoadContent()
@@ -108,6 +114,13 @@ public class Player : IInputEventListener
     
     public void OnKeyboardEvent(object sender, KeyboardEventArgs e)
     {
+        if (e.Key == Keys.W && !_isThrusterOn)
+        {
+            _isThrusterOn = true;
+            _flameRenderer.Start();
+            return;
+        }
+        
         int xAxis = e.Key switch
         {
             Keys.D => 1,
@@ -123,6 +136,21 @@ public class Player : IInputEventListener
         };
         
         HandleMovement(xAxis, yAxis);
+    }
+
+    public void OnKeyboardReleasedEvent(object sender, KeyboardEventArgs e)
+    {
+        if (e.Key == Keys.W && _isThrusterOn)
+        {
+            _isThrusterOn = false;
+            DisableThruster();
+        }
+    }
+
+    private async void DisableThruster()
+    {
+        // TODO: remove _isThrusterOn variable?
+        _flameRenderer.Stop();
     }
 
     public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
@@ -143,6 +171,14 @@ public class Player : IInputEventListener
     {
         _delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
+        Vector2 forward = new(
+            (float)Math.Cos(_rotation),
+            (float)Math.Sin(_rotation)
+        );
+
+        float offset = forward.Length();
+        _flameRenderer.Update(_thruster, offset * _velocity.Length() / 20);
+        
         // rotate player
         float xDiff = _cursorPosition.X - _position.X;
         float yDiff = _cursorPosition.Y - _position.Y;
@@ -181,29 +217,44 @@ public class Player : IInputEventListener
         // rotate the points for the cannon muzzles
         Vector2 muzzle1;
         Vector2 muzzle2;
-        
-        const float x =  8;
-        const float y = 10;
 
         {
+            const float x = 8;
+            const float y = 10;
+
+            {
+                float rot = Pi / 8 * (float)Math.Round(_rotation / (Pi / 8));
+
+                float x2 = (float)(x * Math.Cos(rot) - y * Math.Sin(rot));
+                float y2 = (float)(y * Math.Cos(rot) + x * Math.Sin(rot));
+
+                muzzle1 = new Vector2(_position.X + x2, _position.Y + y2);
+            }
+
+            {
+                float rot = Pi / 8 * (float)Math.Round(_rotation / (Pi / 8));
+
+                float x2 = (float)(x * Math.Cos(rot) + y * Math.Sin(rot));
+                float y2 = (float)(-y * Math.Cos(rot) + x * Math.Sin(rot));
+
+                muzzle2 = new Vector2(_position.X + x2, _position.Y + y2);
+            }
+        }
+
+        _muzzle = new Tuple<Vector2, Vector2>(muzzle1, muzzle2);
+        
+        // rotate the point for the thruster
+        {
+            const float x = -10;
+            const float y = -1;
+            
             float rot = Pi / 8 * (float)Math.Round(_rotation / (Pi / 8));
 
             float x2 = (float)(x * Math.Cos(rot) - y * Math.Sin(rot));
             float y2 = (float)(y * Math.Cos(rot) + x * Math.Sin(rot));
 
-            muzzle1 = new Vector2(_position.X + x2, _position.Y + y2);
+            _thruster = new Vector2(_position.X + x2, _position.Y + y2);
         }
-
-        {
-            float rot = Pi / 8 * (float)Math.Round(_rotation / (Pi / 8));
-
-            float x2 = (float)(x * Math.Cos(rot) + y * Math.Sin(rot));
-            float y2 = (float)(-y * Math.Cos(rot) + x * Math.Sin(rot));
-
-            muzzle2 = new Vector2(_position.X + x2, _position.Y + y2);
-        }
-
-        _muzzle = new Tuple<Vector2, Vector2>(muzzle1, muzzle2);
         
         // sprite rotation
         {
@@ -231,6 +282,8 @@ public class Player : IInputEventListener
 
     public void Draw(SpriteBatch spriteBatch)
     {
+        _flameRenderer.Draw(spriteBatch);
+        
         // draw player sprite
         _sprite.Draw(spriteBatch, _position, _spriteRot, true);
 
@@ -248,5 +301,6 @@ public class Player : IInputEventListener
 
         spriteBatch.Draw(rect, _muzzle.Item1, Color.Red);
         spriteBatch.Draw(rect, _muzzle.Item2, Color.Red);
+        spriteBatch.Draw(rect, _thruster, Color.Blue);
     }
 }
