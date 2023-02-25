@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace astral_assault;
 
-public class Bullet
+public class Bullet : IUpdateEventListener
 {
     private readonly Game1 _root;
     private readonly Vector2 _velocity;
@@ -28,13 +28,13 @@ public class Bullet
         Color[] data = new Color[2 * 2];
         for(int i = 0; i < data.Length; ++i) data[i] = Color.White;
         _rect.SetData(data);
+
+        UpdateEventSource.UpdateEvent += OnUpdate;
     }
 
-    public void Update(GameTime gameTime)
+    public void OnUpdate(object sender, UpdateEventArgs e)
     {
-        float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-        Position += _velocity * delta;
+        Position += _velocity * e.DeltaTime;
     }
 
     public void Draw(SpriteBatch spriteBatch)
