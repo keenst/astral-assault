@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using static astral_assault.InputEventSource;
 
 namespace astral_assault;
 
@@ -38,13 +37,15 @@ public class Player : IInputEventListener, IUpdateEventListener
         _rotation = Pi / 2;
         
         LoadContent();
+        
+        StartListening();
     }
 
-    public void StartListening(InputEventSource inputEventSource)
+    private void StartListening()
     {
-        inputEventSource.KeyboardEvent += OnKeyboardEvent;
-        inputEventSource.MouseMoveEvent += OnMouseMoveEvent;
-        inputEventSource.MouseButtonEvent += OnMouseButtonEvent;
+        InputEventSource.KeyboardEvent += OnKeyboardEvent;
+        InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
+        InputEventSource.MouseButtonEvent += OnMouseButtonEvent;
         UpdateEventSource.UpdateEvent += OnUpdate;
     }
 
@@ -134,7 +135,7 @@ public class Player : IInputEventListener, IUpdateEventListener
 
     public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)
     {
-        if (e.Button == MouseButtons.Left)
+        if (e.Button == InputEventSource.MouseButtons.Left)
         {
             HandleFiring();
         }
