@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace astral_assault;
 
-public class InputEventSource
+public class InputEventSource : IUpdateEventListener
 {
     public event EventHandler<KeyboardEventArgs> 
         KeyboardEvent, 
@@ -36,8 +36,13 @@ public class InputEventSource
         Side1,
         Side2
     }
-    
-    public void Update()
+
+    public InputEventSource()
+    {
+        UpdateEventSource.UpdateEvent += OnUpdate;
+    }
+
+    public void OnUpdate(object sender, UpdateEventArgs e)
     {
         HandleKeyboard();
         HandleMouseButtons();

@@ -6,7 +6,7 @@ using static astral_assault.InputEventSource;
 
 namespace astral_assault;
 
-public class Player : IInputEventListener
+public class Player : IInputEventListener, IUpdateEventListener
 {
     private readonly Game1 _root;
     private Sprite _sprite;
@@ -40,11 +40,12 @@ public class Player : IInputEventListener
         LoadContent();
     }
 
-    public void StartListening(InputEventSource eventSource)
+    public void StartListening(InputEventSource inputEventSource)
     {
-        eventSource.KeyboardEvent += OnKeyboardEvent;
-        eventSource.MouseMoveEvent += OnMouseMoveEvent;
-        eventSource.MouseButtonEvent += OnMouseButtonEvent;
+        inputEventSource.KeyboardEvent += OnKeyboardEvent;
+        inputEventSource.MouseMoveEvent += OnMouseMoveEvent;
+        inputEventSource.MouseButtonEvent += OnMouseButtonEvent;
+        UpdateEventSource.UpdateEvent += OnUpdate;
     }
 
     private void LoadContent()
@@ -139,9 +140,9 @@ public class Player : IInputEventListener
         }
     }
 
-    public void Update(GameTime gameTime)
+    public void OnUpdate(object sender, UpdateEventArgs e)
     {
-        _delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        _delta = e.DeltaTime;
 
         // rotate player
         float xDiff = _cursorPosition.X - _position.X;

@@ -46,7 +46,7 @@ public class Game1 : Game
     private KeyboardState _prevKeyState = Keyboard.GetState();
 
     private readonly InputEventSource _inputEventSource = new();
-    
+
     public Game1()
     {
         // set up game class
@@ -95,8 +95,6 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
-        _inputEventSource.Update();
-        
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
@@ -106,18 +104,15 @@ public class Game1 : Game
 
         _prevKeyState = Keyboard.GetState();
 
-        _player.Update(gameTime);
+        UpdateEventSource.Update(gameTime);
         
         for (int i = 0; i < Bullets.Count; i++)
         {
-            if (Bullets[i].Position.X is > TargetWidth or < 0 ||
-                Bullets[i].Position.Y is > TargetHeight or < 0)
-            {
-                Bullets.RemoveAt(i);
-                return;
-            }
+            if (Bullets[i].Position.X is <= TargetWidth and >= 0 &&
+                Bullets[i].Position.Y is <= TargetHeight and >= 0) continue;
             
-            Bullets[i].Update(gameTime);
+            Bullets.RemoveAt(i);
+            return;
         }
 
         base.Update(gameTime);
