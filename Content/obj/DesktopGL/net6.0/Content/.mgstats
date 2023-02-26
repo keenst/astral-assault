@@ -2,7 +2,7 @@ Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Siz
 "E:/Projekt/rider/astral-assault/Content/assets/asteroid1.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/asteroid1.xnb","TextureProcessor","Texture2DContent",1875,16469,0.1170173
 "E:/Projekt/rider/astral-assault/Content/assets/crosshair.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/crosshair.xnb","TextureProcessor","Texture2DContent",170,1109,0.1034585
 "E:/Projekt/rider/astral-assault/Content/assets/font.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/font.xnb","TextureProcessor","Texture2DContent",676,16885,0.1337632
-"E:/Projekt/rider/astral-assault/Content/assets/player1.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/player1.xnb","TextureProcessor","Texture2DContent",514,4181,0.1424789
-"E:/Projekt/rider/astral-assault/Content/assets/player2.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/player2.xnb","TextureProcessor","Texture2DContent",592,4181,0.1035415
+"E:/Projekt/rider/astral-assault/Content/assets/player1.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/player1.xnb","TextureProcessor","Texture2DContent",514,4181,0.1031753
+"E:/Projekt/rider/astral-assault/Content/assets/player2.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/player2.xnb","TextureProcessor","Texture2DContent",592,4181,0.000997
 "E:/Projekt/rider/astral-assault/Content/assets/player3.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/player3.xnb","TextureProcessor","Texture2DContent",633,4181,0.0013984
-"E:/Projekt/rider/astral-assault/Content/assets/player4.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/player4.xnb","TextureProcessor","Texture2DContent",612,4181,0.0017523
+"E:/Projekt/rider/astral-assault/Content/assets/player4.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/player4.xnb","TextureProcessor","Texture2DContent",612,4181,0.0009477
