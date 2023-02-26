@@ -2,11 +2,10 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using static astral_assault.InputEventSource;
 
 namespace astral_assault;
 
-public class Player : IInputEventListener
+public class Player : IInputEventListener, IUpdateEventListener
 {
     private readonly Game1 _root;
     private Sprite _sprite;
@@ -38,13 +37,16 @@ public class Player : IInputEventListener
         _rotation = Pi / 2;
         
         LoadContent();
+        
+        StartListening();
     }
 
-    public void StartListening(InputEventSource eventSource)
+    private void StartListening()
     {
-        eventSource.KeyboardEvent += OnKeyboardEvent;
-        eventSource.MouseMoveEvent += OnMouseMoveEvent;
-        eventSource.MouseButtonEvent += OnMouseButtonEvent;
+        InputEventSource.KeyboardEvent += OnKeyboardEvent;
+        InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
+        InputEventSource.MouseButtonEvent += OnMouseButtonEvent;
+        UpdateEventSource.UpdateEvent += OnUpdate;
     }
 
     private void LoadContent()
@@ -133,15 +135,15 @@ public class Player : IInputEventListener
 
     public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)
     {
-        if (e.Button == MouseButtons.Left)
+        if (e.Button == InputEventSource.MouseButtons.Left)
         {
             HandleFiring();
         }
     }
 
-    public void Update(GameTime gameTime)
+    public void OnUpdate(object sender, UpdateEventArgs e)
     {
-        _delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        _delta = e.DeltaTime;
 
         // rotate player
         float xDiff = _cursorPosition.X - _position.X;

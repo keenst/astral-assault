@@ -29,6 +29,7 @@ public class Game1 : Game
     // entities
     private Player _player;
     public readonly List<Bullet> Bullets = new();
+    private Asteroid _asteroid;
 
     // display
     public const int TargetWidth = (int)Width.Quarter;
@@ -45,8 +46,6 @@ public class Game1 : Game
     private const int StatUpdateInterval = 300;
     private KeyboardState _prevKeyState = Keyboard.GetState();
 
-    private readonly InputEventSource _inputEventSource = new();
-    
     public Game1()
     {
         // set up game class
@@ -80,11 +79,11 @@ public class Game1 : Game
         
         // create player
         _player = new Player(this, new Vector2(TargetWidth / 2F, TargetHeight / 2F));
-        _player.StartListening(_inputEventSource);
+        _asteroid = new Asteroid(this, new Vector2(TargetWidth / 2F, TargetHeight / 2F));
         
-        // initialize font renderer
         Text.Initialize(this);
-
+        InputEventSource.Initialize();
+        
         base.Initialize();
     }
 
@@ -95,8 +94,6 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
-        _inputEventSource.Update();
-        
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
@@ -106,18 +103,15 @@ public class Game1 : Game
 
         _prevKeyState = Keyboard.GetState();
 
-        _player.Update(gameTime);
+        UpdateEventSource.Update(gameTime);
         
         for (int i = 0; i < Bullets.Count; i++)
         {
-            if (Bullets[i].Position.X is > TargetWidth or < 0 ||
-                Bullets[i].Position.Y is > TargetHeight or < 0)
-            {
-                Bullets.RemoveAt(i);
-                return;
-            }
+            if (Bullets[i].Position.X is <= TargetWidth and >= 0 &&
+                Bullets[i].Position.Y is <= TargetHeight and >= 0) continue;
             
-            Bullets[i].Update(gameTime);
+            Bullets.RemoveAt(i);
+            return;
         }
 
         base.Update(gameTime);
@@ -133,7 +127,8 @@ public class Game1 : Game
         _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap);
         _player.Draw(_spriteBatch);
         foreach (Bullet bullet in Bullets) bullet.Draw(_spriteBatch);
-
+        _asteroid.Draw(_spriteBatch);
+        
         if (ShowDebug)
         {
             long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
