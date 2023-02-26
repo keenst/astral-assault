@@ -27,9 +27,8 @@ public class Game1 : Game
     private RenderTarget2D _renderTarget;
 
     // entities
-    private Player _player;
+    public readonly List<Entity> Entities = new();
     public readonly List<Bullet> Bullets = new();
-    private Asteroid _asteroid;
 
     // display
     public const int TargetWidth = (int)Width.Quarter;
@@ -77,9 +76,9 @@ public class Game1 : Game
             GraphicsDevice.PresentationParameters.BackBufferFormat,
             DepthFormat.Depth24);
         
-        // create player
-        _player = new Player(this, new Vector2(TargetWidth / 2F, TargetHeight / 2F));
-        _asteroid = new Asteroid(this, new Vector2(TargetWidth / 2F, TargetHeight / 2F));
+        Entities.Add(new Player(this, new Vector2(TargetWidth / 2F, TargetHeight / 2F)));
+        Entities.Add(new Asteroid(this, new Vector2(TargetWidth / 3F, TargetHeight / 3F)));
+        Entities.Add(new Crosshair(this, new Vector2(0, 0)));
         
         Text.Initialize(this);
         InputEventSource.Initialize();
@@ -125,9 +124,8 @@ public class Game1 : Game
         GraphicsDevice.Clear(Color.DarkGray);
         
         _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap);
-        _player.Draw(_spriteBatch);
+        foreach (Entity e in Entities) e.Draw(_spriteBatch);
         foreach (Bullet bullet in Bullets) bullet.Draw(_spriteBatch);
-        _asteroid.Draw(_spriteBatch);
         
         if (ShowDebug)
         {

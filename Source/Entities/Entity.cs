@@ -5,11 +5,11 @@ namespace astral_assault;
 
 public class Entity : IUpdateEventListener
 {
-    private Vector2 _position;
-    private Vector2 _velocity;
-    private float _delta;
+    protected Vector2 _position;
     protected float _rotation;
     protected SpriteRenderer _spriteRenderer;
+    
+    private float _delta;
 
     public Entity(Vector2 position)
     {

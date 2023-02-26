@@ -5,22 +5,15 @@ using Microsoft.Xna.Framework.Input;
 
 namespace astral_assault;
 
-public class Player : IInputEventListener, IUpdateEventListener
+public class Player : Entity, IInputEventListener
 {
     private readonly Game1 _root;
-    private Sprite _sprite;
-    private Sprite _crosshairSprite;
-    private Vector2 _position;
     private Vector2 _velocity;
     private Point _cursorPosition;
-    private float _rotation;
-    private float _spriteRot;
     private Tuple<Vector2, Vector2> _muzzle;
     private bool _lastCannon;
     private long _lastTimeFired;
     private float _delta;
-
-    private readonly Texture2D[] _playerSprites = new Texture2D[4];
 
     private const float MoveSpeed = 100;
     private const float MaxSpeed = 100;
@@ -30,15 +23,30 @@ public class Player : IInputEventListener, IUpdateEventListener
     private const float BulletSpeed = 250;
     private const int   ShootSpeed = 200;
 
-    public Player(Game1 root, Vector2 position)
+    public Player(Game1 root, Vector2 position) :base(position)
     {
         _root = root;
         _position = position;
         _rotation = Pi / 2;
         
-        LoadContent();
+        InitSpriteRenderer();
         
         StartListening();
+    }
+
+    private void InitSpriteRenderer()
+    {
+        Texture2D spriteSheet = _root.Content.Load<Texture2D>("assets/player");
+        
+        Frame frame = new(
+            new Rectangle(0, 0, 32, 32),
+            new Rectangle(32, 0, 32, 32),
+            new Rectangle(64, 0, 32, 32),
+            new Rectangle(96, 0, 32, 32));
+
+        Animation animation = new(new[] { frame }, true);
+
+        _spriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation });
     }
 
     private void StartListening()
@@ -46,20 +54,6 @@ public class Player : IInputEventListener, IUpdateEventListener
         InputEventSource.KeyboardEvent += OnKeyboardEvent;
         InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
         InputEventSource.MouseButtonEvent += OnMouseButtonEvent;
-        UpdateEventSource.UpdateEvent += OnUpdate;
-    }
-
-    private void LoadContent()
-    {
-        _playerSprites[0] = _root.Content.Load<Texture2D>("assets/player1");
-        _playerSprites[1] = _root.Content.Load<Texture2D>("assets/player2");
-        _playerSprites[2] = _root.Content.Load<Texture2D>("assets/player3");
-        _playerSprites[3] = _root.Content.Load<Texture2D>("assets/player4");
-
-        Texture2D crosshairSprite = _root.Content.Load<Texture2D>("assets/crosshair");
-
-        _sprite = new Sprite(_playerSprites[0]);
-        _crosshairSprite = new Sprite(crosshairSprite);
     }
 
     private void HandleMovement(int xAxis, int yAxis)
@@ -141,7 +135,7 @@ public class Player : IInputEventListener, IUpdateEventListener
         }
     }
 
-    public void OnUpdate(object sender, UpdateEventArgs e)
+    public override void OnUpdate(object sender, UpdateEventArgs e)
     {
         _delta = e.DeltaTime;
 
@@ -206,49 +200,5 @@ public class Player : IInputEventListener, IUpdateEventListener
         }
 
         _muzzle = new Tuple<Vector2, Vector2>(muzzle1, muzzle2);
-        
-        // sprite rotation
-        {
-            int rot = (int)Math.Round(_rotation / (Pi / 8));
-        
-            if (rot % 4 == 0)
-            {
-                _sprite = new Sprite(_playerSprites[0]);
-                _spriteRot = Pi / 8 * rot;
-                return;
-            }
-
-            _spriteRot = _rotation switch
-            {
-                >= 0         and < Pi / 2    => 0,
-                >= Pi / 2    and < Pi        => Pi / 2,
-                <= 0         and > -Pi / 2   => -Pi / 2,
-                <= -Pi / 2   and > -Pi       => -Pi,
-                _ => 0
-            };
-
-            _sprite = new Sprite(_playerSprites[rot.Mod(4)]);
-        }
-    }
-
-    public void Draw(SpriteBatch spriteBatch)
-    {
-        // draw player sprite
-        _sprite.Draw(spriteBatch, _position, _spriteRot, true);
-
-        // draw crosshair sprite
-        _crosshairSprite.Draw(spriteBatch, _cursorPosition.ToVector2());
-
-        // draw debugging tools
-        if (!_root.ShowDebug) return;
-
-        Texture2D rect = new(_root.GraphicsDevice, 2, 2);
-
-        Color[] data = new Color[2 * 2];
-        for (int i = 0; i < data.Length; ++i) data[i] = Color.White;
-        rect.SetData(data);
-
-        spriteBatch.Draw(rect, _muzzle.Item1, Color.Red);
-        spriteBatch.Draw(rect, _muzzle.Item2, Color.Red);
     }
 }
