@@ -6,10 +6,10 @@ namespace astral_assault;
 
 public class SpriteRenderer : IUpdateEventListener
 {
-    private Animation[] _animations;
-    private Texture2D _spriteSheet;
+    private readonly Animation[] _animations;
+    private readonly Texture2D _spriteSheet;
 
-    private Animation _activeAnimation;
+    private readonly Animation _activeAnimation;
     private int _activeFrame;
 
     private long _lastFrameUpdate;
@@ -49,7 +49,17 @@ public class SpriteRenderer : IUpdateEventListener
     private void DrawStatic(SpriteBatch spriteBatch, Vector2 position)
     {
         Rectangle source = _activeAnimation.Frames[_activeFrame].Source;
-        spriteBatch.Draw(_spriteSheet, position, source, Color.White);
+        
+        spriteBatch.Draw(
+            _spriteSheet, 
+            position, 
+            source, 
+            Color.White, 
+            0, 
+            new Vector2(source.Height / 2F, source.Width / 2F),
+            new Vector2(1, 1),
+            SpriteEffects.None,
+            0);
     }
 
     private void DrawRotatable(SpriteBatch spriteBatch, Vector2 position, float rotation)
