@@ -28,6 +28,7 @@ public class Game1 : Game
 
     // entities
     public readonly List<Entity> Entities = new();
+    public CollisionSystem CollisionSystem = new();
 
     // display
     public const int TargetWidth = (int)Width.Quarter;
@@ -81,7 +82,7 @@ public class Game1 : Game
         
         Text.Initialize(this);
         InputEventSource.Initialize();
-        
+
         base.Initialize();
     }
 
@@ -137,6 +138,24 @@ public class Game1 : Game
                 _renderTime.ToString(), 
                 new Vector2(0, 9), 
                 Color.Yellow);
+
+            if (CollisionSystem.Colliders.Count > 0)
+            {
+                foreach (Collider collider in CollisionSystem.Colliders)
+                {
+                    int width = collider.Rectangle.Width;
+                    int height = collider.Rectangle.Height;
+                    
+                    Texture2D rect = new(GraphicsDevice, width, height);
+
+                    Color[] data = new Color[width * height];
+                    
+                    Array.Fill(data, new Color(Color.White, 0.2F));
+                    rect.SetData(data);
+
+                    _spriteBatch.Draw(rect, collider.Rectangle.Location.ToVector2(), Color.Blue);
+                }
+            }
         }
         
         _spriteBatch.End();

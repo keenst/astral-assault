@@ -7,7 +7,6 @@ namespace astral_assault;
 
 public class Player : Entity, IInputEventListener
 {
-    private readonly Game1 _root;
     private Point _cursorPosition;
     private Tuple<Vector2, Vector2> _muzzle;
     private bool _lastCannon;
@@ -22,20 +21,27 @@ public class Player : Entity, IInputEventListener
     private const float BulletSpeed = 250;
     private const int   ShootSpeed = 200;
 
-    public Player(Game1 root, Vector2 position) :base(position)
+    public Player(Game1 root, Vector2 position) :base(root, position)
     {
-        _root = root;
+        Root = root;
         Position = position;
         Rotation = Pi / 2;
         
         InitSpriteRenderer();
         
         StartListening();
+        
+        Collider = new Collider(
+            this, 
+            new Rectangle(
+                new Point((int)Position.X - 12, (int)Position.Y - 12), 
+                new Point(24, 24)));
+        Root.CollisionSystem.AddCollider(Collider);
     }
 
     private void InitSpriteRenderer()
     {
-        Texture2D spriteSheet = _root.Content.Load<Texture2D>("assets/player");
+        Texture2D spriteSheet = Root.Content.Load<Texture2D>("assets/player");
         
         Frame frame = new(
             new Rectangle(0, 0, 32, 32),
@@ -91,9 +97,9 @@ public class Player : Entity, IInputEventListener
 
         float rot = (float)Math.Atan2(yDiff, xDiff);
             
-        _root.Entities.Add(
+        Root.Entities.Add(
             new Bullet(
-                _root, 
+                Root, 
                 _lastCannon ? _muzzle.Item1 : _muzzle.Item2, 
                 rot, 
                 BulletSpeed));
@@ -122,7 +128,7 @@ public class Player : Entity, IInputEventListener
 
     public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
     {
-        Point scale = new((int)_root.ScaleX, (int)_root.ScaleY);
+        Point scale = new((int)Root.ScaleX, (int)Root.ScaleY);
         _cursorPosition = e.Position / scale;
     }
 
@@ -146,6 +152,7 @@ public class Player : Entity, IInputEventListener
         
         // apply player velocity
         Position += Velocity * _delta;
+        Collider.SetPosition(Position.ToPoint());
 
         // apply friction
         float sign = Math.Sign(Velocity.Length());
