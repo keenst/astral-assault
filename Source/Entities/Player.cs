@@ -5,22 +5,14 @@ using Microsoft.Xna.Framework.Input;
 
 namespace astral_assault;
 
-public class Player : IInputEventListener, IUpdateEventListener
+public class Player : Entity, IInputEventListener
 {
     private readonly Game1 _root;
-    private Sprite _sprite;
-    private Sprite _crosshairSprite;
-    private Vector2 _position;
-    private Vector2 _velocity;
     private Point _cursorPosition;
-    private float _rotation;
-    private float _spriteRot;
     private Tuple<Vector2, Vector2> _muzzle;
     private bool _lastCannon;
     private long _lastTimeFired;
     private float _delta;
-
-    private readonly Texture2D[] _playerSprites = new Texture2D[4];
 
     private const float MoveSpeed = 100;
     private const float MaxSpeed = 100;
@@ -30,15 +22,30 @@ public class Player : IInputEventListener, IUpdateEventListener
     private const float BulletSpeed = 250;
     private const int   ShootSpeed = 200;
 
-    public Player(Game1 root, Vector2 position)
+    public Player(Game1 root, Vector2 position) :base(position)
     {
         _root = root;
-        _position = position;
-        _rotation = Pi / 2;
+        Position = position;
+        Rotation = Pi / 2;
         
-        LoadContent();
+        InitSpriteRenderer();
         
         StartListening();
+    }
+
+    private void InitSpriteRenderer()
+    {
+        Texture2D spriteSheet = _root.Content.Load<Texture2D>("assets/player");
+        
+        Frame frame = new(
+            new Rectangle(0, 0, 32, 32),
+            new Rectangle(32, 0, 32, 32),
+            new Rectangle(64, 0, 32, 32),
+            new Rectangle(96, 0, 32, 32));
+
+        Animation animation = new(new[] { frame }, true);
+
+        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation });
     }
 
     private void StartListening()
@@ -46,43 +53,29 @@ public class Player : IInputEventListener, IUpdateEventListener
         InputEventSource.KeyboardEvent += OnKeyboardEvent;
         InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
         InputEventSource.MouseButtonEvent += OnMouseButtonEvent;
-        UpdateEventSource.UpdateEvent += OnUpdate;
-    }
-
-    private void LoadContent()
-    {
-        _playerSprites[0] = _root.Content.Load<Texture2D>("assets/player1");
-        _playerSprites[1] = _root.Content.Load<Texture2D>("assets/player2");
-        _playerSprites[2] = _root.Content.Load<Texture2D>("assets/player3");
-        _playerSprites[3] = _root.Content.Load<Texture2D>("assets/player4");
-
-        Texture2D crosshairSprite = _root.Content.Load<Texture2D>("assets/crosshair");
-
-        _sprite = new Sprite(_playerSprites[0]);
-        _crosshairSprite = new Sprite(crosshairSprite);
     }
 
     private void HandleMovement(int xAxis, int yAxis)
     {
         // acceleration and deceleration
         Vector2 forward = new Vector2(
-            (float)Math.Cos(_rotation), 
-            (float)Math.Sin(_rotation)
+            (float)Math.Cos(Rotation), 
+            (float)Math.Sin(Rotation)
         ) * MoveSpeed * _delta;
         
-        _velocity = new Vector2(
-            Math.Clamp(_velocity.X + forward.X * yAxis, -MaxSpeed, MaxSpeed),
-            Math.Clamp(_velocity.Y + forward.Y * yAxis, -MaxSpeed, MaxSpeed));
+        Velocity = new Vector2(
+            Math.Clamp(Velocity.X + forward.X * yAxis, -MaxSpeed, MaxSpeed),
+            Math.Clamp(Velocity.Y + forward.Y * yAxis, -MaxSpeed, MaxSpeed));
 
         // tilting
         Vector2 right = new Vector2(
-            (float)Math.Cos(_rotation + Pi / 2), 
-            (float)Math.Sin(_rotation + Pi / 2)
+            (float)Math.Cos(Rotation + Pi / 2), 
+            (float)Math.Sin(Rotation + Pi / 2)
         ) * TiltSpeed * _delta;
         
-        _velocity = new Vector2(
-            Math.Clamp(_velocity.X + right.X * xAxis, -MaxSpeed, MaxSpeed),
-            Math.Clamp(_velocity.Y + right.Y * xAxis, -MaxSpeed, MaxSpeed));
+        Velocity = new Vector2(
+            Math.Clamp(Velocity.X + right.X * xAxis, -MaxSpeed, MaxSpeed),
+            Math.Clamp(Velocity.Y + right.Y * xAxis, -MaxSpeed, MaxSpeed));
     }
 
     private void HandleFiring()
@@ -98,7 +91,7 @@ public class Player : IInputEventListener, IUpdateEventListener
 
         float rot = (float)Math.Atan2(yDiff, xDiff);
             
-        _root.Bullets.Add(
+        _root.Entities.Add(
             new Bullet(
                 _root, 
                 _lastCannon ? _muzzle.Item1 : _muzzle.Item2, 
@@ -141,43 +134,43 @@ public class Player : IInputEventListener, IUpdateEventListener
         }
     }
 
-    public void OnUpdate(object sender, UpdateEventArgs e)
+    public override void OnUpdate(object sender, UpdateEventArgs e)
     {
         _delta = e.DeltaTime;
 
         // rotate player
-        float xDiff = _cursorPosition.X - _position.X;
-        float yDiff = _cursorPosition.Y - _position.Y;
+        float xDiff = _cursorPosition.X - Position.X;
+        float yDiff = _cursorPosition.Y - Position.Y;
 
-        _rotation = (float)Math.Atan2(yDiff, xDiff);
+        Rotation = (float)Math.Atan2(yDiff, xDiff);
         
         // apply player velocity
-        _position += _velocity * _delta;
+        Position += Velocity * _delta;
 
         // apply friction
-        float sign = Math.Sign(_velocity.Length());
+        float sign = Math.Sign(Velocity.Length());
 
         if (sign != 0)
         {
-            float direction = (float)Math.Atan2(_velocity.Y, _velocity.X);
+            float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
             
-            _velocity -= 
+            Velocity -= 
                 new Vector2((float)Math.Cos(direction), (float)Math.Sin(direction)) * Friction * _delta * sign;
         }
         
         // wrap position
-        _position.X = _position.X switch
+        Position.X = Position.X switch
         {
             < -16 => Game1.TargetWidth - 16,
             > Game1.TargetWidth + 16 => 16,
-            _ => _position.X
+            _ => Position.X
         };
 
-        _position.Y = _position.Y switch
+        Position.Y = Position.Y switch
         {
             < -16 => Game1.TargetHeight - 16,
             > Game1.TargetHeight + 16 => 16,
-            _ => _position.Y
+            _ => Position.Y
         };
         
         // rotate the points for the cannon muzzles
@@ -188,67 +181,23 @@ public class Player : IInputEventListener, IUpdateEventListener
         const float y = 10;
 
         {
-            float rot = Pi / 8 * (float)Math.Round(_rotation / (Pi / 8));
+            float rot = Pi / 8 * (float)Math.Round(Rotation / (Pi / 8));
 
             float x2 = (float)(x * Math.Cos(rot) - y * Math.Sin(rot));
             float y2 = (float)(y * Math.Cos(rot) + x * Math.Sin(rot));
 
-            muzzle1 = new Vector2(_position.X + x2, _position.Y + y2);
+            muzzle1 = new Vector2(Position.X + x2, Position.Y + y2);
         }
 
         {
-            float rot = Pi / 8 * (float)Math.Round(_rotation / (Pi / 8));
+            float rot = Pi / 8 * (float)Math.Round(Rotation / (Pi / 8));
 
             float x2 = (float)(x * Math.Cos(rot) + y * Math.Sin(rot));
             float y2 = (float)(-y * Math.Cos(rot) + x * Math.Sin(rot));
 
-            muzzle2 = new Vector2(_position.X + x2, _position.Y + y2);
+            muzzle2 = new Vector2(Position.X + x2, Position.Y + y2);
         }
 
         _muzzle = new Tuple<Vector2, Vector2>(muzzle1, muzzle2);
-        
-        // sprite rotation
-        {
-            int rot = (int)Math.Round(_rotation / (Pi / 8));
-        
-            if (rot % 4 == 0)
-            {
-                _sprite = new Sprite(_playerSprites[0]);
-                _spriteRot = Pi / 8 * rot;
-                return;
-            }
-
-            _spriteRot = _rotation switch
-            {
-                >= 0         and < Pi / 2    => 0,
-                >= Pi / 2    and < Pi        => Pi / 2,
-                <= 0         and > -Pi / 2   => -Pi / 2,
-                <= -Pi / 2   and > -Pi       => -Pi,
-                _ => 0
-            };
-
-            _sprite = new Sprite(_playerSprites[rot.Mod(4)]);
-        }
-    }
-
-    public void Draw(SpriteBatch spriteBatch)
-    {
-        // draw player sprite
-        _sprite.Draw(spriteBatch, _position, _spriteRot, true);
-
-        // draw crosshair sprite
-        _crosshairSprite.Draw(spriteBatch, _cursorPosition.ToVector2());
-
-        // draw debugging tools
-        if (!_root.ShowDebug) return;
-
-        Texture2D rect = new(_root.GraphicsDevice, 2, 2);
-
-        Color[] data = new Color[2 * 2];
-        for (int i = 0; i < data.Length; ++i) data[i] = Color.White;
-        rect.SetData(data);
-
-        spriteBatch.Draw(rect, _muzzle.Item1, Color.Red);
-        spriteBatch.Draw(rect, _muzzle.Item2, Color.Red);
     }
 }
