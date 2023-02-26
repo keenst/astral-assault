@@ -29,6 +29,7 @@ public class Game1 : Game
     // entities
     private Player _player;
     public readonly List<Bullet> Bullets = new();
+    private Asteroid _asteroid;
 
     // display
     public const int TargetWidth = (int)Width.Quarter;
@@ -78,7 +79,8 @@ public class Game1 : Game
         
         // create player
         _player = new Player(this, new Vector2(TargetWidth / 2F, TargetHeight / 2F));
-
+        _asteroid = new Asteroid(this, new Vector2(TargetWidth / 2F, TargetHeight / 2F));
+        
         Text.Initialize(this);
         InputEventSource.Initialize();
         
@@ -125,7 +127,8 @@ public class Game1 : Game
         _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap);
         _player.Draw(_spriteBatch);
         foreach (Bullet bullet in Bullets) bullet.Draw(_spriteBatch);
-
+        _asteroid.Draw(_spriteBatch);
+        
         if (ShowDebug)
         {
             long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
