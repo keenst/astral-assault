@@ -5,15 +5,16 @@ namespace astral_assault;
 
 public class Entity : IUpdateEventListener
 {
-    protected Vector2 _position;
-    protected float _rotation;
-    protected SpriteRenderer _spriteRenderer;
+    protected Vector2 Position;
+    protected Vector2 Velocity;
+    protected float Rotation;
+    protected SpriteRenderer SpriteRenderer;
     
     private float _delta;
 
     public Entity(Vector2 position)
     {
-        _position = position;
+        Position = position;
         UpdateEventSource.UpdateEvent += OnUpdate;
     }
     
@@ -24,6 +25,6 @@ public class Entity : IUpdateEventListener
     
     public void Draw(SpriteBatch spriteBatch)
     {
-        _spriteRenderer.Draw(spriteBatch, _position, _rotation);
+        SpriteRenderer.Draw(spriteBatch, Position, Rotation);
     }
 }

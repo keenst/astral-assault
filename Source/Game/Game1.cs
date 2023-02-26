@@ -28,7 +28,6 @@ public class Game1 : Game
 
     // entities
     public readonly List<Entity> Entities = new();
-    public readonly List<Bullet> Bullets = new();
 
     // display
     public const int TargetWidth = (int)Width.Quarter;
@@ -103,15 +102,6 @@ public class Game1 : Game
         _prevKeyState = Keyboard.GetState();
 
         UpdateEventSource.Update(gameTime);
-        
-        for (int i = 0; i < Bullets.Count; i++)
-        {
-            if (Bullets[i].Position.X is <= TargetWidth and >= 0 &&
-                Bullets[i].Position.Y is <= TargetHeight and >= 0) continue;
-            
-            Bullets.RemoveAt(i);
-            return;
-        }
 
         base.Update(gameTime);
     }
@@ -125,8 +115,7 @@ public class Game1 : Game
         
         _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap);
         foreach (Entity e in Entities) e.Draw(_spriteBatch);
-        foreach (Bullet bullet in Bullets) bullet.Draw(_spriteBatch);
-        
+
         if (ShowDebug)
         {
             long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;

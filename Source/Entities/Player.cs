@@ -8,7 +8,6 @@ namespace astral_assault;
 public class Player : Entity, IInputEventListener
 {
     private readonly Game1 _root;
-    private Vector2 _velocity;
     private Point _cursorPosition;
     private Tuple<Vector2, Vector2> _muzzle;
     private bool _lastCannon;
@@ -26,8 +25,8 @@ public class Player : Entity, IInputEventListener
     public Player(Game1 root, Vector2 position) :base(position)
     {
         _root = root;
-        _position = position;
-        _rotation = Pi / 2;
+        Position = position;
+        Rotation = Pi / 2;
         
         InitSpriteRenderer();
         
@@ -46,7 +45,7 @@ public class Player : Entity, IInputEventListener
 
         Animation animation = new(new[] { frame }, true);
 
-        _spriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation });
+        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation });
     }
 
     private void StartListening()
@@ -60,23 +59,23 @@ public class Player : Entity, IInputEventListener
     {
         // acceleration and deceleration
         Vector2 forward = new Vector2(
-            (float)Math.Cos(_rotation), 
-            (float)Math.Sin(_rotation)
+            (float)Math.Cos(Rotation), 
+            (float)Math.Sin(Rotation)
         ) * MoveSpeed * _delta;
         
-        _velocity = new Vector2(
-            Math.Clamp(_velocity.X + forward.X * yAxis, -MaxSpeed, MaxSpeed),
-            Math.Clamp(_velocity.Y + forward.Y * yAxis, -MaxSpeed, MaxSpeed));
+        Velocity = new Vector2(
+            Math.Clamp(Velocity.X + forward.X * yAxis, -MaxSpeed, MaxSpeed),
+            Math.Clamp(Velocity.Y + forward.Y * yAxis, -MaxSpeed, MaxSpeed));
 
         // tilting
         Vector2 right = new Vector2(
-            (float)Math.Cos(_rotation + Pi / 2), 
-            (float)Math.Sin(_rotation + Pi / 2)
+            (float)Math.Cos(Rotation + Pi / 2), 
+            (float)Math.Sin(Rotation + Pi / 2)
         ) * TiltSpeed * _delta;
         
-        _velocity = new Vector2(
-            Math.Clamp(_velocity.X + right.X * xAxis, -MaxSpeed, MaxSpeed),
-            Math.Clamp(_velocity.Y + right.Y * xAxis, -MaxSpeed, MaxSpeed));
+        Velocity = new Vector2(
+            Math.Clamp(Velocity.X + right.X * xAxis, -MaxSpeed, MaxSpeed),
+            Math.Clamp(Velocity.Y + right.Y * xAxis, -MaxSpeed, MaxSpeed));
     }
 
     private void HandleFiring()
@@ -92,7 +91,7 @@ public class Player : Entity, IInputEventListener
 
         float rot = (float)Math.Atan2(yDiff, xDiff);
             
-        _root.Bullets.Add(
+        _root.Entities.Add(
             new Bullet(
                 _root, 
                 _lastCannon ? _muzzle.Item1 : _muzzle.Item2, 
@@ -140,38 +139,38 @@ public class Player : Entity, IInputEventListener
         _delta = e.DeltaTime;
 
         // rotate player
-        float xDiff = _cursorPosition.X - _position.X;
-        float yDiff = _cursorPosition.Y - _position.Y;
+        float xDiff = _cursorPosition.X - Position.X;
+        float yDiff = _cursorPosition.Y - Position.Y;
 
-        _rotation = (float)Math.Atan2(yDiff, xDiff);
+        Rotation = (float)Math.Atan2(yDiff, xDiff);
         
         // apply player velocity
-        _position += _velocity * _delta;
+        Position += Velocity * _delta;
 
         // apply friction
-        float sign = Math.Sign(_velocity.Length());
+        float sign = Math.Sign(Velocity.Length());
 
         if (sign != 0)
         {
-            float direction = (float)Math.Atan2(_velocity.Y, _velocity.X);
+            float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
             
-            _velocity -= 
+            Velocity -= 
                 new Vector2((float)Math.Cos(direction), (float)Math.Sin(direction)) * Friction * _delta * sign;
         }
         
         // wrap position
-        _position.X = _position.X switch
+        Position.X = Position.X switch
         {
             < -16 => Game1.TargetWidth - 16,
             > Game1.TargetWidth + 16 => 16,
-            _ => _position.X
+            _ => Position.X
         };
 
-        _position.Y = _position.Y switch
+        Position.Y = Position.Y switch
         {
             < -16 => Game1.TargetHeight - 16,
             > Game1.TargetHeight + 16 => 16,
-            _ => _position.Y
+            _ => Position.Y
         };
         
         // rotate the points for the cannon muzzles
@@ -182,21 +181,21 @@ public class Player : Entity, IInputEventListener
         const float y = 10;
 
         {
-            float rot = Pi / 8 * (float)Math.Round(_rotation / (Pi / 8));
+            float rot = Pi / 8 * (float)Math.Round(Rotation / (Pi / 8));
 
             float x2 = (float)(x * Math.Cos(rot) - y * Math.Sin(rot));
             float y2 = (float)(y * Math.Cos(rot) + x * Math.Sin(rot));
 
-            muzzle1 = new Vector2(_position.X + x2, _position.Y + y2);
+            muzzle1 = new Vector2(Position.X + x2, Position.Y + y2);
         }
 
         {
-            float rot = Pi / 8 * (float)Math.Round(_rotation / (Pi / 8));
+            float rot = Pi / 8 * (float)Math.Round(Rotation / (Pi / 8));
 
             float x2 = (float)(x * Math.Cos(rot) + y * Math.Sin(rot));
             float y2 = (float)(-y * Math.Cos(rot) + x * Math.Sin(rot));
 
-            muzzle2 = new Vector2(_position.X + x2, _position.Y + y2);
+            muzzle2 = new Vector2(Position.X + x2, Position.Y + y2);
         }
 
         _muzzle = new Tuple<Vector2, Vector2>(muzzle1, muzzle2);

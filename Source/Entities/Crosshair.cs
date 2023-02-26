@@ -20,7 +20,7 @@ public class Crosshair : Entity, IMouseEventListener
 
         Animation animation = new(new[] { frame }, false);
         
-        _spriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation });
+        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation });
     }
 
     public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)
@@ -31,6 +31,6 @@ public class Crosshair : Entity, IMouseEventListener
     public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
     {
         Point scale = new((int)_root.ScaleX, (int)_root.ScaleY);
-        _position = (e.Position / scale).ToVector2();
+        Position = (e.Position / scale).ToVector2();
     }
 }

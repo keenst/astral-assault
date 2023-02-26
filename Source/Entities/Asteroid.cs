@@ -22,12 +22,12 @@ public class Asteroid : Entity
 
         Animation animation = new(new[] { frame }, true);
 
-        _spriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation });
+        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation });
     }
 
     public override void OnUpdate(object sender, UpdateEventArgs e)
     {
-        _rotation += 0.01F;
-        if (_rotation > Math.PI * 2) _rotation = 0;
+        Rotation += 0.01F;
+        if (Rotation > Math.PI * 2) Rotation = 0;
     }
 }
