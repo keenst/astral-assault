@@ -6,13 +6,11 @@ namespace astral_assault;
 
 public class Asteroid : Entity
 {
-    private Game1 _root;
-    
-    public Asteroid(Game1 root, Vector2 position) : base(position)
+    public Asteroid(Game1 root, Vector2 position) : base(root, position)
     {
-        _root = root;
+        Root = root;
 
-        Texture2D spriteSheet = _root.Content.Load<Texture2D>("assets/asteroid1");
+        Texture2D spriteSheet = Root.Content.Load<Texture2D>("assets/asteroid1");
 
         Frame frame = new(
             new Rectangle(0, 0, 32, 32),
@@ -23,6 +21,13 @@ public class Asteroid : Entity
         Animation animation = new(new[] { frame }, true);
 
         SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation });
+        
+        Collider = new Collider(
+            this, 
+            new Rectangle(
+                new Point((int)Position.X - 12, (int)Position.Y - 12), 
+                new Point(24, 24)));
+        Root.CollisionSystem.AddCollider(Collider);
     }
 
     public override void OnUpdate(object sender, UpdateEventArgs e)
