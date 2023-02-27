@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace astral_assault;
@@ -21,7 +20,7 @@ public class Entity : IUpdateEventListener
         Destroy
     }
 
-    public Entity(Game1 root, Vector2 position)
+    protected Entity(Game1 root, Vector2 position)
     {
         Root = root;
         Position = position;
@@ -72,9 +71,9 @@ public class Entity : IUpdateEventListener
         }
     }
 
-    public void OnCollision(Collider other)
+    public virtual void OnCollision(Collider other)
     {
-        Debug.WriteLine("collision!");
+        
     }
     
     public void Draw(SpriteBatch spriteBatch)
@@ -82,7 +81,7 @@ public class Entity : IUpdateEventListener
         SpriteRenderer.Draw(spriteBatch, Position, Rotation);
     }
 
-    public void Destroy()
+    protected void Destroy()
     {
         Root.Entities.Remove(this);
         Root.CollisionSystem.RemoveCollider(Collider);

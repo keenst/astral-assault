@@ -1,5 +1,7 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
-"E:/Projekt/rider/astral-assault/Content/assets/asteroid1.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/asteroid1.xnb","TextureProcessor","Texture2DContent",1875,16469,0.1170173
+"E:/Projekt/rider/astral-assault/Content/assets/asteriod1.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/asteriod1.xnb","TextureProcessor","Texture2DContent",744,4181,0.1447531
+"E:/Projekt/rider/astral-assault/Content/assets/asteroid2.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/asteroid2.xnb","TextureProcessor","Texture2DContent",1318,9301,0.0056597
+"E:/Projekt/rider/astral-assault/Content/assets/asteroid3.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/asteroid3.xnb","TextureProcessor","Texture2DContent",1875,16469,0.0039786
 "E:/Projekt/rider/astral-assault/Content/assets/crosshair.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/crosshair.xnb","TextureProcessor","Texture2DContent",170,1109,0.1034585
 "E:/Projekt/rider/astral-assault/Content/assets/font.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/font.xnb","TextureProcessor","Texture2DContent",676,16885,0.1337632
 "E:/Projekt/rider/astral-assault/Content/assets/player.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/player.xnb","TextureProcessor","Texture2DContent",1592,16469,0.1038618

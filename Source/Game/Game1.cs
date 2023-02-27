@@ -77,7 +77,10 @@ public class Game1 : Game
             DepthFormat.Depth24);
         
         Entities.Add(new Player(this, new Vector2(TargetWidth / 2F, TargetHeight / 2F)));
-        Entities.Add(new Asteroid(this, new Vector2(TargetWidth / 3F, TargetHeight / 3F)));
+        Entities.Add(new Asteroid(
+            this,
+            new Vector2(TargetWidth / 3F, TargetHeight / 3F),
+            Asteroid.Size.Medium));
         Entities.Add(new Crosshair(this, new Vector2(0, 0)));
         
         Text.Initialize(this);
