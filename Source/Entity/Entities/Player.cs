@@ -37,6 +37,8 @@ public class Player : Entity, IInputEventListener
                 new Point((int)Position.X - 12, (int)Position.Y - 12), 
                 new Point(24, 24)));
         Root.CollisionSystem.AddCollider(Collider);
+
+        OutOfBoundsBehavior = OutOfBounds.Wrap;
     }
 
     private void InitSpriteRenderer()
@@ -142,6 +144,8 @@ public class Player : Entity, IInputEventListener
 
     public override void OnUpdate(object sender, UpdateEventArgs e)
     {
+        base.OnUpdate(sender, e);
+        
         _delta = e.DeltaTime;
 
         // rotate player
@@ -149,10 +153,6 @@ public class Player : Entity, IInputEventListener
         float yDiff = _cursorPosition.Y - Position.Y;
 
         Rotation = (float)Math.Atan2(yDiff, xDiff);
-        
-        // apply player velocity
-        Position += Velocity * _delta;
-        Collider.SetPosition(Position.ToPoint());
 
         // apply friction
         float sign = Math.Sign(Velocity.Length());
@@ -164,22 +164,7 @@ public class Player : Entity, IInputEventListener
             Velocity -= 
                 new Vector2((float)Math.Cos(direction), (float)Math.Sin(direction)) * Friction * _delta * sign;
         }
-        
-        // wrap position
-        Position.X = Position.X switch
-        {
-            < -16 => Game1.TargetWidth - 16,
-            > Game1.TargetWidth + 16 => 16,
-            _ => Position.X
-        };
 
-        Position.Y = Position.Y switch
-        {
-            < -16 => Game1.TargetHeight - 16,
-            > Game1.TargetHeight + 16 => 16,
-            _ => Position.Y
-        };
-        
         // rotate the points for the cannon muzzles
         Vector2 muzzle1;
         Vector2 muzzle2;

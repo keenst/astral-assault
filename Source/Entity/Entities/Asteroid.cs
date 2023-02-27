@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -28,11 +30,15 @@ public class Asteroid : Entity
                 new Point((int)Position.X - 12, (int)Position.Y - 12), 
                 new Point(24, 24)));
         Root.CollisionSystem.AddCollider(Collider);
+
+        OutOfBoundsBehavior = OutOfBounds.Wrap;
     }
 
     public override void OnUpdate(object sender, UpdateEventArgs e)
     {
-        Rotation += 0.01F;
-        if (Rotation > Math.PI * 2) Rotation = 0;
+        base.OnUpdate(sender, e);
+        
+        Rotation += 1F * e.DeltaTime;
+        if (Rotation > Math.PI) Rotation = (float)-Math.PI;
     }
 }
