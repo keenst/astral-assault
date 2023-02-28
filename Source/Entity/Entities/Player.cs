@@ -39,6 +39,10 @@ public class Player : Entity, IInputEventListener
         Root.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Wrap;
+
+        IsActor = true;
+        MaxHP = 20;
+        HP = 20;
     }
 
     private void InitSpriteRenderer()

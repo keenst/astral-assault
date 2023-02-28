@@ -65,6 +65,18 @@ public class Asteroid : Entity
         Root.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Wrap;
+
+        IsActor = true;
+        
+        MaxHP = 12;
+        HP = 12;
+    }
+
+    public override void OnDeath()
+    {
+        
+        
+        base.OnDeath();
     }
 
     public override void OnUpdate(object sender, UpdateEventArgs e)
