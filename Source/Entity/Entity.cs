@@ -41,6 +41,12 @@ public class Entity : IUpdateEventListener
     
     public virtual void OnUpdate(object sender, UpdateEventArgs e)
     {
+        if (IsActor && HP <= 0)
+        {
+            OnDeath();
+            return;
+        }
+        
         Position += Velocity * e.DeltaTime;
         Collider?.SetPosition(Position.ToPoint());
 

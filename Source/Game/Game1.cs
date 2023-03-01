@@ -80,7 +80,7 @@ public class Game1 : Game
         Entities.Add(new Asteroid(
             this,
             new Vector2(TargetWidth / 3F, TargetHeight / 3F),
-            Asteroid.Size.Medium));
+            Asteroid.Sizes.Medium));
         Entities.Add(new Crosshair(this, new Vector2(0, 0)));
         
         Text.Initialize(this);

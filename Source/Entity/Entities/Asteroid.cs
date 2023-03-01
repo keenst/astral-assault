@@ -7,17 +7,19 @@ namespace astral_assault;
 public class Asteroid : Entity
 {
     private float _rotSpeed;
+    private Sizes _size;
 
-    public enum Size
+    public enum Sizes
     {
         Smallest,
         Small,
         Medium
     }
 
-    public Asteroid(Game1 root, Vector2 position, Size size) : base(root, position)
+    public Asteroid(Game1 root, Vector2 position, Sizes size) : base(root, position)
     {
         Root = root;
+        _size = size;
 
         Random rnd = new();
         _rotSpeed = rnd.Next(5, 20) / 10F;
@@ -30,17 +32,17 @@ public class Asteroid : Entity
 
         switch (size)
         {
-            case Size.Smallest:
+            case Sizes.Smallest:
                 spriteSheet = Root.Content.Load<Texture2D>("assets/asteroid1");
                 spriteSize = 16;
                 colliderSize = 24;
                 break;
-            case Size.Small:
+            case Sizes.Small:
                 spriteSheet = Root.Content.Load<Texture2D>("assets/asteroid2");
                 spriteSize = 24;
                 colliderSize = 24;
                 break;
-            case Size.Medium:
+            case Sizes.Medium:
                 spriteSheet = Root.Content.Load<Texture2D>("assets/asteroid3");
                 spriteSize = 32;
                 colliderSize = 24;
@@ -74,7 +76,8 @@ public class Asteroid : Entity
 
     public override void OnDeath()
     {
-        
+        Root.Entities.Add(new Asteroid(Root, Position, _size));
+        Root.Entities.Add(new Asteroid(Root, Position, _size));
         
         base.OnDeath();
     }
