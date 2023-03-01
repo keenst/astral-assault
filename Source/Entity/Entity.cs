@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -17,6 +18,7 @@ public class Entity : IUpdateEventListener
     protected float MaxHP;
     protected float HP;
     protected float ContactDamage;
+    protected bool IsFriendly;
 
     private Texture2D _healthBarTexture;
 
@@ -81,11 +83,13 @@ public class Entity : IUpdateEventListener
         }
     }
 
-    public virtual void OnCollision(Collider other)
+    public void OnCollision(Collider other)
     {
-        if (!IsActor) return;
+        if (!IsActor || other.Parent.IsFriendly == IsFriendly) return;
 
+        Debug.WriteLine("collision");
         
+        HP = Math.Max(0, HP - other.Parent.ContactDamage);
     }
     
     public void Draw(SpriteBatch spriteBatch)

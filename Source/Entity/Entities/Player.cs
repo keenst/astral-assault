@@ -43,6 +43,7 @@ public class Player : Entity, IInputEventListener
         IsActor = true;
         MaxHP = 20;
         HP = 20;
+        IsFriendly = true;
     }
 
     private void InitSpriteRenderer()

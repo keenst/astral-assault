@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO.IsolatedStorage;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -35,6 +36,9 @@ public class Bullet : Entity
         Root.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Destroy;
+
+        ContactDamage = 8;
+        IsFriendly = true;
     }
 
     public override void OnUpdate(object sender, UpdateEventArgs e)
