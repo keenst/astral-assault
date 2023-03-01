@@ -23,7 +23,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:assets/asteriod1.png
+/build:assets/asteriod1.png;assets/asteroid1.png
 
 #begin assets/asteroid2.png
 /importer:TextureImporter

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO.IsolatedStorage;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

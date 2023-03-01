@@ -8,6 +8,7 @@ public class Asteroid : Entity
 {
     private float _rotSpeed;
     private Sizes _size;
+    private bool _hasExploded;
 
     public enum Sizes
     {
@@ -36,16 +37,22 @@ public class Asteroid : Entity
                 spriteSheet = Root.Content.Load<Texture2D>("assets/asteroid1");
                 spriteSize = 16;
                 colliderSize = 24;
+                MaxHP = 12;
+                HP = MaxHP;
                 break;
             case Sizes.Small:
                 spriteSheet = Root.Content.Load<Texture2D>("assets/asteroid2");
                 spriteSize = 24;
                 colliderSize = 24;
+                MaxHP = 24;
+                HP = MaxHP;
                 break;
             case Sizes.Medium:
                 spriteSheet = Root.Content.Load<Texture2D>("assets/asteroid3");
                 spriteSize = 32;
                 colliderSize = 24;
+                MaxHP = 36;
+                HP = MaxHP;
                 break;
         }
         
@@ -69,16 +76,23 @@ public class Asteroid : Entity
         OutOfBoundsBehavior = OutOfBounds.Wrap;
 
         IsActor = true;
-        
-        MaxHP = 12;
-        HP = 12;
     }
 
     public override void OnDeath()
     {
-        Root.Entities.Add(new Asteroid(Root, Position, _size));
-        Root.Entities.Add(new Asteroid(Root, Position, _size));
+        if (!_hasExploded && _size - 1 >= 0)
+        {
+            Random rnd = new();
+            int amount = rnd.Next(1, 4);
+            
+            for (int i = 0; i < amount; i++)
+            {
+                Root.Entities.Add(new Asteroid(Root, Position, _size - 1));
+            }
+        }
         
+        _hasExploded = true;
+
         base.OnDeath();
     }
 

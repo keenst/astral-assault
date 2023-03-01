@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -20,6 +21,10 @@ public class Entity : IUpdateEventListener
     protected float ContactDamage;
     protected bool IsFriendly;
 
+    private bool _isInvincible;
+    private long _timeSpawned;
+    private const int InvincibilityDurationMS = 100;
+
     private Texture2D _healthBarTexture;
 
     protected enum OutOfBounds
@@ -33,6 +38,7 @@ public class Entity : IUpdateEventListener
     {
         Root = root;
         Position = position;
+        _timeSpawned = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         
         UpdateEventSource.UpdateEvent += OnUpdate;
         
@@ -92,8 +98,9 @@ public class Entity : IUpdateEventListener
     public void OnCollision(Collider other)
     {
         if (!IsActor || other.Parent.IsFriendly == IsFriendly) return;
-
-        Debug.WriteLine("collision");
+        
+        long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        if (timeNow < _timeSpawned + InvincibilityDurationMS) return;
         
         HP = Math.Max(0, HP - other.Parent.ContactDamage);
     }
