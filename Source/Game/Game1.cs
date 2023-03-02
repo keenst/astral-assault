@@ -27,8 +27,8 @@ public class Game1 : Game
     private RenderTarget2D _renderTarget;
 
     // entities
-    private Player _player;
-    public readonly List<Bullet> Bullets = new();
+    public readonly List<Entity> Entities = new();
+    public CollisionSystem CollisionSystem = new();
 
     // display
     public const int TargetWidth = (int)Width.Quarter;
@@ -45,8 +45,6 @@ public class Game1 : Game
     private const int StatUpdateInterval = 300;
     private KeyboardState _prevKeyState = Keyboard.GetState();
 
-    private readonly InputEventSource _inputEventSource = new();
-    
     public Game1()
     {
         // set up game class
@@ -78,12 +76,15 @@ public class Game1 : Game
             GraphicsDevice.PresentationParameters.BackBufferFormat,
             DepthFormat.Depth24);
         
-        // create player
-        _player = new Player(this, new Vector2(TargetWidth / 2F, TargetHeight / 2F));
-        _player.StartListening(_inputEventSource);
+        Entities.Add(new Player(this, new Vector2(TargetWidth / 2F, TargetHeight / 2F)));
+        Entities.Add(new Asteroid(
+            this,
+            new Vector2(TargetWidth / 3F, TargetHeight / 3F),
+            Asteroid.Sizes.Medium));
+        Entities.Add(new Crosshair(this, new Vector2(0, 0)));
         
-        // initialize font renderer
         Text.Initialize(this);
+        InputEventSource.Initialize();
 
         base.Initialize();
     }
@@ -95,8 +96,6 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
-        _inputEventSource.Update();
-        
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
@@ -106,19 +105,7 @@ public class Game1 : Game
 
         _prevKeyState = Keyboard.GetState();
 
-        _player.Update(gameTime);
-        
-        for (int i = 0; i < Bullets.Count; i++)
-        {
-            if (Bullets[i].Position.X is > TargetWidth or < 0 ||
-                Bullets[i].Position.Y is > TargetHeight or < 0)
-            {
-                Bullets.RemoveAt(i);
-                return;
-            }
-            
-            Bullets[i].Update(gameTime);
-        }
+        UpdateEventSource.Update(gameTime);
 
         base.Update(gameTime);
     }
@@ -131,8 +118,7 @@ public class Game1 : Game
         GraphicsDevice.Clear(Color.DarkGray);
         
         _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap);
-        _player.Draw(_spriteBatch);
-        foreach (Bullet bullet in Bullets) bullet.Draw(_spriteBatch);
+        foreach (Entity e in Entities) e.Draw(_spriteBatch);
 
         if (ShowDebug)
         {
@@ -155,6 +141,24 @@ public class Game1 : Game
                 _renderTime.ToString(), 
                 new Vector2(0, 9), 
                 Color.Yellow);
+
+            if (CollisionSystem.Colliders.Count > 0)
+            {
+                foreach (Collider collider in CollisionSystem.Colliders)
+                {
+                    int width = collider.Rectangle.Width;
+                    int height = collider.Rectangle.Height;
+                    
+                    Texture2D rect = new(GraphicsDevice, width, height);
+
+                    Color[] data = new Color[width * height];
+                    
+                    Array.Fill(data, new Color(Color.White, 0.2F));
+                    rect.SetData(data);
+
+                    _spriteBatch.Draw(rect, collider.Rectangle.Location.ToVector2(), Color.Blue);
+                }
+            }
         }
         
         _spriteBatch.End();
