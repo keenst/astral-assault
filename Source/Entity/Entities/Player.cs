@@ -41,8 +41,8 @@ public class Player : Entity, IInputEventListener
         OutOfBoundsBehavior = OutOfBounds.Wrap;
 
         IsActor = true;
-        MaxHP = 20;
-        HP = 20;
+        MaxHP = 50;
+        HP = MaxHP;
         IsFriendly = true;
     }
 
@@ -113,7 +113,19 @@ public class Player : Entity, IInputEventListener
             
         _lastCannon = !_lastCannon;
     }
-    
+
+    public override void OnCollision(Collider other)
+    {
+        base.OnCollision(other);
+
+        if (IsFriendly == other.Parent.IsFriendly) return;
+        
+        Vector2 direction = Position - other.Parent.Position;
+        direction.Normalize();
+
+        Velocity = direction * 50;
+    }
+
     public void OnKeyboardEvent(object sender, KeyboardEventArgs e)
     {
         int xAxis = e.Key switch

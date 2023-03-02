@@ -6,7 +6,7 @@ namespace astral_assault;
 
 public class Entity : IUpdateEventListener
 {
-    protected Vector2 Position;
+    public Vector2 Position;
     protected Vector2 Velocity;
     protected float Rotation;
     protected SpriteRenderer SpriteRenderer;
@@ -17,7 +17,7 @@ public class Entity : IUpdateEventListener
     protected float MaxHP;
     protected float HP;
     protected float ContactDamage;
-    
+
     public bool IsFriendly;
 
     private bool _isInvincible;
