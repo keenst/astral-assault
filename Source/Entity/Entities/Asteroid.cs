@@ -36,16 +36,18 @@ public class Asteroid : Entity
             case Sizes.Smallest:
                 spriteSheet = Root.Content.Load<Texture2D>("assets/asteroid1");
                 spriteSize = 16;
-                colliderSize = 24;
+                colliderSize = 10;
                 MaxHP = 12;
                 HP = MaxHP;
+                ContactDamage = 5;
                 break;
             case Sizes.Small:
                 spriteSheet = Root.Content.Load<Texture2D>("assets/asteroid2");
                 spriteSize = 24;
-                colliderSize = 24;
+                colliderSize = 16;
                 MaxHP = 24;
                 HP = MaxHP;
+                ContactDamage = 7;
                 break;
             case Sizes.Medium:
                 spriteSheet = Root.Content.Load<Texture2D>("assets/asteroid3");
@@ -53,6 +55,7 @@ public class Asteroid : Entity
                 colliderSize = 24;
                 MaxHP = 36;
                 HP = MaxHP;
+                ContactDamage = 12;
                 break;
         }
         
@@ -78,7 +81,7 @@ public class Asteroid : Entity
         IsActor = true;
     }
 
-    public override void OnDeath()
+    protected override void OnDeath()
     {
         if (!_hasExploded && _size - 1 >= 0)
         {

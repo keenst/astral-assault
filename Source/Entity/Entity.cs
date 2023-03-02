@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Globalization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -19,7 +17,8 @@ public class Entity : IUpdateEventListener
     protected float MaxHP;
     protected float HP;
     protected float ContactDamage;
-    protected bool IsFriendly;
+    
+    public bool IsFriendly;
 
     private bool _isInvincible;
     private long _timeSpawned;
@@ -95,7 +94,7 @@ public class Entity : IUpdateEventListener
         }
     }
 
-    public void OnCollision(Collider other)
+    public virtual void OnCollision(Collider other)
     {
         if (!IsActor || other.Parent.IsFriendly == IsFriendly) return;
         
@@ -116,8 +115,8 @@ public class Entity : IUpdateEventListener
         Root.Entities.Remove(this);
         Root.CollisionSystem.RemoveCollider(Collider);
     }
-    
-    public virtual void OnDeath()
+
+    protected virtual void OnDeath()
     {
         Destroy();
     }

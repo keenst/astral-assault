@@ -40,6 +40,13 @@ public class Bullet : Entity
         IsFriendly = true;
     }
 
+    public override void OnCollision(Collider other)
+    {
+        if (IsFriendly == other.Parent.IsFriendly) return;
+        
+        Destroy();
+    }
+
     public override void OnUpdate(object sender, UpdateEventArgs e)
     {
         base.OnUpdate(sender, e);
