@@ -19,6 +19,8 @@ public class Crosshair : Entity, IMouseEventListener
         Animation animation = new(new[] { frame }, false);
         
         SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation });
+
+        OutOfBoundsBehavior = OutOfBounds.DoNothing;
     }
 
     public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)

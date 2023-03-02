@@ -33,12 +33,23 @@ public class Bullet : Entity
                 new Point((int)Position.X - 1, (int)Position.Y - 1), 
                 new Point(2, 2)));
         Root.CollisionSystem.AddCollider(Collider);
+
+        OutOfBoundsBehavior = OutOfBounds.Destroy;
+
+        ContactDamage = 4;
+        IsFriendly = true;
+    }
+
+    public override void OnCollision(Collider other)
+    {
+        if (IsFriendly == other.Parent.IsFriendly) return;
+        
+        Destroy();
     }
 
     public override void OnUpdate(object sender, UpdateEventArgs e)
     {
-        Position += Velocity * e.DeltaTime;
-        Collider.SetPosition(Position.ToPoint());
+        base.OnUpdate(sender, e);
 
         if (Position.X is > Game1.TargetWidth or < 0 ||
             Position.Y is > Game1.TargetHeight or < 0)
