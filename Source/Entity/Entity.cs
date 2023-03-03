@@ -20,8 +20,7 @@ public class Entity : IUpdateEventListener
 
     public bool IsFriendly;
 
-    private bool _isInvincible;
-    private long _timeSpawned;
+    private readonly long _timeSpawned;
     private const int InvincibilityDurationMS = 100;
 
     private Texture2D _healthBarTexture;
