@@ -28,7 +28,7 @@ public class Game1 : Game
 
     // entities
     public readonly List<Entity> Entities = new();
-    public CollisionSystem CollisionSystem = new();
+    public readonly CollisionSystem CollisionSystem = new();
 
     // display
     public const int TargetWidth = (int)Width.Quarter;
@@ -38,7 +38,7 @@ public class Game1 : Game
     public readonly float ScaleY;
 
     // debug tools
-    public bool ShowDebug;
+    private bool _showDebug;
     private float _frameRate;
     private float _renderTime;
     private long _lastStatUpdate;
@@ -63,7 +63,7 @@ public class Game1 : Game
         IsFixedTimeStep = false;
 
         // set up debug tools
-        ShowDebug = false;
+        _showDebug = false;
     }
 
     protected override void Initialize()
@@ -101,7 +101,7 @@ public class Game1 : Game
             Exit();
 
         if (Keyboard.GetState().IsKeyDown(Keys.F3) && !_prevKeyState.IsKeyDown(Keys.F3))
-            ShowDebug = !ShowDebug;
+            _showDebug = !_showDebug;
 
         _prevKeyState = Keyboard.GetState();
 
@@ -120,7 +120,7 @@ public class Game1 : Game
         _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap);
         foreach (Entity e in Entities) e.Draw(_spriteBatch);
 
-        if (ShowDebug)
+        if (_showDebug)
         {
             long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             

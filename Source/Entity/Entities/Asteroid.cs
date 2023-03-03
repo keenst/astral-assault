@@ -6,8 +6,8 @@ namespace astral_assault;
 
 public class Asteroid : Entity
 {
-    private float _rotSpeed;
-    private Sizes _size;
+    private readonly float _rotSpeed;
+    private readonly Sizes _size;
     private bool _hasExploded;
 
     public enum Sizes

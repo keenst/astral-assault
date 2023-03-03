@@ -6,24 +6,24 @@ namespace astral_assault;
 
 public class Collider
 {
-    public Entity Parent;
+    public readonly Entity Parent;
     public Rectangle Rectangle;
-    public Vector2[] Corners;
-    public Vector2[] Axes;
+    private Vector2[] _corners;
+    private Vector2[] _axes;
 
     public Collider(Entity parent, Rectangle rectangle)
     {
         Parent = parent;
         Rectangle = rectangle;
-        Corners = GetCorners(Rectangle);
-        Axes = GetAxes(Corners);
+        _corners = GetCorners(Rectangle);
+        _axes = GetAxes(_corners);
     }
     
     public bool CollidesWith(Collider other)
     {
         List<Vector2> axes = new();
-        axes.AddRange(Axes);
-        axes.AddRange(other.Axes);
+        axes.AddRange(_axes);
+        axes.AddRange(other._axes);
         axes = axes.Distinct().ToList();
 
         foreach (Vector2 axis in axes)
@@ -33,7 +33,7 @@ public class Collider
             float minOther  = float.MaxValue;
             float maxOther  = float.MinValue;
 
-            foreach (Vector2 corner in Corners)
+            foreach (Vector2 corner in _corners)
             {
                 float projection = Vector2.Dot(corner, axis);
 
@@ -44,7 +44,7 @@ public class Collider
                     maxThis = projection;
             }
 
-            foreach (Vector2 corner in other.Corners)
+            foreach (Vector2 corner in other._corners)
             {
                 float projection = Vector2.Dot(corner, axis);
 
@@ -67,8 +67,8 @@ public class Collider
         Rectangle.X = position.X - Rectangle.Width / 2;
         Rectangle.Y = position.Y - Rectangle.Height / 2;
 
-        Corners = GetCorners(Rectangle);
-        Axes = GetAxes(Corners);
+        _corners = GetCorners(Rectangle);
+        _axes = GetAxes(_corners);
     }
 
     private static Vector2[] GetCorners(Rectangle rect)
