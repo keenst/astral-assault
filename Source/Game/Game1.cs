@@ -29,7 +29,8 @@ public class Game1 : Game
     // entities
     public readonly List<Entity> Entities = new();
     public readonly CollisionSystem CollisionSystem = new();
-
+    private WaveController _waveController;
+    
     // display
     public const int TargetWidth = (int)Width.Quarter;
     public const int TargetHeight = (int)Height.Quarter;
@@ -61,8 +62,7 @@ public class Game1 : Game
 
         graphics.SynchronizeWithVerticalRetrace = false;
         IsFixedTimeStep = false;
-
-        // set up debug tools
+        
         _showDebug = false;
     }
 
@@ -77,14 +77,11 @@ public class Game1 : Game
             DepthFormat.Depth24);
         
         Entities.Add(new Player(this, new Vector2(TargetWidth / 2F, TargetHeight / 2F)));
-        Entities.Add(new Asteroid(
-            this,
-            new Vector2(TargetWidth / 3F, TargetHeight / 3F),
-            Asteroid.Sizes.Medium));
         Entities.Add(new Crosshair(this, new Vector2(0, 0)));
         
         Text.Initialize(this);
         InputEventSource.Initialize();
+        _waveController = new WaveController(this);
 
         base.Initialize();
     }
@@ -119,6 +116,8 @@ public class Game1 : Game
         
         _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap);
         foreach (Entity e in Entities) e.Draw(_spriteBatch);
+        
+        _waveController.Draw(_spriteBatch);
 
         if (_showDebug)
         {
