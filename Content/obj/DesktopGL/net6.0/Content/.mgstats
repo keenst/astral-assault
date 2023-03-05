@@ -1,7 +1,0 @@
-Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
-"E:/Projekt/rider/astral-assault/Content/assets/crosshair.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/crosshair.xnb","TextureProcessor","Texture2DContent",170,1109,0.1034585
-"E:/Projekt/rider/astral-assault/Content/assets/font.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/font.xnb","TextureProcessor","Texture2DContent",676,16885,0.1337632
-"E:/Projekt/rider/astral-assault/Content/assets/player1.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/player1.xnb","TextureProcessor","Texture2DContent",514,4181,0.1326487
-"E:/Projekt/rider/astral-assault/Content/assets/player2.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/player2.xnb","TextureProcessor","Texture2DContent",591,4181,0.0012251
-"E:/Projekt/rider/astral-assault/Content/assets/player3.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/player3.xnb","TextureProcessor","Texture2DContent",633,4181,0.0013984
-"E:/Projekt/rider/astral-assault/Content/assets/player4.png","E:/Projekt/rider/astral-assault/Content/bin/DesktopGL/Content/assets/player4.xnb","TextureProcessor","Texture2DContent",609,4181,0.0011431
