@@ -21,9 +21,8 @@ public class Player : Entity, IInputEventListener
     private const float BulletSpeed = 250;
     private const int   ShootSpeed = 200;
 
-    public Player(Game1 root, Vector2 position) :base(root, position)
+    public Player(MainGameState gameState, Vector2 position) :base(gameState, position)
     {
-        Root = root;
         Position = position;
         Rotation = Pi / 2;
         
@@ -36,7 +35,7 @@ public class Player : Entity, IInputEventListener
             new Rectangle(
                 new Point((int)Position.X - 12, (int)Position.Y - 12), 
                 new Point(24, 24)));
-        Root.CollisionSystem.AddCollider(Collider);
+        _gameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Wrap;
 
@@ -48,7 +47,7 @@ public class Player : Entity, IInputEventListener
 
     private void InitSpriteRenderer()
     {
-        Texture2D spriteSheet = Root.Content.Load<Texture2D>("assets/player");
+        Texture2D spriteSheet = _gameState.Root.Content.Load<Texture2D>("assets/player");
         
         Frame frame = new(
             new Rectangle(0, 0, 32, 32),
@@ -104,9 +103,9 @@ public class Player : Entity, IInputEventListener
 
         float rot = (float)Math.Atan2(yDiff, xDiff);
             
-        Root.Entities.Add(
+        _gameState.Entities.Add(
             new Bullet(
-                Root, 
+                _gameState, 
                 _lastCannon ? _muzzle.Item1 : _muzzle.Item2, 
                 rot, 
                 BulletSpeed));
@@ -124,6 +123,15 @@ public class Player : Entity, IInputEventListener
         direction.Normalize();
 
         Velocity = direction * 50;
+    }
+
+    protected override void OnDeath()
+    {
+        Game1 root = _gameState.Root;
+        
+        root.GameStateMachine.ChangeState(root.GameOverState);
+        
+        base.OnDeath();
     }
 
     public void OnKeyboardEvent(object sender, KeyboardEventArgs e)
@@ -147,7 +155,7 @@ public class Player : Entity, IInputEventListener
 
     public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
     {
-        Point scale = new((int)Root.ScaleX, (int)Root.ScaleY);
+        Point scale = new((int)_gameState.Root.ScaleX, (int)_gameState.Root.ScaleY);
         _cursorPosition = e.Position / scale;
     }
 

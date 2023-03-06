@@ -6,16 +6,14 @@ namespace astral_assault;
 
 public class Bullet : Entity
 {
-    public Bullet(Game1 root, Vector2 position, float rotation, float speed) :base(root, position)
+    public Bullet(MainGameState gameState, Vector2 position, float rotation, float speed) :base(gameState, position)
     {
-        Root = root;
-        
         Velocity = new Vector2(
             (float)Math.Cos(rotation),
             (float)Math.Sin(rotation)
             ) * speed;
         
-        Texture2D spriteSheet = new(Root.GraphicsDevice, 2, 2);
+        Texture2D spriteSheet = new(_gameState.Root.GraphicsDevice, 2, 2);
         
         Color[] data = new Color[2 * 2];
         for(int i = 0; i < data.Length; ++i) data[i] = Color.White;
@@ -32,7 +30,7 @@ public class Bullet : Entity
             new Rectangle(
                 new Point((int)Position.X - 1, (int)Position.Y - 1), 
                 new Point(2, 2)));
-        Root.CollisionSystem.AddCollider(Collider);
+        _gameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Destroy;
 

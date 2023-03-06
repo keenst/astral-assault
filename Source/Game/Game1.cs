@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -21,17 +20,17 @@ public class Game1 : Game
         Half = 960,
         Quarter = 480
     }
+
+    public GameState MainGameState;
+    public GameState GameOverState;
+    public GameStateMachine GameStateMachine;
     
     // render
     private SpriteBatch _spriteBatch;
     private RenderTarget2D _renderTarget;
 
-    // entities
-    public readonly List<Entity> Entities = new();
-    public readonly CollisionSystem CollisionSystem = new();
-    private WaveController _waveController;
-    
     // display
+    private static readonly Color BackgroundColor = new(28, 23, 41);
     public const int TargetWidth = (int)Width.Quarter;
     public const int TargetHeight = (int)Height.Quarter;
     private readonly Matrix _scale;
@@ -39,7 +38,7 @@ public class Game1 : Game
     public readonly float ScaleY;
 
     // debug tools
-    private bool _showDebug;
+    public bool ShowDebug;
     private float _frameRate;
     private float _renderTime;
     private long _lastStatUpdate;
@@ -63,7 +62,7 @@ public class Game1 : Game
         graphics.SynchronizeWithVerticalRetrace = false;
         IsFixedTimeStep = false;
         
-        _showDebug = false;
+        ShowDebug = false;
     }
 
     protected override void Initialize()
@@ -75,13 +74,13 @@ public class Game1 : Game
             false,
             GraphicsDevice.PresentationParameters.BackBufferFormat,
             DepthFormat.Depth24);
-        
-        Entities.Add(new Player(this, new Vector2(TargetWidth / 2F, TargetHeight / 2F)));
-        Entities.Add(new Crosshair(this, new Vector2(0, 0)));
-        
+
         Text.Initialize(this);
         InputEventSource.Initialize();
-        _waveController = new WaveController(this);
+        
+        MainGameState = new MainGameState(this);
+        GameOverState = new GameOverState(this);
+        GameStateMachine = new GameStateMachine(MainGameState);
 
         base.Initialize();
     }
@@ -98,7 +97,7 @@ public class Game1 : Game
             Exit();
 
         if (Keyboard.GetState().IsKeyDown(Keys.F3) && !_prevKeyState.IsKeyDown(Keys.F3))
-            _showDebug = !_showDebug;
+            ShowDebug = !ShowDebug;
 
         _prevKeyState = Keyboard.GetState();
 
@@ -112,14 +111,13 @@ public class Game1 : Game
         // draw sprites to render target
         GraphicsDevice.SetRenderTarget(_renderTarget);
         
-        GraphicsDevice.Clear(Color.DarkGray);
+        GraphicsDevice.Clear(BackgroundColor);
         
         _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap);
-        foreach (Entity e in Entities) e.Draw(_spriteBatch);
-        
-        _waveController.Draw(_spriteBatch);
 
-        if (_showDebug)
+        GameStateMachine.Draw(_spriteBatch);
+        
+        if (ShowDebug)
         {
             long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             
@@ -140,24 +138,6 @@ public class Game1 : Game
                 _renderTime.ToString(), 
                 new Vector2(0, 9), 
                 Color.Yellow);
-
-            if (CollisionSystem.Colliders.Count > 0)
-            {
-                foreach (Collider collider in CollisionSystem.Colliders)
-                {
-                    int width = collider.Rectangle.Width;
-                    int height = collider.Rectangle.Height;
-                    
-                    Texture2D rect = new(GraphicsDevice, width, height);
-
-                    Color[] data = new Color[width * height];
-                    
-                    Array.Fill(data, new Color(Color.White, 0.2F));
-                    rect.SetData(data);
-
-                    _spriteBatch.Draw(rect, collider.Rectangle.Location.ToVector2(), Color.Blue);
-                }
-            }
         }
         
         _spriteBatch.End();
