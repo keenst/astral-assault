@@ -5,7 +5,7 @@ namespace astral_assault;
 
 public class Crosshair : Entity, IMouseEventListener
 {
-    public Crosshair(MainGameState gameState) : base(gameState, new Vector2(0, 0))
+    public Crosshair(GameplayState gameState) : base(gameState, new Vector2(0, 0))
     {
         InputEventSource.MouseButtonEvent += OnMouseButtonEvent;
         InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
@@ -19,6 +19,14 @@ public class Crosshair : Entity, IMouseEventListener
         SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation });
 
         OutOfBoundsBehavior = OutOfBounds.DoNothing;
+    }
+
+    public override void Destroy()
+    {
+        InputEventSource.MouseButtonEvent -= OnMouseButtonEvent;
+        InputEventSource.MouseMoveEvent -= OnMouseMoveEvent;
+        
+        base.Destroy();
     }
 
     public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)

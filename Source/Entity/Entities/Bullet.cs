@@ -6,7 +6,7 @@ namespace astral_assault;
 
 public class Bullet : Entity
 {
-    public Bullet(MainGameState gameState, Vector2 position, float rotation, float speed) :base(gameState, position)
+    public Bullet(GameplayState gameState, Vector2 position, float rotation, float speed) :base(gameState, position)
     {
         Velocity = new Vector2(
             (float)Math.Cos(rotation),

@@ -7,7 +7,7 @@ namespace astral_assault;
 
 public class WaveController : IUpdateEventListener
 {
-    private readonly MainGameState _gameState;
+    private readonly GameplayState _gameState;
     private readonly Game1 _root;
     private int _currentWave;
 
@@ -18,7 +18,7 @@ public class WaveController : IUpdateEventListener
     private long _waveTimer;
     private const long WaveDelay = 5000;
     
-    public WaveController(MainGameState gameState, Game1 root)
+    public WaveController(GameplayState gameState, Game1 root)
     {
         _gameState = gameState;
         _root = root;

@@ -17,7 +17,7 @@ public class Asteroid : Entity
         Medium
     }
 
-    public Asteroid(MainGameState gameState, Vector2 position, Sizes size) : base(gameState, position)
+    public Asteroid(GameplayState gameState, Vector2 position, Sizes size) : base(gameState, position)
     {
         _size = size;
 

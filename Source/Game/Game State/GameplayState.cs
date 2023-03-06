@@ -5,13 +5,13 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace astral_assault;
 
-public class MainGameState : GameState
+public class GameplayState : GameState
 {
     public readonly List<Entity> Entities;
     public readonly CollisionSystem CollisionSystem = new();
     public WaveController WaveController;
 
-    public MainGameState(Game1 root) : base(root)
+    public GameplayState(Game1 root) : base(root)
     {
         Entities = new List<Entity>();
         WaveController = new WaveController(this, Root);

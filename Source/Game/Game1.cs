@@ -20,9 +20,7 @@ public class Game1 : Game
         Half = 960,
         Quarter = 480
     }
-
-    public GameState MainGameState;
-    public GameState GameOverState;
+    
     public GameStateMachine GameStateMachine;
     
     // render
@@ -78,9 +76,7 @@ public class Game1 : Game
         Text.Initialize(this);
         InputEventSource.Initialize();
         
-        MainGameState = new MainGameState(this);
-        GameOverState = new GameOverState(this);
-        GameStateMachine = new GameStateMachine(MainGameState);
+        GameStateMachine = new GameStateMachine(new GameplayState(this));
 
         base.Initialize();
     }

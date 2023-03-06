@@ -11,7 +11,7 @@ public class Entity : IUpdateEventListener
     protected float Rotation;
     protected SpriteRenderer SpriteRenderer;
     public Collider Collider;
-    protected MainGameState _gameState;
+    protected GameplayState _gameState;
     protected OutOfBounds OutOfBoundsBehavior = OutOfBounds.Wrap;
     protected bool IsActor = false;
     protected float MaxHP;
@@ -32,7 +32,7 @@ public class Entity : IUpdateEventListener
         Destroy
     }
 
-    protected Entity(MainGameState gameState, Vector2 position)
+    protected Entity(GameplayState gameState, Vector2 position)
     {
         _gameState = gameState;
         Position = position;
@@ -114,10 +114,12 @@ public class Entity : IUpdateEventListener
         SpriteRenderer.Draw(spriteBatch, Position, Rotation);
     }
 
-    public void Destroy()
+    public virtual void Destroy()
     {
         _gameState.Entities.Remove(this);
         _gameState.CollisionSystem.RemoveCollider(Collider);
+        
+        UpdateEventSource.UpdateEvent -= OnUpdate;
     }
 
     protected virtual void OnDeath()

@@ -21,7 +21,7 @@ public class Player : Entity, IInputEventListener
     private const float BulletSpeed = 250;
     private const int   ShootSpeed = 200;
 
-    public Player(MainGameState gameState, Vector2 position) :base(gameState, position)
+    public Player(GameplayState gameState, Vector2 position) :base(gameState, position)
     {
         Position = position;
         Rotation = Pi / 2;
@@ -65,6 +65,13 @@ public class Player : Entity, IInputEventListener
         InputEventSource.KeyboardEvent += OnKeyboardEvent;
         InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
         InputEventSource.MouseButtonEvent += OnMouseButtonEvent;
+    }
+    
+    private void StopListening()
+    {
+        InputEventSource.KeyboardEvent -= OnKeyboardEvent;
+        InputEventSource.MouseMoveEvent -= OnMouseMoveEvent;
+        InputEventSource.MouseButtonEvent -= OnMouseButtonEvent;
     }
 
     private void HandleMovement(int xAxis, int yAxis)
@@ -125,11 +132,18 @@ public class Player : Entity, IInputEventListener
         Velocity = direction * 50;
     }
 
+    public override void Destroy()
+    {
+        StopListening();
+        
+        base.Destroy();
+    }
+    
     protected override void OnDeath()
     {
         Game1 root = _gameState.Root;
         
-        root.GameStateMachine.ChangeState(root.GameOverState);
+        root.GameStateMachine.ChangeState(new GameOverState(root));
         
         base.OnDeath();
     }
