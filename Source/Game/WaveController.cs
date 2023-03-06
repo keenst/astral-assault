@@ -7,6 +7,7 @@ namespace astral_assault;
 
 public class WaveController : IUpdateEventListener
 {
+    private readonly GameplayState _gameState;
     private readonly Game1 _root;
     private int _currentWave;
 
@@ -17,9 +18,11 @@ public class WaveController : IUpdateEventListener
     private long _waveTimer;
     private const long WaveDelay = 5000;
     
-    public WaveController(Game1 root)
+    public WaveController(GameplayState gameState, Game1 root)
     {
+        _gameState = gameState;
         _root = root;
+
         UpdateEventSource.UpdateEvent += OnUpdate;
         
         StartNextWave();
@@ -57,7 +60,7 @@ public class WaveController : IUpdateEventListener
             Vector2 position = new(x, y);
             Asteroid.Sizes size = (Asteroid.Sizes)rnd.Next(0, 3);
             
-            _root.Entities.Add(new Asteroid(_root, position, size));
+            _gameState.Entities.Add(new Asteroid(_gameState, position, size));
         }
 
         _drawWaveText = true;
@@ -78,7 +81,7 @@ public class WaveController : IUpdateEventListener
             _drawWaveText = false;
         }
 
-        int enemiesAlive = _root.Entities.Count(x => x is Asteroid);
+        int enemiesAlive = _gameState.Entities.Count(x => x is Asteroid);
         if (enemiesAlive == 0)
         {
             if (timeNow - _waveTimer < WaveDelay) return;
@@ -86,5 +89,15 @@ public class WaveController : IUpdateEventListener
             StartNextWave();
             _waveTimer = timeNow;
         }
+    }
+
+    public void Start()
+    {
+        
+    }
+
+    public void Stop()
+    {
+        
     }
 }

@@ -10,8 +10,8 @@ public class Entity : IUpdateEventListener
     protected Vector2 Velocity;
     protected float Rotation;
     protected SpriteRenderer SpriteRenderer;
-    protected Collider Collider;
-    protected Game1 Root;
+    public Collider Collider;
+    protected GameplayState _gameState;
     protected OutOfBounds OutOfBoundsBehavior = OutOfBounds.Wrap;
     protected bool IsActor = false;
     protected float MaxHP;
@@ -32,9 +32,9 @@ public class Entity : IUpdateEventListener
         Destroy
     }
 
-    protected Entity(Game1 root, Vector2 position)
+    protected Entity(GameplayState gameState, Vector2 position)
     {
-        Root = root;
+        _gameState = gameState;
         Position = position;
         _timeSpawned = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         
@@ -90,6 +90,11 @@ public class Entity : IUpdateEventListener
                 
                 break;
             }
+            
+            default:
+            {
+                throw new ArgumentOutOfRangeException();
+            }
         }
     }
 
@@ -109,10 +114,12 @@ public class Entity : IUpdateEventListener
         SpriteRenderer.Draw(spriteBatch, Position, Rotation);
     }
 
-    protected void Destroy()
+    public virtual void Destroy()
     {
-        Root.Entities.Remove(this);
-        Root.CollisionSystem.RemoveCollider(Collider);
+        _gameState.Entities.Remove(this);
+        _gameState.CollisionSystem.RemoveCollider(Collider);
+        
+        UpdateEventSource.UpdateEvent -= OnUpdate;
     }
 
     protected virtual void OnDeath()
@@ -122,7 +129,7 @@ public class Entity : IUpdateEventListener
 
     private void CreateHealthBarTexture()
     {
-        _healthBarTexture = new Texture2D(Root.GraphicsDevice, 1, 1);
+        _healthBarTexture = new Texture2D(_gameState.Root.GraphicsDevice, 1, 1);
         Color[] data = { Color.White };
         _healthBarTexture.SetData(data);
     }

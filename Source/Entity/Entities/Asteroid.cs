@@ -17,9 +17,8 @@ public class Asteroid : Entity
         Medium
     }
 
-    public Asteroid(Game1 root, Vector2 position, Sizes size) : base(root, position)
+    public Asteroid(GameplayState gameState, Vector2 position, Sizes size) : base(gameState, position)
     {
-        Root = root;
         _size = size;
 
         Random rnd = new();
@@ -27,14 +26,14 @@ public class Asteroid : Entity
         Velocity.X = rnd.Next(-100, 100);
         Velocity.Y = rnd.Next(-100, 100);
 
-        Texture2D spriteSheet = default;
-        int colliderSize = 0;
-        int spriteSize = 0;
+        Texture2D spriteSheet;
+        int colliderSize;
+        int spriteSize;
 
         switch (size)
         {
             case Sizes.Smallest:
-                spriteSheet = Root.Content.Load<Texture2D>("assets/asteroid1");
+                spriteSheet = _gameState.Root.Content.Load<Texture2D>("assets/asteroid1");
                 spriteSize = 16;
                 colliderSize = 10;
                 MaxHP = 12;
@@ -42,7 +41,7 @@ public class Asteroid : Entity
                 ContactDamage = 5;
                 break;
             case Sizes.Small:
-                spriteSheet = Root.Content.Load<Texture2D>("assets/asteroid2");
+                spriteSheet = _gameState.Root.Content.Load<Texture2D>("assets/asteroid2");
                 spriteSize = 24;
                 colliderSize = 16;
                 MaxHP = 24;
@@ -50,13 +49,15 @@ public class Asteroid : Entity
                 ContactDamage = 7;
                 break;
             case Sizes.Medium:
-                spriteSheet = Root.Content.Load<Texture2D>("assets/asteroid3");
+                spriteSheet = _gameState.Root.Content.Load<Texture2D>("assets/asteroid3");
                 spriteSize = 32;
                 colliderSize = 24;
                 MaxHP = 36;
                 HP = MaxHP;
                 ContactDamage = 12;
                 break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
         
         Frame frame = new(
@@ -74,7 +75,7 @@ public class Asteroid : Entity
             new Rectangle(
                 new Point((int)Position.X - colliderSize / 2, (int)Position.Y - colliderSize / 2), 
                 new Point(colliderSize, colliderSize)));
-        Root.CollisionSystem.AddCollider(Collider);
+        _gameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Wrap;
 
@@ -90,7 +91,7 @@ public class Asteroid : Entity
             
             for (int i = 0; i < amount; i++)
             {
-                Root.Entities.Add(new Asteroid(Root, Position, _size - 1));
+                _gameState.Entities.Add(new Asteroid(_gameState, Position, _size - 1));
             }
         }
         

@@ -5,14 +5,12 @@ namespace astral_assault;
 
 public class Crosshair : Entity, IMouseEventListener
 {
-    public Crosshair(Game1 root, Vector2 position) : base(root, position)
+    public Crosshair(GameplayState gameState) : base(gameState, new Vector2(0, 0))
     {
-        Root = root;
-
         InputEventSource.MouseButtonEvent += OnMouseButtonEvent;
         InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
 
-        Texture2D spriteSheet = Root.Content.Load<Texture2D>("assets/crosshair");
+        Texture2D spriteSheet = _gameState.Root.Content.Load<Texture2D>("assets/crosshair");
 
         Frame frame = new(new Rectangle(0, 0, 16, 16));
 
@@ -23,6 +21,14 @@ public class Crosshair : Entity, IMouseEventListener
         OutOfBoundsBehavior = OutOfBounds.DoNothing;
     }
 
+    public override void Destroy()
+    {
+        InputEventSource.MouseButtonEvent -= OnMouseButtonEvent;
+        InputEventSource.MouseMoveEvent -= OnMouseMoveEvent;
+        
+        base.Destroy();
+    }
+
     public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)
     {
         
@@ -30,7 +36,7 @@ public class Crosshair : Entity, IMouseEventListener
 
     public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
     {
-        Point scale = new((int)Root.ScaleX, (int)Root.ScaleY);
+        Point scale = new((int)_gameState.Root.ScaleX, (int)_gameState.Root.ScaleY);
         Position = (e.Position / scale).ToVector2();
     }
 }
