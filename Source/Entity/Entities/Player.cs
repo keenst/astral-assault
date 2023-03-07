@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq;
+using System.Numerics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace astral_assault;
 
@@ -95,6 +98,17 @@ public class Player : Entity, IInputEventListener
         Velocity = new Vector2(
             Math.Clamp(Velocity.X + right.X * xAxis, -MaxSpeed, MaxSpeed),
             Math.Clamp(Velocity.Y + right.Y * xAxis, -MaxSpeed, MaxSpeed));
+
+        if (Velocity.Length() > MaxSpeed)
+        {
+            Velocity.Normalize();
+            Velocity *= MaxSpeed;
+        }
+        else if (Velocity.Length() < -MaxSpeed)
+        {
+            Velocity.Normalize();
+            Velocity *= -MaxSpeed;
+        }
     }
 
     private void HandleFiring()
@@ -150,20 +164,19 @@ public class Player : Entity, IInputEventListener
 
     public void OnKeyboardEvent(object sender, KeyboardEventArgs e)
     {
-        int xAxis = e.Key switch
-        {
-            Keys.D => 1,
-            Keys.A => -1,
-            _ => 0
-        };
-        
-        int yAxis = e.Key switch
-        {
-            Keys.W => 1,
-            Keys.S => -1,
-            _ => 0
-        };
-        
+        int xAxis = 0;
+        int yAxis = 0;
+
+        if (e.Keys.Contains(Keys.D))
+            xAxis = 1;
+        else if (e.Keys.Contains(Keys.A))
+            xAxis = -1;
+
+        if (e.Keys.Contains(Keys.W))
+            yAxis = 1;
+        else if (e.Keys.Contains(Keys.S))
+            yAxis = -1;
+
         HandleMovement(xAxis, yAxis);
     }
 

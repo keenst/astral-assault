@@ -59,16 +59,22 @@ public static class InputEventSource
             _prevKeysDown.Clear();
             return;
         }
+
+        List<Keys> keysDown = new();
+        List<Keys> keysPressed = new();
         
         foreach (Keys key in _keysDown)
         {
-            KeyboardEvent?.Invoke(null, new KeyboardEventArgs(key));
+            keysDown.Add(key);
             
             if (!_prevKeysDown.Contains(key))
             {
-                KeyboardPressedEvent?.Invoke(null, new KeyboardEventArgs(key));
+                keysPressed.Add(key);
             }
         }
+        
+        KeyboardEvent?.Invoke(null, new KeyboardEventArgs(keysDown.ToArray()));
+        KeyboardPressedEvent?.Invoke(null, new KeyboardEventArgs(keysPressed.ToArray()));
     }
     
     private static void HandleMouseButtons()
