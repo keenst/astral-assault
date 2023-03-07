@@ -5,10 +5,10 @@ namespace astral_assault;
 
 public class KeyboardEventArgs : EventArgs
 {
-    public Keys Key { get; }
+    public Keys[] Keys { get; }
 
-    public KeyboardEventArgs(Keys key)
+    public KeyboardEventArgs(Keys[] keys)
     {
-        Key = key;
+        Keys = keys;
     }
 }
