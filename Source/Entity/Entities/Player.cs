@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Numerics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace astral_assault;
 
@@ -16,13 +14,13 @@ public class Player : Entity, IInputEventListener
     private long _lastTimeFired;
     private float _delta;
 
-    private const float MoveSpeed = 100;
+    private const float MoveSpeed = 200;
     private const float MaxSpeed = 100;
-    private const float TiltSpeed = 80;
+    private const float TiltSpeed = 200;
     private const float Friction = 30;
     private const float Pi = 3.14F;
     private const float BulletSpeed = 250;
-    private const int   ShootSpeed = 200;
+    private const int ShootSpeed = 200;
 
     public Player(GameplayState gameState, Vector2 position) :base(gameState, position)
     {
