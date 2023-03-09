@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace astral_assault;
+namespace AstralAssault;
 
 public class Game1 : Game
 {

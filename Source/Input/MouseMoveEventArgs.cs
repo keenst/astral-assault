@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 
-namespace astral_assault;
+namespace AstralAssault;
 
 public class MouseMoveEventArgs : EventArgs
 {

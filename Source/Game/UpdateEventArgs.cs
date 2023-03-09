@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace astral_assault;
+namespace AstralAssault;
 
 public class UpdateEventArgs : EventArgs
 {

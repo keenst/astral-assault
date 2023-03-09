@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace astral_assault;
+namespace AstralAssault;
 
 public class Crosshair : Entity, IMouseEventListener
 {

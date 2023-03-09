@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.Xna.Framework;
 
-namespace astral_assault;
+namespace AstralAssault;
 
 public class Collider
 {

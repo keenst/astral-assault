@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace astral_assault;
+namespace AstralAssault;
 
 public class CollisionSystem : IUpdateEventListener 
 {
