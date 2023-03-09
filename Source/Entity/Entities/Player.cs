@@ -50,7 +50,7 @@ public class Player : Entity, IInputEventListener
 
     private void InitSpriteRenderer()
     {
-        Texture2D spriteSheet = _gameState.Root.Content.Load<Texture2D>("assets/player");
+        Texture2D spriteSheet = AssetManager.LoadTexture("player");
         
         Frame frame = new(
             new Rectangle(0, 0, 32, 32),
@@ -206,9 +206,7 @@ public class Player : Entity, IInputEventListener
         // check range to cursor
         float distance = Vector2.Distance(Position, _cursorPosition);
         _isCrosshairActive = distance >= 12;
-        
-        Debug.WriteLine(distance);
-        
+
         // rotate player
         if (_isCrosshairActive)
         {

@@ -33,7 +33,7 @@ public class Asteroid : Entity
         switch (size)
         {
             case Sizes.Smallest:
-                spriteSheet = _gameState.Root.Content.Load<Texture2D>("assets/asteroid1");
+                spriteSheet = AssetManager.LoadTexture("asteroid1");
                 spriteSize = 16;
                 colliderSize = 10;
                 MaxHP = 12;
@@ -41,7 +41,7 @@ public class Asteroid : Entity
                 ContactDamage = 5;
                 break;
             case Sizes.Small:
-                spriteSheet = _gameState.Root.Content.Load<Texture2D>("assets/asteroid2");
+                spriteSheet = AssetManager.LoadTexture("asteroid2");
                 spriteSize = 24;
                 colliderSize = 16;
                 MaxHP = 24;
@@ -49,7 +49,7 @@ public class Asteroid : Entity
                 ContactDamage = 7;
                 break;
             case Sizes.Medium:
-                spriteSheet = _gameState.Root.Content.Load<Texture2D>("assets/asteroid3");
+                spriteSheet = AssetManager.LoadTexture("asteroid3");
                 spriteSize = 32;
                 colliderSize = 24;
                 MaxHP = 36;

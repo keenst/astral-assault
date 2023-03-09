@@ -10,7 +10,7 @@ public class Crosshair : Entity, IMouseEventListener
         InputEventSource.MouseButtonEvent += OnMouseButtonEvent;
         InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
 
-        Texture2D spriteSheet = _gameState.Root.Content.Load<Texture2D>("assets/crosshair");
+        Texture2D spriteSheet = AssetManager.LoadTexture("crosshair");
 
         Frame activeFrame   = new(new Rectangle(0,  0, 16, 16));
         Frame inactiveFrame = new(new Rectangle(16, 0, 16, 16));
@@ -33,6 +33,8 @@ public class Crosshair : Entity, IMouseEventListener
     
     public override void OnUpdate(object sender, UpdateEventArgs e)
     {
+        if (_gameState.Player == null) return;
+        
         Vector2 playerPosition = _gameState.Player.Position;
         float distance = Vector2.Distance(playerPosition, Position);
         if (distance < 12) SpriteRenderer.PlayAnimation(1);

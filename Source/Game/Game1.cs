@@ -61,6 +61,8 @@ public class Game1 : Game
         IsFixedTimeStep = false;
         
         ShowDebug = false;
+        
+        AssetManager.Init(this);
     }
 
     protected override void Initialize()
@@ -73,8 +75,9 @@ public class Game1 : Game
             GraphicsDevice.PresentationParameters.BackBufferFormat,
             DepthFormat.Depth24);
 
-        Text.Initialize(this);
-        InputEventSource.Initialize();
+        Text.Init(this);
+        InputEventSource.Init();
+        AssetManager.Init(this);
         
         GameStateMachine = new GameStateMachine(new GameplayState(this));
 

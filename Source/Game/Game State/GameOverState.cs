@@ -57,8 +57,8 @@ public class GameOverState : GameState, IKeyboardEventListener, IUpdateEventList
 
     public override void Enter()
     {
-        _gameOverText = Root.Content.Load<Texture2D>("assets/game over");
-        _restartPrompt = Root.Content.Load<Texture2D>("assets/restart");
+        _gameOverText = AssetManager.LoadTexture("game over");
+        _restartPrompt = AssetManager.LoadTexture("restart");
     }
 
     public override void Exit()
