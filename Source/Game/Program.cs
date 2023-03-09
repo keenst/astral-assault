@@ -1,2 +1,4 @@
-﻿using var game = new astral_assault.Game1();
+﻿using AstralAssault;
+
+using Game1 game = new();
 game.Run();
