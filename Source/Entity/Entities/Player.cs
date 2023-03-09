@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,9 +9,10 @@ namespace astral_assault;
 
 public class Player : Entity, IInputEventListener
 {
-    private Point _cursorPosition;
+    private Vector2 _cursorPosition;
     private Tuple<Vector2, Vector2> _muzzle;
     private bool _lastCannon;
+    private bool _isCrosshairActive = true;
     private long _lastTimeFired;
     private float _delta;
 
@@ -111,6 +113,8 @@ public class Player : Entity, IInputEventListener
 
     private void HandleFiring()
     {
+        if (!_isCrosshairActive) return;
+        
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         
         if (_lastTimeFired + ShootSpeed > timeNow) return;
@@ -181,7 +185,8 @@ public class Player : Entity, IInputEventListener
     public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
     {
         Point scale = new((int)_gameState.Root.ScaleX, (int)_gameState.Root.ScaleY);
-        _cursorPosition = e.Position / scale;
+        _cursorPosition.X = e.Position.ToVector2().X / scale.X;
+        _cursorPosition.Y = e.Position.ToVector2().Y / scale.Y;
     }
 
     public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)
@@ -198,11 +203,20 @@ public class Player : Entity, IInputEventListener
         
         _delta = e.DeltaTime;
 
+        // check range to cursor
+        float distance = Vector2.Distance(Position, _cursorPosition);
+        _isCrosshairActive = distance >= 12;
+        
+        Debug.WriteLine(distance);
+        
         // rotate player
-        float xDiff = _cursorPosition.X - Position.X;
-        float yDiff = _cursorPosition.Y - Position.Y;
+        if (_isCrosshairActive)
+        {
+            float xDiff = _cursorPosition.X - Position.X;
+            float yDiff = _cursorPosition.Y - Position.Y;
 
-        Rotation = (float)Math.Atan2(yDiff, xDiff);
+            Rotation = (float)Math.Atan2(yDiff, xDiff);
+        }
 
         // apply friction
         float sign = Math.Sign(Velocity.Length());

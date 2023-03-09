@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -6,10 +7,11 @@ namespace astral_assault;
 
 public class SpriteRenderer : IUpdateEventListener
 {
-    private readonly Animation[] _animations;
+    public Animation[] Animations { get; }
     private readonly Texture2D _spriteSheet;
 
-    private readonly Animation _activeAnimation;
+    public Animation ActiveAnimation { get; private set; }
+    public int ActiveAnimationIndex => Animations.ToList().IndexOf(ActiveAnimation);
     private int _activeFrame;
 
     private long _lastFrameUpdate;
@@ -18,29 +20,39 @@ public class SpriteRenderer : IUpdateEventListener
 
     public SpriteRenderer(Texture2D spriteSheet, Animation[] frames)
     {
-        _animations = frames;
+        Animations = frames;
         _spriteSheet = spriteSheet;
         
         UpdateEventSource.UpdateEvent += OnUpdate;
-        _activeAnimation = _animations[0];
+        ActiveAnimation = Animations[0];
     }
 
     public void OnUpdate(object sender, UpdateEventArgs e)
     {
-        if (_activeAnimation.Frames.Length == 1) return;
+        if (ActiveAnimation.Frames.Length == 1) return;
         
-        int frameLength = _activeAnimation.Frames[_activeFrame].Time;
+        int frameLength = ActiveAnimation.Frames[_activeFrame].Time;
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
         if (timeNow < _lastFrameUpdate + frameLength) return;
 
-        _activeFrame = (_activeFrame + 1) % _activeAnimation.Frames.Length;
+        _activeFrame = (_activeFrame + 1) % ActiveAnimation.Frames.Length;
         _lastFrameUpdate = timeNow;
+    }
+
+    public void PlayAnimation(int index)
+    {
+        if (index >= Animations.Length || index < 0) 
+            throw new ArgumentOutOfRangeException();
+
+        ActiveAnimation = Animations[index];
+        _activeFrame = 0;
+        _lastFrameUpdate = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
     }
 
     public void Draw(SpriteBatch spriteBatch, Vector2 position, float rotation)
     {
-        if (_activeAnimation.HasRotation)
+        if (ActiveAnimation.HasRotation)
             DrawRotatable(spriteBatch, position, rotation);
         else
             DrawStatic(spriteBatch, position);
@@ -48,7 +60,7 @@ public class SpriteRenderer : IUpdateEventListener
 
     private void DrawStatic(SpriteBatch spriteBatch, Vector2 position)
     {
-        Rectangle source = _activeAnimation.Frames[_activeFrame].Source;
+        Rectangle source = ActiveAnimation.Frames[_activeFrame].Source;
         
         spriteBatch.Draw(
             _spriteSheet, 
@@ -87,7 +99,7 @@ public class SpriteRenderer : IUpdateEventListener
         
         if (rot % 4 == 0)
         {
-            source = _activeAnimation.Frames[_activeFrame].Rotations[0];
+            source = ActiveAnimation.Frames[_activeFrame].Rotations[0];
             spriteRotation = Pi / 8 * rot;
             return new Tuple<float, Rectangle>(spriteRotation, source);
         }
@@ -101,7 +113,7 @@ public class SpriteRenderer : IUpdateEventListener
             _ => 0
         };
 
-        source = _activeAnimation.Frames[_activeFrame].Rotations[rot.Mod(4)];
+        source = ActiveAnimation.Frames[_activeFrame].Rotations[rot.Mod(4)];
 
         return new Tuple<float, Rectangle>(spriteRotation, source);
     }

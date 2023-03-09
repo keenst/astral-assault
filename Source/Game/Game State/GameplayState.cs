@@ -10,6 +10,8 @@ public class GameplayState : GameState
     public readonly List<Entity> Entities;
     public readonly CollisionSystem CollisionSystem = new();
     public WaveController WaveController;
+    
+    public Player Player => (Player) Entities.Find(entity => entity is Player);
 
     public GameplayState(Game1 root) : base(root)
     {
