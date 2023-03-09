@@ -37,7 +37,7 @@ public static class InputEventSource
         Side2
     }
 
-    public static void Initialize()
+    public static void Init()
     {
         UpdateEventSource.UpdateEvent += OnUpdate;
     }

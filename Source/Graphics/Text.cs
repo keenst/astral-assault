@@ -11,10 +11,10 @@ public static class Text
 
     private static Dictionary<char, int> _dict;
 
-    public static void Initialize(Game1 root)
+    public static void Init(Game1 root)
     {
         _root = root;
-        _font = _root.Content.Load<Texture2D>("assets/font");
+        _font = AssetManager.LoadTexture("font");
         _dict = new Dictionary<char, int>
         {
             { 'A', 0 },
