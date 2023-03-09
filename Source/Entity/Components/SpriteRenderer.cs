@@ -7,6 +7,7 @@ namespace AstralAssault;
 
 public class SpriteRenderer : IUpdateEventListener
 {
+    private readonly float _layerDepth;
     private readonly Animation[] _animations;
     private readonly Texture2D _spriteSheet;
     private Animation _activeAnimation;
@@ -17,10 +18,11 @@ public class SpriteRenderer : IUpdateEventListener
 
     private const float Pi = 3.14F;
 
-    public SpriteRenderer(Texture2D spriteSheet, Animation[] frames)
+    public SpriteRenderer(Texture2D spriteSheet, Animation[] animations, float layerDepth = LayerDepth.Foreground)
     {
-        _animations = frames;
+        _animations = animations;
         _spriteSheet = spriteSheet;
+        _layerDepth = layerDepth;
         
         UpdateEventSource.UpdateEvent += OnUpdate;
         _activeAnimation = _animations[0];
@@ -70,7 +72,7 @@ public class SpriteRenderer : IUpdateEventListener
             new Vector2(source.Height / 2F, source.Width / 2F),
             new Vector2(1, 1),
             SpriteEffects.None,
-            0);
+            _layerDepth);
     }
 
     private void DrawRotatable(SpriteBatch spriteBatch, Vector2 position, float rotation)
@@ -86,7 +88,7 @@ public class SpriteRenderer : IUpdateEventListener
             new Vector2(source.Height / 2F, source.Width / 2F),
             new Vector2(1, 1),
             SpriteEffects.None,
-            0);
+            _layerDepth);
     }
 
     private Tuple<float, Rectangle> GetRotation(float rotation)

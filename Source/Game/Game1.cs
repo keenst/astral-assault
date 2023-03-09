@@ -112,7 +112,7 @@ public class Game1 : Game
         
         GraphicsDevice.Clear(BackgroundColor);
         
-        _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap);
+        _spriteBatch.Begin(SpriteSortMode.BackToFront, null, SamplerState.PointWrap);
 
         GameStateMachine.Draw(_spriteBatch);
         

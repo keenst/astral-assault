@@ -148,8 +148,36 @@ public class Entity : IUpdateEventListener
         Rectangle emptyHealthBar = new(x, y, width, height);
         Rectangle fullHealthBar = new(x, y, filled, height);
         
-        spriteBatch.Draw(_healthBarTexture, outline, Color.Black);
-        spriteBatch.Draw(_healthBarTexture, emptyHealthBar, Color.Red);
-        spriteBatch.Draw(_healthBarTexture, fullHealthBar, Color.LimeGreen);
+        Rectangle source = new(0, 0, 1, 1);
+        
+        spriteBatch.Draw(
+            _healthBarTexture, 
+            outline, 
+            source, 
+            Color.Black, 
+            0, 
+            Vector2.Zero, 
+            SpriteEffects.None, 
+            0.2F);
+        
+        spriteBatch.Draw(
+            _healthBarTexture, 
+            emptyHealthBar, 
+            source, 
+            Color.Red, 
+            0, 
+            Vector2.Zero, 
+            SpriteEffects.None, 
+            0.1F);
+        
+        spriteBatch.Draw(
+            _healthBarTexture, 
+            fullHealthBar, 
+            source, 
+            Color.LimeGreen, 
+            0, 
+            Vector2.Zero, 
+            SpriteEffects.None, 
+            0);
     }
 }
