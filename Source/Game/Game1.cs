@@ -75,9 +75,9 @@ public class Game1 : Game
             GraphicsDevice.PresentationParameters.BackBufferFormat,
             DepthFormat.Depth24);
 
-        Text.Init(this);
-        InputEventSource.Init();
         AssetManager.Init(this);
+        TextRenderer.Init();
+        InputEventSource.Init();
         
         GameStateMachine = new GameStateMachine(new GameplayState(this));
 
