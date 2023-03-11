@@ -39,7 +39,9 @@ public class GameplayState : GameState
             Array.Fill(data, new Color(Color.White, 0.2F));
             rect.SetData(data);
 
-            spriteBatch.Draw(rect, collider.Rectangle.Location.ToVector2(), Color.Blue);
+            Color color = collider.Parent.IsColliding ? Color.Red : Color.Blue;
+            
+            spriteBatch.Draw(rect, collider.Rectangle.Location.ToVector2(), color);
         }
     }
 

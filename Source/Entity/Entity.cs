@@ -8,6 +8,7 @@ public class Entity : IUpdateEventListener
 {
     public Vector2 Position;
     public Vector2 Velocity;
+    public bool IsColliding;
     protected float Rotation;
     protected Collider Collider;
     protected SpriteRenderer SpriteRenderer;
@@ -98,11 +99,18 @@ public class Entity : IUpdateEventListener
         }
     }
 
-    public virtual void OnCollision(Collider other)
+    public virtual void OnCollisionEnter(Collider other)
     {
+        IsColliding = true;
+        
         if (!IsActor || other.Parent.IsFriendly == IsFriendly) return;
 
         HP = Math.Max(0, HP - other.Parent.ContactDamage);
+    }
+    
+    public void OnCollisionExit(Collider other)
+    {
+        IsColliding = false;
     }
     
     public void Draw(SpriteBatch spriteBatch)

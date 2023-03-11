@@ -38,7 +38,7 @@ public class Bullet : Entity
         IsFriendly = true;
     }
 
-    public override void OnCollision(Collider other)
+    public override void OnCollisionEnter(Collider other)
     {
         if (IsFriendly == other.Parent.IsFriendly) return;
         

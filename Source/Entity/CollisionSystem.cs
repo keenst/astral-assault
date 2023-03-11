@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
@@ -26,14 +27,26 @@ public class CollisionSystem : IUpdateEventListener
                 Collider other = Colliders[j];
                 if (collider == other) continue;
 
+                Tuple<Collider, Collider> colliderPair = new(collider, other);
+
                 if (!collider.CollidesWith(
-                        other, 
-                        e.DeltaTime,
-                        out Vector2 initialImpulseThis,
-                        out Vector2 initialImpulseOther,
-                        out Vector2 totalImpulseThis,
-                        out Vector2 totalImpulseOther)) 
+                    other,
+                    e.DeltaTime,
+                    out Vector2 initialImpulseThis,
+                    out Vector2 initialImpulseOther,
+                    out Vector2 totalImpulseThis,
+                    out Vector2 totalImpulseOther))
+                {
+                    if (_lastCollisions.Any(t => 
+                        t.Item1 == collider && t.Item2 == other ||
+                        t.Item2 == collider && t.Item1 == other))
+                    {
+                        collider.Parent.OnCollisionExit(other);
+                        other.Parent.OnCollisionExit(collider);
+                    }
+
                     continue;
+                }
 
                 if (collider.IsSolid && other.IsSolid && collider.Parent.TimeSinceSpawned > 1000)
                 {
@@ -46,13 +59,25 @@ public class CollisionSystem : IUpdateEventListener
                     collider.SetPosition(collider.Parent.Position.ToPoint());
                     other.SetPosition(other.Parent.Position.ToPoint());
                 }
-
-                Tuple<Collider, Collider> colliderPair = new(collider, other);
+                
                 currentCollisions.Add(colliderPair);
-                if (_lastCollisions.Contains(colliderPair)) continue;
+                if (_lastCollisions.Any(t => 
+                    t.Item1 == collider && t.Item2 == other ||
+                    t.Item2 == collider && t.Item1 == other))
+                    continue;
 
-                collider.Parent.OnCollision(other);
-                other.Parent.OnCollision(collider);
+                collider.Parent.OnCollisionEnter(other);
+                other.Parent.OnCollisionEnter(collider);
+            }
+        }
+
+        if (currentCollisions.Count < _lastCollisions.Count)
+        {
+            List<Tuple<Collider, Collider>> removedCollisions = _lastCollisions.Except(currentCollisions).ToList();
+            foreach (Tuple<Collider, Collider> removedCollision in removedCollisions)
+            {
+                removedCollision.Item1.Parent.OnCollisionExit(removedCollision.Item2);
+                removedCollision.Item2.Parent.OnCollisionExit(removedCollision.Item1);
             }
         }
 

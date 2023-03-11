@@ -137,9 +137,9 @@ public class Player : Entity, IInputEventListener
         _lastCannon = !_lastCannon;
     }
 
-    public override void OnCollision(Collider other)
+    public override void OnCollisionEnter(Collider other)
     {
-        base.OnCollision(other);
+        base.OnCollisionEnter(other);
 
         if (IsFriendly == other.Parent.IsFriendly) return;
         
