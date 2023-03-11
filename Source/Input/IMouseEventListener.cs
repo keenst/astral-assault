@@ -1,4 +1,4 @@
-﻿namespace astral_assault;
+﻿namespace AstralAssault;
 
 public interface IMouseEventListener
 {

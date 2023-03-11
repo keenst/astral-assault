@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace astral_assault;
+namespace AstralAssault;
 
 public class Game1 : Game
 {
@@ -22,15 +21,14 @@ public class Game1 : Game
         Quarter = 480
     }
     
+    public GameStateMachine GameStateMachine;
+    
     // render
     private SpriteBatch _spriteBatch;
     private RenderTarget2D _renderTarget;
 
-    // entities
-    private Player _player;
-    public readonly List<Bullet> Bullets = new();
-
     // display
+    private static readonly Color BackgroundColor = new(28, 23, 41);
     public const int TargetWidth = (int)Width.Quarter;
     public const int TargetHeight = (int)Height.Quarter;
     private readonly Matrix _scale;
@@ -45,8 +43,6 @@ public class Game1 : Game
     private const int StatUpdateInterval = 300;
     private KeyboardState _prevKeyState = Keyboard.GetState();
 
-    private readonly InputEventSource _inputEventSource = new();
-    
     public Game1()
     {
         // set up game class
@@ -63,9 +59,10 @@ public class Game1 : Game
 
         graphics.SynchronizeWithVerticalRetrace = false;
         IsFixedTimeStep = false;
-
-        // set up debug tools
+        
         ShowDebug = false;
+        
+        AssetManager.Init(this);
     }
 
     protected override void Initialize()
@@ -77,13 +74,12 @@ public class Game1 : Game
             false,
             GraphicsDevice.PresentationParameters.BackBufferFormat,
             DepthFormat.Depth24);
+
+        AssetManager.Init(this);
+        TextRenderer.Init();
+        InputEventSource.Init();
         
-        // create player
-        _player = new Player(this, new Vector2(TargetWidth / 2F, TargetHeight / 2F));
-        _player.StartListening(_inputEventSource);
-        
-        // initialize font renderer
-        Text.Initialize(this);
+        GameStateMachine = new GameStateMachine(new GameplayState(this));
 
         base.Initialize();
     }
@@ -95,8 +91,6 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
-        _inputEventSource.Update();
-        
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
@@ -106,19 +100,7 @@ public class Game1 : Game
 
         _prevKeyState = Keyboard.GetState();
 
-        _player.Update(gameTime);
-        
-        for (int i = 0; i < Bullets.Count; i++)
-        {
-            if (Bullets[i].Position.X is > TargetWidth or < 0 ||
-                Bullets[i].Position.Y is > TargetHeight or < 0)
-            {
-                Bullets.RemoveAt(i);
-                return;
-            }
-            
-            Bullets[i].Update(gameTime);
-        }
+        UpdateEventSource.Update(gameTime);
 
         base.Update(gameTime);
     }
@@ -128,12 +110,12 @@ public class Game1 : Game
         // draw sprites to render target
         GraphicsDevice.SetRenderTarget(_renderTarget);
         
-        GraphicsDevice.Clear(Color.DarkGray);
+        GraphicsDevice.Clear(BackgroundColor);
         
-        _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap);
-        _player.Draw(_spriteBatch);
-        foreach (Bullet bullet in Bullets) bullet.Draw(_spriteBatch);
+        _spriteBatch.Begin(SpriteSortMode.BackToFront, null, SamplerState.PointWrap);
 
+        GameStateMachine.Draw(_spriteBatch);
+        
         if (ShowDebug)
         {
             long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
