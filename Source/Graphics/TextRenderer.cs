@@ -54,7 +54,8 @@ public static class TextRenderer
             { ':', 36 },
             { ';', 37 },
             { '.', 38 },
-            { ',', 39 }
+            { ',', 39 },
+            { ' ', 40 }
         };
     }
 
@@ -68,8 +69,17 @@ public static class TextRenderer
             int y = _dict[text[i]] / 6;
 
             Rectangle source = new(x * 10, y * 10, 10, 10);
-            
-            spriteBatch.Draw(_font, new Vector2(position.X + i * 10, position.Y), source, color);
+
+            spriteBatch.Draw(
+                _font,
+                new Vector2(position.X + i * 10, position.Y),
+                source,
+                color,
+                0,
+                Vector2.Zero,
+                1,
+                SpriteEffects.None,
+                0);
         }
     }
 }

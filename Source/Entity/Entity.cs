@@ -155,7 +155,7 @@ public class Entity : IUpdateEventListener
             0, 
             Vector2.Zero, 
             SpriteEffects.None, 
-            0.2F);
+            0.03F);
         
         spriteBatch.Draw(
             _healthBarTexture, 
@@ -165,7 +165,7 @@ public class Entity : IUpdateEventListener
             0, 
             Vector2.Zero, 
             SpriteEffects.None, 
-            0.1F);
+            0.02F);
         
         spriteBatch.Draw(
             _healthBarTexture, 
@@ -175,6 +175,6 @@ public class Entity : IUpdateEventListener
             0, 
             Vector2.Zero, 
             SpriteEffects.None, 
-            0);
+            0.01F);
     }
 }

@@ -70,7 +70,7 @@ public class WaveController : IUpdateEventListener
     public void Draw(SpriteBatch spriteBatch)
     {
         if (!_drawWaveText) return;
-        spriteBatch.Write($"Wave{_currentWave}", new Vector2(10, 10), Color.White);
+        spriteBatch.Write($"Wave: {_currentWave}", new Vector2(10, 10), Color.White);
     }
 
     public void OnUpdate(object sender, UpdateEventArgs e)

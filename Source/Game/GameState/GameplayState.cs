@@ -23,6 +23,8 @@ public class GameplayState : GameState
     {
         foreach (Entity entity in Entities) entity.Draw(spriteBatch);
 
+        WaveController.Draw(spriteBatch);
+
         if (!Root.ShowDebug) return;
         
         foreach (Collider collider in CollisionSystem.Colliders)
