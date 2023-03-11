@@ -90,14 +90,4 @@ public class WaveController : IUpdateEventListener
             _waveTimer = timeNow;
         }
     }
-
-    public void Start()
-    {
-        
-    }
-
-    public void Stop()
-    {
-        
-    }
 }
