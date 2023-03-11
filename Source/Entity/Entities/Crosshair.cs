@@ -36,9 +36,9 @@ public class Crosshair : Entity, IMouseEventListener
     
     public override void OnUpdate(object sender, UpdateEventArgs e)
     {
-        if (_gameState.Player == null) return;
+        if (GameState.Player == null) return;
         
-        Vector2 playerPosition = _gameState.Player.Position;
+        Vector2 playerPosition = GameState.Player.Position;
         float distance = Vector2.Distance(playerPosition, Position);
         if (distance < 12) SpriteRenderer.PlayAnimation(1);
         else if (SpriteRenderer.ActiveAnimationIndex != 0) SpriteRenderer.PlayAnimation(0);
@@ -51,7 +51,7 @@ public class Crosshair : Entity, IMouseEventListener
 
     public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
     {
-        Point scale = new((int)_gameState.Root.ScaleX, (int)_gameState.Root.ScaleY);
+        Point scale = new((int)GameState.Root.ScaleX, (int)GameState.Root.ScaleY);
         Position = (e.Position / scale).ToVector2();
     }
 }

@@ -29,6 +29,7 @@ public class Asteroid : Entity
         Texture2D spriteSheet;
         int colliderSize;
         int spriteSize;
+        float mass;
 
         switch (size)
         {
@@ -39,6 +40,7 @@ public class Asteroid : Entity
                 MaxHP = 12;
                 HP = MaxHP;
                 ContactDamage = 5;
+                mass = 6;
                 break;
             case Sizes.Small:
                 spriteSheet = AssetManager.LoadTexture("asteroid2");
@@ -47,6 +49,7 @@ public class Asteroid : Entity
                 MaxHP = 24;
                 HP = MaxHP;
                 ContactDamage = 7;
+                mass = 12;
                 break;
             case Sizes.Medium:
                 spriteSheet = AssetManager.LoadTexture("asteroid3");
@@ -55,6 +58,7 @@ public class Asteroid : Entity
                 MaxHP = 36;
                 HP = MaxHP;
                 ContactDamage = 12;
+                mass = 18;
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -74,8 +78,10 @@ public class Asteroid : Entity
             this, 
             new Rectangle(
                 new Point((int)Position.X - colliderSize / 2, (int)Position.Y - colliderSize / 2), 
-                new Point(colliderSize, colliderSize)));
-        _gameState.CollisionSystem.AddCollider(Collider);
+                new Point(colliderSize, colliderSize)),
+            true,
+            mass);
+        GameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Wrap;
 
@@ -91,7 +97,7 @@ public class Asteroid : Entity
             
             for (int i = 0; i < amount; i++)
             {
-                _gameState.Entities.Add(new Asteroid(_gameState, Position, _size - 1));
+                GameState.Entities.Add(new Asteroid(GameState, Position, _size - 1));
             }
         }
         
