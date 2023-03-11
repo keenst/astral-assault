@@ -74,6 +74,7 @@ public static class InputEventSource
         }
         
         KeyboardEvent?.Invoke(null, new KeyboardEventArgs(keysDown.ToArray()));
+        if (keysPressed.Count == 0) return;
         KeyboardPressedEvent?.Invoke(null, new KeyboardEventArgs(keysPressed.ToArray()));
     }
     
