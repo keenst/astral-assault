@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -28,7 +27,7 @@ public class Player : Entity, IInputEventListener
     {
         Position = position;
         Rotation = Pi / 2;
-        
+
         InitSpriteRenderer();
         
         StartListening();
@@ -37,8 +36,10 @@ public class Player : Entity, IInputEventListener
             this, 
             new Rectangle(
                 new Point((int)Position.X - 12, (int)Position.Y - 12), 
-                new Point(24, 24)));
-        _gameState.CollisionSystem.AddCollider(Collider);
+                new Point(24, 24)),
+            true,
+            10);
+        GameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Wrap;
 
@@ -126,9 +127,9 @@ public class Player : Entity, IInputEventListener
 
         float rot = (float)Math.Atan2(yDiff, xDiff);
             
-        _gameState.Entities.Add(
+        GameState.Entities.Add(
             new Bullet(
-                _gameState, 
+                GameState, 
                 _lastCannon ? _muzzle.Item1 : _muzzle.Item2, 
                 rot, 
                 BulletSpeed));
@@ -145,7 +146,7 @@ public class Player : Entity, IInputEventListener
         Vector2 direction = Position - other.Parent.Position;
         direction.Normalize();
 
-        Velocity = direction * 50;
+        //Velocity = direction * 50;
     }
 
     public override void Destroy()
@@ -157,7 +158,7 @@ public class Player : Entity, IInputEventListener
     
     protected override void OnDeath()
     {
-        Game1 root = _gameState.Root;
+        Game1 root = GameState.Root;
         
         root.GameStateMachine.ChangeState(new GameOverState(root));
         
@@ -184,7 +185,7 @@ public class Player : Entity, IInputEventListener
 
     public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
     {
-        Point scale = new((int)_gameState.Root.ScaleX, (int)_gameState.Root.ScaleY);
+        Point scale = new((int)GameState.Root.ScaleX, (int)GameState.Root.ScaleY);
         _cursorPosition.X = e.Position.ToVector2().X / scale.X;
         _cursorPosition.Y = e.Position.ToVector2().Y / scale.Y;
     }

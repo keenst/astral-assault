@@ -13,7 +13,7 @@ public class Bullet : Entity
             (float)Math.Sin(rotation)
             ) * speed;
         
-        Texture2D spriteSheet = new(_gameState.Root.GraphicsDevice, 2, 2);
+        Texture2D spriteSheet = new(GameState.Root.GraphicsDevice, 2, 2);
         
         Color[] data = new Color[2 * 2];
         for(int i = 0; i < data.Length; ++i) data[i] = Color.White;
@@ -30,7 +30,7 @@ public class Bullet : Entity
             new Rectangle(
                 new Point((int)Position.X - 1, (int)Position.Y - 1), 
                 new Point(2, 2)));
-        _gameState.CollisionSystem.AddCollider(Collider);
+        GameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Destroy;
 

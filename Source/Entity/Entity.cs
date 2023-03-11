@@ -7,11 +7,11 @@ namespace AstralAssault;
 public class Entity : IUpdateEventListener
 {
     public Vector2 Position;
-    protected Vector2 Velocity;
+    public Vector2 Velocity;
     protected float Rotation;
+    protected Collider Collider;
     protected SpriteRenderer SpriteRenderer;
-    public Collider Collider;
-    protected GameplayState _gameState;
+    protected readonly GameplayState GameState;
     protected OutOfBounds OutOfBoundsBehavior = OutOfBounds.Wrap;
     protected bool IsActor = false;
     protected float MaxHP;
@@ -21,7 +21,7 @@ public class Entity : IUpdateEventListener
     public bool IsFriendly;
 
     private readonly long _timeSpawned;
-    private const int InvincibilityDurationMS = 100;
+    public long TimeSinceSpawned => DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - _timeSpawned;
 
     private Texture2D _healthBarTexture;
 
@@ -34,7 +34,7 @@ public class Entity : IUpdateEventListener
 
     protected Entity(GameplayState gameState, Vector2 position)
     {
-        _gameState = gameState;
+        GameState = gameState;
         Position = position;
         _timeSpawned = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         
@@ -101,10 +101,7 @@ public class Entity : IUpdateEventListener
     public virtual void OnCollision(Collider other)
     {
         if (!IsActor || other.Parent.IsFriendly == IsFriendly) return;
-        
-        long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        if (timeNow < _timeSpawned + InvincibilityDurationMS) return;
-        
+
         HP = Math.Max(0, HP - other.Parent.ContactDamage);
     }
     
@@ -116,8 +113,8 @@ public class Entity : IUpdateEventListener
 
     public virtual void Destroy()
     {
-        _gameState.Entities.Remove(this);
-        _gameState.CollisionSystem.RemoveCollider(Collider);
+        GameState.Entities.Remove(this);
+        GameState.CollisionSystem.RemoveCollider(Collider);
         
         UpdateEventSource.UpdateEvent -= OnUpdate;
     }
@@ -129,7 +126,7 @@ public class Entity : IUpdateEventListener
 
     private void CreateHealthBarTexture()
     {
-        _healthBarTexture = new Texture2D(_gameState.Root.GraphicsDevice, 1, 1);
+        _healthBarTexture = new Texture2D(GameState.Root.GraphicsDevice, 1, 1);
         Color[] data = { Color.White };
         _healthBarTexture.SetData(data);
     }
