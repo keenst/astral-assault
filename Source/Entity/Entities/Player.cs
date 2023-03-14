@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Drawing;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Point = Microsoft.Xna.Framework.Point;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace AstralAssault;
 
@@ -34,9 +37,9 @@ public class Player : Entity, IInputEventListener
         
         Collider = new Collider(
             this, 
-            new Rectangle(
-                new Point((int)Position.X - 12, (int)Position.Y - 12), 
-                new Point(24, 24)),
+            new RectangleF(
+                new PointF((int)Position.X - 12, (int)Position.Y - 12), 
+                new SizeF(24, 24)),
             true,
             10);
         GameState.CollisionSystem.AddCollider(Collider);

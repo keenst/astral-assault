@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Drawing;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Color = Microsoft.Xna.Framework.Color;
+using Point = Microsoft.Xna.Framework.Point;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace AstralAssault;
 
@@ -27,9 +31,9 @@ public class Bullet : Entity
         
         Collider = new Collider(
             this, 
-            new Rectangle(
-                new Point((int)Position.X - 1, (int)Position.Y - 1), 
-                new Point(2, 2)));
+            new RectangleF(
+                new PointF((int)Position.X - 1, (int)Position.Y - 1), 
+                new SizeF(2, 2)));
         GameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Destroy;

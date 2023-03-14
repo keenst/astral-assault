@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using Microsoft.Xna.Framework;
 
@@ -8,13 +10,13 @@ namespace AstralAssault;
 public class Collider
 {
     public readonly Entity Parent;
-    public Rectangle Rectangle;
+    public RectangleF Rectangle;
     public bool IsSolid;
     private Vector2[] _corners;
     private Vector2[] _axes;
     private readonly float _mass;
     
-    public Collider(Entity parent, Rectangle rectangle, bool isSolid, float mass)
+    public Collider(Entity parent, RectangleF rectangle, bool isSolid, float mass)
     {
         Parent = parent;
         Rectangle = rectangle;
@@ -24,7 +26,7 @@ public class Collider
         _mass = mass;
     }
     
-    public Collider(Entity parent, Rectangle rectangle)
+    public Collider(Entity parent, RectangleF rectangle)
     {
         Parent = parent;
         Rectangle = rectangle;
@@ -121,7 +123,7 @@ public class Collider
         return true;
     }
 
-    public void SetPosition(Point position)
+    public void SetPosition(PointF position)
     {
         Rectangle.X = position.X - Rectangle.Width / 2;
         Rectangle.Y = position.Y - Rectangle.Height / 2;
@@ -130,7 +132,7 @@ public class Collider
         _axes = GetAxes(_corners);
     }
 
-    private static Vector2[] GetCorners(Rectangle rect)
+    private static Vector2[] GetCorners(RectangleF rect)
     {
         Vector2[] corners = new Vector2[4];
         corners[0] = new Vector2(rect.Left,  rect.Top);

@@ -29,12 +29,12 @@ public class GameplayState : GameState
         
         foreach (Collider collider in CollisionSystem.Colliders)
         {
-            int width = collider.Rectangle.Width;
-            int height = collider.Rectangle.Height;
+            float width = collider.Rectangle.Width;
+            float height = collider.Rectangle.Height;
                 
-            Texture2D rect = new(Root.GraphicsDevice, width, height);
+            Texture2D rect = new(Root.GraphicsDevice, (int)width, (int)height);
 
-            Color[] data = new Color[width * height];
+            Color[] data = new Color[(int)width * (int)height];
                 
             Array.Fill(data, new Color(Color.White, 0.2F));
             rect.SetData(data);

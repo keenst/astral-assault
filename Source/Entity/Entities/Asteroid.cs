@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Drawing;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Point = Microsoft.Xna.Framework.Point;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace AstralAssault;
 
@@ -76,9 +79,9 @@ public class Asteroid : Entity
         
         Collider = new Collider(
             this, 
-            new Rectangle(
-                new Point((int)Position.X - colliderSize / 2, (int)Position.Y - colliderSize / 2), 
-                new Point(colliderSize, colliderSize)),
+            new RectangleF(
+                new PointF((int)Position.X - colliderSize / 2, (int)Position.Y - colliderSize / 2), 
+                new SizeF(colliderSize, colliderSize)),
             true,
             mass);
         GameState.CollisionSystem.AddCollider(Collider);

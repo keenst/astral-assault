@@ -52,7 +52,7 @@ public class Entity : IUpdateEventListener
         }
         
         Position += Velocity * e.DeltaTime;
-        Collider?.SetPosition(Position.ToPoint());
+        Collider?.SetPosition(Position.ToPointF());
 
         switch (OutOfBoundsBehavior)
         {

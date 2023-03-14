@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
@@ -35,6 +36,10 @@ public class CollisionSystem : IUpdateEventListener
                         out Vector2 totalImpulseOther)) 
                     continue;
 
+                Tuple<Collider, Collider> colliderPair = new(collider, other);
+                currentCollisions.Add(colliderPair);
+                if (_lastCollisions.Contains(colliderPair)) continue;
+
                 if (collider.IsSolid && other.IsSolid && collider.Parent.TimeSinceSpawned > 1000)
                 {
                     collider.Parent.Position += initialImpulseThis;
@@ -42,15 +47,14 @@ public class CollisionSystem : IUpdateEventListener
                     
                     collider.Parent.Velocity += totalImpulseThis / e.DeltaTime / 10F;
                     other.Parent.Velocity += totalImpulseOther / e.DeltaTime / 10F;
+
+                    collider.SetPosition(collider.Parent.Position.ToPointF());
+                    other.SetPosition(other.Parent.Position.ToPointF());
                     
-                    collider.SetPosition(collider.Parent.Position.ToPoint());
-                    other.SetPosition(other.Parent.Position.ToPoint());
+                    Debug.WriteLine("physics");
                 }
-
-                Tuple<Collider, Collider> colliderPair = new(collider, other);
-                currentCollisions.Add(colliderPair);
-                if (_lastCollisions.Contains(colliderPair)) continue;
-
+                
+                Debug.WriteLine("on collision");
                 collider.Parent.OnCollision(other);
                 other.Parent.OnCollision(collider);
             }
