@@ -38,7 +38,7 @@ public class Player : Entity, IInputEventListener
                 new Point((int)Position.X - 12, (int)Position.Y - 12), 
                 new Point(24, 24)),
             true,
-            10);
+            0.1F);
         GameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Wrap;

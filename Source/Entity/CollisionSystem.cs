@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 
@@ -27,44 +28,33 @@ public class CollisionSystem : IUpdateEventListener
                 Collider other = Colliders[j];
                 if (collider == other) continue;
 
-                Tuple<Collider, Collider> colliderPair = new(collider, other);
-
                 if (!collider.CollidesWith(
                     other,
-                    e.DeltaTime,
-                    out Vector2 initialImpulseThis,
-                    out Vector2 initialImpulseOther,
-                    out Vector2 totalImpulseThis,
-                    out Vector2 totalImpulseOther))
+                    out Vector2 collisionNormal,
+                    out float collisionDepth,
+                    out Vector2 impulse))
                 {
-                    if (_lastCollisions.Any(t => 
-                        t.Item1 == collider && t.Item2 == other ||
-                        t.Item2 == collider && t.Item1 == other))
-                    {
-                        collider.Parent.OnCollisionExit(other);
-                        other.Parent.OnCollisionExit(collider);
-                    }
-
                     continue;
                 }
+                
+                currentCollisions.Add(new Tuple<Collider, Collider>(collider, other));
+
+                if (_lastCollisions.Any(t =>
+                        (t.Item1 == collider && t.Item2 == other) ||
+                        (t.Item2 == collider && t.Item1 == other)))
+                    continue;
 
                 if (collider.IsSolid && other.IsSolid && collider.Parent.TimeSinceSpawned > 1000)
                 {
-                    collider.Parent.Position += initialImpulseThis;
-                    other.Parent.Position += initialImpulseOther;
+                    Vector2 forceA = impulse / e.DeltaTime;
+                    Vector2 forceB = -impulse / e.DeltaTime;
                     
-                    collider.Parent.Velocity += totalImpulseThis / e.DeltaTime / 10F;
-                    other.Parent.Velocity += totalImpulseOther / e.DeltaTime / 10F;
+                    collider.Parent.Velocity += forceA / collider.Mass;
+                    other.Parent.Velocity += forceB / other.Mass;
                     
-                    collider.SetPosition(collider.Parent.Position.ToPoint());
-                    other.SetPosition(other.Parent.Position.ToPoint());
+                    Debug.WriteLine($"collider.Parent.Velocity: {collider.Parent.Velocity}");
+                    Debug.WriteLine($"other.Parent.Velocity: {other.Parent.Velocity}");
                 }
-                
-                currentCollisions.Add(colliderPair);
-                if (_lastCollisions.Any(t => 
-                    t.Item1 == collider && t.Item2 == other ||
-                    t.Item2 == collider && t.Item1 == other))
-                    continue;
 
                 collider.Parent.OnCollisionEnter(other);
                 other.Parent.OnCollisionEnter(collider);

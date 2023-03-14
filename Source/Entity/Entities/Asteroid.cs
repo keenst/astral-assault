@@ -40,7 +40,7 @@ public class Asteroid : Entity
                 MaxHP = 12;
                 HP = MaxHP;
                 ContactDamage = 5;
-                mass = 6;
+                mass = 0.6F;
                 break;
             case Sizes.Small:
                 spriteSheet = AssetManager.LoadTexture("asteroid2");
@@ -49,7 +49,7 @@ public class Asteroid : Entity
                 MaxHP = 24;
                 HP = MaxHP;
                 ContactDamage = 7;
-                mass = 12;
+                mass = 1.2F;
                 break;
             case Sizes.Medium:
                 spriteSheet = AssetManager.LoadTexture("asteroid3");
@@ -58,7 +58,7 @@ public class Asteroid : Entity
                 MaxHP = 36;
                 HP = MaxHP;
                 ContactDamage = 12;
-                mass = 18;
+                mass = 1.8F;
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
