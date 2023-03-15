@@ -45,13 +45,14 @@ public class CollisionSystem : IUpdateEventListener
                     collider.Parent.Position += initialImpulseThis;
                     other.Parent.Position += initialImpulseOther;
                     
-                    collider.Parent.Velocity += totalImpulseThis / e.DeltaTime / 10F;
-                    other.Parent.Velocity += totalImpulseOther / e.DeltaTime / 10F;
+                    collider.Parent.Velocity += totalImpulseThis / e.DeltaTime;
+                    other.Parent.Velocity += totalImpulseOther / e.DeltaTime;
 
                     collider.SetPosition(collider.Parent.Position.ToPointF());
                     other.SetPosition(other.Parent.Position.ToPointF());
                     
-                    Debug.WriteLine("physics");
+                    Debug.WriteLine($"total impulse this: {totalImpulseThis}");
+                    Debug.WriteLine($"total impulse other: {totalImpulseOther}");
                 }
                 
                 Debug.WriteLine("on collision");

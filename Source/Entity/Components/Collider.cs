@@ -98,6 +98,8 @@ public class Collider
 
             if (overlap >= minOverlap) continue;
             
+            Debug.WriteLine($"overlap: {overlap}");
+            
             minOverlap = overlap;
 
             Vector2 direction = axis;
