@@ -2,19 +2,17 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace astral_assault;
+namespace AstralAssault;
 
-public static class Text
+public static class TextRenderer
 {
-    private static Game1 _root;
     private static Texture2D _font;
 
     private static Dictionary<char, int> _dict;
 
-    public static void Initialize(Game1 root)
+    public static void Init()
     {
-        _root = root;
-        _font = _root.Content.Load<Texture2D>("assets/font");
+        _font = AssetManager.LoadTexture("font");
         _dict = new Dictionary<char, int>
         {
             { 'A', 0 },
@@ -56,7 +54,8 @@ public static class Text
             { ':', 36 },
             { ';', 37 },
             { '.', 38 },
-            { ',', 39 }
+            { ',', 39 },
+            { ' ', 40 }
         };
     }
 
@@ -70,8 +69,17 @@ public static class Text
             int y = _dict[text[i]] / 6;
 
             Rectangle source = new(x * 10, y * 10, 10, 10);
-            
-            spriteBatch.Draw(_font, new Vector2(position.X + i * 10, position.Y), source, color);
+
+            spriteBatch.Draw(
+                _font,
+                new Vector2(position.X + i * 10, position.Y),
+                source,
+                color,
+                0,
+                Vector2.Zero,
+                1,
+                SpriteEffects.None,
+                0);
         }
     }
 }
