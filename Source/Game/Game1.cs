@@ -43,6 +43,8 @@ public class Game1 : Game
     private const int StatUpdateInterval = 300;
     private KeyboardState _prevKeyState = Keyboard.GetState();
 
+    private SpriteEffect _spriteEffect;
+    
     public Game1()
     {
         // set up game class
@@ -87,6 +89,7 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+        _spriteEffect = Content.Load<SpriteEffect>("highlight");
     }
 
     protected override void Update(GameTime gameTime)
@@ -115,7 +118,21 @@ public class Game1 : Game
         _spriteBatch.Begin(SpriteSortMode.BackToFront, null, SamplerState.PointWrap);
 
         GameStateMachine.Draw(_spriteBatch);
-        
+
+        Texture2D texture = AssetManager.LoadTexture("restart");
+        Rectangle source = new(0, 0, 12, 12);
+        Rectangle destination = new(12, 12, 12, 12);
+        _spriteBatch.Draw(
+            texture, 
+            new Vector2(12, 12), 
+            null, 
+            Color.White, 
+            0, 
+            Vector2.Zero, 
+            Vector2.One, 
+            SpriteEffects.,
+            1F);
+
         if (ShowDebug)
         {
             long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
