@@ -12,7 +12,7 @@ public static class TextRenderer
 
     public static void Init()
     {
-        _font = AssetManager.LoadTexture("font");
+        _font = AssetManager.Load<Texture2D>("font");
         _dict = new Dictionary<char, int>
         {
             { 'A', 0 },

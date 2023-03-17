@@ -17,6 +17,7 @@ public class Entity : IUpdateEventListener
     protected float MaxHP;
     protected float HP;
     protected float ContactDamage;
+    protected float HighlightAlpha;
 
     public bool IsFriendly;
 
@@ -49,6 +50,11 @@ public class Entity : IUpdateEventListener
         {
             OnDeath();
             return;
+        }
+
+        if (HighlightAlpha > 0)
+        {
+            HighlightAlpha -= e.DeltaTime * 7;
         }
         
         Position += Velocity * e.DeltaTime;
@@ -103,12 +109,14 @@ public class Entity : IUpdateEventListener
         if (!IsActor || other.Parent.IsFriendly == IsFriendly) return;
 
         HP = Math.Max(0, HP - other.Parent.ContactDamage);
+        
+        HighlightAlpha = 0.5F;
     }
     
     public void Draw(SpriteBatch spriteBatch)
     {
         if (IsActor) DrawHealthBar(spriteBatch);
-        SpriteRenderer.Draw(spriteBatch, Position, Rotation);
+        SpriteRenderer.Draw(spriteBatch, Position, Rotation, HighlightAlpha);
     }
 
     public virtual void Destroy()

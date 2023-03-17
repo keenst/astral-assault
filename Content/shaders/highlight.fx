@@ -9,6 +9,7 @@
 
 Texture2D SpriteTexture;
 sampler s0;
+float blendAlpha;
 
 sampler2D SpriteTextureSampler = sampler_state
 {
@@ -25,8 +26,19 @@ struct VertexShaderOutput
 float4 MainPS(VertexShaderOutput input) : COLOR
 {
 	float4 color = tex2D(s0, input.TextureCoordinates);
-	color.gb = color.r;
-	return color;
+	
+	float4 o = color;
+	o.r = color.r + blendAlpha;
+	o.g = color.g + blendAlpha;
+	o.b = color.b + blendAlpha;
+	o.a = color.a;
+	
+    return o;
+}
+
+float4 DisabledPS(VertexShaderOutput input) : COLOR
+{
+	return tex2D(s0, input.TextureCoordinates);
 }
 
 technique SpriteDrawing
@@ -34,5 +46,10 @@ technique SpriteDrawing
 	pass P0
 	{
 		PixelShader = compile PS_SHADERMODEL MainPS();
+	}
+	
+	pass P1 
+	{
+        PixelShader = compile PS_SHADERMODEL DisabledPS();
 	}
 };

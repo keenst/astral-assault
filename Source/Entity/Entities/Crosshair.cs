@@ -10,7 +10,7 @@ public class Crosshair : Entity, IMouseEventListener
         InputEventSource.MouseButtonEvent += OnMouseButtonEvent;
         InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
 
-        Texture2D spriteSheet = AssetManager.LoadTexture("crosshair");
+        Texture2D spriteSheet = AssetManager.Load<Texture2D>("crosshair");
 
         Frame activeFrame   = new(new Rectangle(0,  0, 16, 16));
         Frame inactiveFrame = new(new Rectangle(16, 0, 16, 16));

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
@@ -6,20 +7,38 @@ namespace AstralAssault;
 public static class AssetManager
 {
     private static readonly Dictionary<string, Texture2D> Textures = new();
+    private static readonly Dictionary<string, Effect> Effects = new();
     private static Game1 _root;
     
     public static void Init(Game1 root)
     {
         _root = root;
     }
-    
-    public static Texture2D LoadTexture(string path)
+
+    public static T Load<T>(string path)
     {
-        if (Textures.ContainsKey(path))
-            return Textures[path];
+        Dictionary<string, T> activeDictionary;
+        string activeDirectory;
         
-        Texture2D texture = _root.Content.Load<Texture2D>($"assets/{path}");
-        Textures.Add(path, texture);
-        return texture;
+        if (typeof(T) == typeof(Texture2D))
+        {
+            activeDictionary = Textures as Dictionary<string, T>;
+            activeDirectory = "assets";
+        }
+        else if (typeof(T) == typeof(Effect))
+        {
+            activeDictionary = Effects as Dictionary<string, T>;
+            activeDirectory = "shaders";
+        }
+        else
+        {
+            throw new ArgumentException("T must be either Texture2D or Effect");
+        }
+
+        if (activeDictionary.ContainsKey(path))
+            return activeDictionary[path];
+        
+        T asset = _root.Content.Load<T>($"{activeDirectory}/{path}");
+        return asset;
     }
 }

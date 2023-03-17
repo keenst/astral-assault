@@ -13,9 +13,10 @@ public class SpriteRenderer : IUpdateEventListener
     private Animation _activeAnimation;
     public int ActiveAnimationIndex => _animations.ToList().IndexOf(_activeAnimation);
     private int _activeFrame;
-
     private long _lastFrameUpdate;
 
+    private readonly Effect _highlightEffect;
+    
     private const float Pi = 3.14F;
 
     public SpriteRenderer(Texture2D spriteSheet, Animation[] animations, float layerDepth = LayerDepth.Foreground)
@@ -26,6 +27,8 @@ public class SpriteRenderer : IUpdateEventListener
         
         UpdateEventSource.UpdateEvent += OnUpdate;
         _activeAnimation = _animations[0];
+        
+        _highlightEffect = AssetManager.Load<Effect>("highlight");
     }
 
     public void OnUpdate(object sender, UpdateEventArgs e)
@@ -50,13 +53,26 @@ public class SpriteRenderer : IUpdateEventListener
         _activeFrame = 0;
         _lastFrameUpdate = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
     }
+    
+    
 
-    public void Draw(SpriteBatch spriteBatch, Vector2 position, float rotation)
+    public void Draw(SpriteBatch spriteBatch, Vector2 position, float rotation, float highlightAlpha = 0)
     {
+        if (highlightAlpha > 0)
+        {
+            _highlightEffect.CurrentTechnique.Passes[0].Apply();
+            _highlightEffect.Parameters["blendAlpha"].SetValue(highlightAlpha);
+        }
+        
         if (_activeAnimation.HasRotation)
             DrawRotatable(spriteBatch, position, rotation);
         else
             DrawStatic(spriteBatch, position);
+
+        if (highlightAlpha > 0)
+        {
+            _highlightEffect.CurrentTechnique.Passes[1].Apply();
+        }
     }
 
     private void DrawStatic(SpriteBatch spriteBatch, Vector2 position)

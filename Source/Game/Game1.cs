@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Numerics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
+using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace AstralAssault;
 
@@ -43,8 +46,6 @@ public class Game1 : Game
     private const int StatUpdateInterval = 300;
     private KeyboardState _prevKeyState = Keyboard.GetState();
 
-    private SpriteEffect _spriteEffect;
-    
     public Game1()
     {
         // set up game class
@@ -89,7 +90,6 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-        _spriteEffect = Content.Load<SpriteEffect>("highlight");
     }
 
     protected override void Update(GameTime gameTime)
@@ -115,23 +115,9 @@ public class Game1 : Game
         
         GraphicsDevice.Clear(BackgroundColor);
         
-        _spriteBatch.Begin(SpriteSortMode.BackToFront, null, SamplerState.PointWrap);
+        _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointWrap);
 
         GameStateMachine.Draw(_spriteBatch);
-
-        Texture2D texture = AssetManager.LoadTexture("restart");
-        Rectangle source = new(0, 0, 12, 12);
-        Rectangle destination = new(12, 12, 12, 12);
-        _spriteBatch.Draw(
-            texture, 
-            new Vector2(12, 12), 
-            null, 
-            Color.White, 
-            0, 
-            Vector2.Zero, 
-            Vector2.One, 
-            SpriteEffects.,
-            1F);
 
         if (ShowDebug)
         {
