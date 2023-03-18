@@ -52,7 +52,7 @@ public class Collider
         Vector2 centerThis = GetCenter(_corners);
         Vector2 centerOther = GetCenter(other._corners);
 
-        Vector2 relativeVelocity = (centerOther - centerThis) / deltaTime;
+        Vector2 relativeVelocity = centerOther - centerThis;
 
         initialImpulseThis = Vector2.Zero;
         initialImpulseOther = Vector2.Zero;
@@ -110,7 +110,7 @@ public class Collider
         totalImpulseThis = initialImpulseThis;
         totalImpulseOther = initialImpulseOther;
 
-        Vector2 newRelativeVelocity = (centerOther - centerThis) / deltaTime;
+        Vector2 newRelativeVelocity = centerOther - centerThis;
         Vector2 impulse = (newRelativeVelocity - relativeVelocity) * (_mass * other._mass) / (_mass + other._mass);
         
         Vector2 impulseThis = -impulse * (other._mass / (_mass + other._mass));

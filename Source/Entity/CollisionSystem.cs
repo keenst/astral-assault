@@ -37,11 +37,11 @@ public class CollisionSystem : IUpdateEventListener
 
                 if (collider.IsSolid && other.IsSolid && collider.Parent.TimeSinceSpawned > 1000)
                 {
-                    collider.Parent.Position += initialImpulseThis;
-                    other.Parent.Position += initialImpulseOther;
+                    collider.Parent.Position += initialImpulseThis * e.DeltaTime;
+                    other.Parent.Position += initialImpulseOther * e.DeltaTime;
                     
-                    collider.Parent.Velocity += totalImpulseThis / e.DeltaTime / 10F;
-                    other.Parent.Velocity += totalImpulseOther / e.DeltaTime / 10F;
+                    collider.Parent.Velocity += totalImpulseThis * e.DeltaTime * 1000F;
+                    other.Parent.Velocity += totalImpulseOther * e.DeltaTime * 1000F;
                     
                     collider.SetPosition(collider.Parent.Position.ToPoint());
                     other.SetPosition(other.Parent.Position.ToPoint());
