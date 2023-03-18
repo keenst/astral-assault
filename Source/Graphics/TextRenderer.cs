@@ -81,7 +81,7 @@ public static class TextRenderer
                 new Vector2(position.X + i * 10, position.Y),
                 0,
                 layerDepth,
-                DrawTaskEffect.None,
+                new List<IDrawTaskEffect>(),
                 color,
                 Vector2.Zero));
         }

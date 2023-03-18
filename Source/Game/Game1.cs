@@ -31,6 +31,7 @@ public class Game1 : Game
     private SpriteBatch _spriteBatch;
     private RenderTarget2D _renderTarget;
     private static readonly Effect HighlightEffect = AssetManager.Load<Effect>("highlight");
+    private static readonly Effect ColorEffect = AssetManager.Load<Effect>("color");
 
     // display
     private static readonly Color BackgroundColor = new(28, 23, 41);
@@ -83,6 +84,7 @@ public class Game1 : Game
         AssetManager.Init(this);
         TextRenderer.Init();
         InputEventSource.Init();
+        Palette.Init();
         
         GameStateMachine = new GameStateMachine(new GameplayState(this));
 
@@ -119,8 +121,6 @@ public class Game1 : Game
 
         List<DrawTask> drawTasks = GameStateMachine.GetDrawTasks().OrderBy(dt => (int)dt.LayerDepth).ToList();
 
-        _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointWrap);
-
         if (ShowDebug)
         {
             long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
@@ -129,7 +129,7 @@ public class Game1 : Game
             {
                 _frameRate = 1 / (float)gameTime.ElapsedGameTime.TotalSeconds;
                 _renderTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-
+        
                 _lastStatUpdate = timeNow;
             }
             
@@ -145,22 +145,43 @@ public class Game1 : Game
             drawTasks.AddRange(renderTimeTask);
         }
         
+        _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointWrap);
+        
         foreach (DrawTask drawTask in drawTasks)
         {
+            foreach (IDrawTaskEffect effect in drawTask.Effects)
+            {
+                switch (effect)
+                {
+                    case HighlightEffect highlightEffect:
+                        HighlightEffect.CurrentTechnique.Passes[1].Apply();
+                        HighlightEffect.Parameters["blendAlpha"].SetValue(highlightEffect.Alpha);
+                        HighlightEffect.CurrentTechnique.Passes[0].Apply();
+                        break;
+                    
+                    case ColorEffect colorEffect:
+                        ColorEffect.CurrentTechnique.Passes[1].Apply();
+                        ColorEffect.Parameters["newColor"].SetValue(colorEffect.Color);
+                        ColorEffect.CurrentTechnique.Passes[0].Apply();
+                        break;
+                }
+            }
+
             _spriteBatch.Draw(
                 drawTask.Texture,
                 drawTask.Destination,
                 drawTask.Source,
-                drawTask.Color,
+                Color.White,
                 drawTask.Rotation,
                 drawTask.Origin,
                 SpriteEffects.None,
                 0);
+            
+            HighlightEffect.CurrentTechnique.Passes[1].Apply();
+            ColorEffect.CurrentTechnique.Passes[1].Apply();
         }
-
-        _spriteBatch.End();
         
-        drawTasks.Clear();
+        _spriteBatch.End();
 
         // draw render target to screen
         GraphicsDevice.SetRenderTarget(null);

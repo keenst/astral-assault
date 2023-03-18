@@ -49,7 +49,7 @@ public class GameplayState : GameState
                 collider.Rectangle.Location.ToVector2(), 
                 0, 
                 LayerDepth.Debug, 
-                DrawTaskEffect.None,
+                new List<IDrawTaskEffect>(),
                 Color.Blue,
                 Vector2.Zero));
         }

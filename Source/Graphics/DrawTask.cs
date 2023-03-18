@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -11,7 +12,7 @@ public struct DrawTask
     public Rectangle Destination { get; }
     public float Rotation { get; }
     public LayerDepth LayerDepth { get; }
-    public DrawTaskEffect Effect { get; }
+    public List<IDrawTaskEffect> Effects { get; }
     public Color Color { get; }
     public Vector2 Origin { get; }
 
@@ -21,7 +22,7 @@ public struct DrawTask
         Rectangle destination,
         float rotation,
         LayerDepth layerDepth,
-        DrawTaskEffect effect,
+        List<IDrawTaskEffect> effects,
         Color color)
     {
         Texture = texture;
@@ -29,7 +30,7 @@ public struct DrawTask
         Destination = destination;
         Rotation = rotation;
         LayerDepth = layerDepth;
-        Effect = effect;
+        Effects = effects;
         Color = color;
         Origin = new Vector2(
             (float)Math.Round(Source.Width / 2D),
@@ -42,7 +43,7 @@ public struct DrawTask
         Vector2 position,
         float rotation,
         LayerDepth layerDepth,
-        DrawTaskEffect effect,
+        List<IDrawTaskEffect> effects,
         Color color,
         Vector2 origin)
     {
@@ -55,7 +56,7 @@ public struct DrawTask
             source.Height);
         Rotation = rotation;
         LayerDepth = layerDepth;
-        Effect = effect;
+        Effects = effects;
         Color = color;
         Origin = origin;
     }
@@ -65,7 +66,7 @@ public struct DrawTask
         Vector2 position,
         float rotation,
         LayerDepth layerDepth,
-        DrawTaskEffect effect,
+        List<IDrawTaskEffect> effects,
         Color color,
         Vector2 origin)
     {
@@ -82,7 +83,7 @@ public struct DrawTask
             Source.Height);
         Rotation = rotation;
         LayerDepth = layerDepth;
-        Effect = effect;
+        Effects = effects;
         Color = color;
         Origin = origin;
     }
@@ -93,7 +94,7 @@ public struct DrawTask
         Vector2 position,
         float rotation,
         LayerDepth layerDepth,
-        DrawTaskEffect effect)
+        List<IDrawTaskEffect> effects)
     {
         Texture = texture;
         Source = source;
@@ -104,7 +105,7 @@ public struct DrawTask
             source.Height);
         Rotation = rotation;
         LayerDepth = layerDepth;
-        Effect = effect;
+        Effects = effects;
         Color = Color.White;
         Origin = new Vector2(
             (float)Math.Round(Source.Width / 2D),
@@ -116,7 +117,7 @@ public struct DrawTask
         Vector2 position,
         float rotation,
         LayerDepth layerDepth,
-        DrawTaskEffect effect)
+        List<IDrawTaskEffect> effects)
     {
         Texture = texture;
         Source = new Rectangle(
@@ -131,7 +132,7 @@ public struct DrawTask
             Source.Height);
         Rotation = rotation;
         LayerDepth = layerDepth;
-        Effect = effect;
+        Effects = effects;
         Color = Color.White;
         Origin = new Vector2(
             (float)Math.Round(Source.Width / 2D),

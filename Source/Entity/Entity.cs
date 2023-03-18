@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
+using Vector4 = Microsoft.Xna.Framework.Vector4;
 
 namespace AstralAssault;
 
@@ -18,7 +21,6 @@ public class Entity : IUpdateEventListener
     protected float MaxHP;
     protected float HP;
     protected float ContactDamage;
-    protected DrawTaskEffect DrawTaskEffect = DrawTaskEffect.None;
 
     public bool IsFriendly;
 
@@ -143,13 +145,17 @@ public class Entity : IUpdateEventListener
         const int height = 3;
 
         int filled = (int)Math.Ceiling(HP / MaxHP * width);
-
+        
         int x = (int)Position.X - width / 2;
         int y = (int)Position.Y - 20;
         
         Rectangle outline = new(x - 1, y - 1, width + 2, height + 2);
         Rectangle emptyHealthBar = new(x, y, width, height);
         Rectangle fullHealthBar = new(x, y, filled, height);
+
+        Vector4 outlineColor = Palette.GetColorVector(Palette.Colors.Black);
+        Vector4 emptyColor = Palette.GetColorVector(Palette.Colors.Red6);
+        Vector4 fullColor = Palette.GetColorVector(Palette.Colors.Green7);
         
         Rectangle source = new(0, 0, 1, 1);
         
@@ -159,7 +165,7 @@ public class Entity : IUpdateEventListener
             outline,
             0, 
             LayerDepth.HUD, 
-            DrawTaskEffect.None,
+            new List<IDrawTaskEffect> { new ColorEffect(outlineColor) },
             Color.Black);
         
         DrawTask empty = new(
@@ -168,7 +174,7 @@ public class Entity : IUpdateEventListener
             emptyHealthBar,
             0, 
             LayerDepth.HUD, 
-            DrawTaskEffect,
+            new List<IDrawTaskEffect> { new ColorEffect(emptyColor) },
             Color.Red);
         
         DrawTask full = new(
@@ -177,7 +183,7 @@ public class Entity : IUpdateEventListener
             fullHealthBar,
             0, 
             LayerDepth.HUD, 
-            DrawTaskEffect,
+            new List<IDrawTaskEffect> { new ColorEffect(fullColor) }, 
             Color.LimeGreen);
         
         return new List<DrawTask> { background, empty, full };

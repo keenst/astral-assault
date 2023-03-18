@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,7 +15,7 @@ public class SpriteRenderer : IUpdateEventListener
     public int ActiveAnimationIndex => _animations.ToList().IndexOf(_activeAnimation);
     private int _activeFrame;
     private long _lastFrameUpdate;
-    public DrawTaskEffect DrawTaskEffect = DrawTaskEffect.None;
+    public List<IDrawTaskEffect> DrawTaskEffect = new();
     
     private const float Pi = 3.14F;
 
