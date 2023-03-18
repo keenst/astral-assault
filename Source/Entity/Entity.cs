@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
@@ -20,6 +21,9 @@ public class Entity : IUpdateEventListener
     protected float MaxHP;
     protected float HP;
     protected float ContactDamage;
+    
+    private bool _isHighlighted;
+    private float _hightlightAlpha;
 
     public bool IsFriendly;
 
@@ -48,6 +52,21 @@ public class Entity : IUpdateEventListener
     
     public virtual void OnUpdate(object sender, UpdateEventArgs e)
     {
+        if (_isHighlighted)
+        {
+            _hightlightAlpha -= e.DeltaTime * 4;
+            if (_hightlightAlpha <= 0)
+            {
+                _isHighlighted = false;
+                _hightlightAlpha = 0;
+                SpriteRenderer.RemoveEffect<HighlightEffect>();
+            }
+            else
+            {
+                SpriteRenderer.SetEffect<HighlightEffect, float>(_hightlightAlpha);
+            }
+        }
+        
         if (IsActor && HP <= 0)
         {
             OnDeath();
@@ -106,6 +125,11 @@ public class Entity : IUpdateEventListener
         if (!IsActor || other.Parent.IsFriendly == IsFriendly) return;
 
         HP = Math.Max(0, HP - other.Parent.ContactDamage);
+
+        _isHighlighted = true;
+        _hightlightAlpha = 0.7F;
+        
+        SpriteRenderer.SetEffect<HighlightEffect, float>(_hightlightAlpha);
     }
     
     public List<DrawTask> GetDrawTasks()
