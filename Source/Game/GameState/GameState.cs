@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using System.Collections.Generic;
 
 namespace AstralAssault;
 
@@ -11,7 +11,7 @@ public abstract class GameState
         Root = root;
     }
     
-    public abstract void Draw(SpriteBatch spriteBatch);
+    public abstract List<DrawTask> GetDrawTasks();
     public abstract void Enter();
     public abstract void Exit();
 }

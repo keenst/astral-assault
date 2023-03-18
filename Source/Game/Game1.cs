@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Numerics;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -29,6 +30,7 @@ public class Game1 : Game
     // render
     private SpriteBatch _spriteBatch;
     private RenderTarget2D _renderTarget;
+    private static readonly Effect HighlightEffect = AssetManager.Load<Effect>("highlight");
 
     // display
     private static readonly Color BackgroundColor = new(28, 23, 41);
@@ -114,10 +116,10 @@ public class Game1 : Game
         GraphicsDevice.SetRenderTarget(_renderTarget);
         
         GraphicsDevice.Clear(BackgroundColor);
-        
-        _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointWrap);
 
-        GameStateMachine.Draw(_spriteBatch);
+        List<DrawTask> drawTasks = GameStateMachine.GetDrawTasks().OrderBy(dt => (int)dt.LayerDepth).ToList();
+
+        _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointWrap);
 
         if (ShowDebug)
         {
@@ -131,18 +133,34 @@ public class Game1 : Game
                 _lastStatUpdate = timeNow;
             }
             
-            _spriteBatch.Write(
-                Math.Round(_frameRate).ToString(), 
-                new Vector2(0, 0), 
-                Color.Yellow);
+            string frameRate = Math.Round(_frameRate).ToString();
+            string renderTime = _renderTime.ToString();
             
-            _spriteBatch.Write(
-                _renderTime.ToString(), 
-                new Vector2(0, 9), 
-                Color.Yellow);
+            List<DrawTask> frameRateTask = 
+                frameRate.CreateDrawTasks(Vector2.Zero, Color.Yellow, LayerDepth.Debug);
+            List<DrawTask> renderTimeTask = 
+                renderTime.CreateDrawTasks(new Vector2(0, 9), Color.Yellow, LayerDepth.Debug);
+            
+            drawTasks.AddRange(frameRateTask);
+            drawTasks.AddRange(renderTimeTask);
         }
         
+        foreach (DrawTask drawTask in drawTasks)
+        {
+            _spriteBatch.Draw(
+                drawTask.Texture,
+                drawTask.Destination,
+                drawTask.Source,
+                drawTask.Color,
+                drawTask.Rotation,
+                drawTask.Origin,
+                SpriteEffects.None,
+                0);
+        }
+
         _spriteBatch.End();
+        
+        drawTasks.Clear();
 
         // draw render target to screen
         GraphicsDevice.SetRenderTarget(null);

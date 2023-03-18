@@ -19,13 +19,18 @@ public class GameplayState : GameState
         WaveController = new WaveController(this, Root);
     }
 
-    public override void Draw(SpriteBatch spriteBatch)
+    public override List<DrawTask> GetDrawTasks()
     {
-        foreach (Entity entity in Entities) entity.Draw(spriteBatch);
+        List<DrawTask> drawTasks = new();
+        
+        foreach (Entity entity in Entities)
+        {
+            drawTasks.AddRange(entity.GetDrawTasks());
+        }
 
-        WaveController.Draw(spriteBatch);
+        drawTasks.AddRange(WaveController.GetDrawTasks());
 
-        if (!Root.ShowDebug) return;
+        if (!Root.ShowDebug) return drawTasks;
         
         foreach (Collider collider in CollisionSystem.Colliders)
         {
@@ -38,9 +43,18 @@ public class GameplayState : GameState
                 
             Array.Fill(data, new Color(Color.White, 0.2F));
             rect.SetData(data);
-
-            spriteBatch.Draw(rect, collider.Rectangle.Location.ToVector2(), Color.Blue);
+            
+            drawTasks.Add(new DrawTask(
+                rect, 
+                collider.Rectangle.Location.ToVector2(), 
+                0, 
+                LayerDepth.Debug, 
+                DrawTaskEffect.None,
+                Color.Blue,
+                Vector2.Zero));
         }
+
+        return drawTasks;
     }
 
     public override void Enter()

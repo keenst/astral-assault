@@ -21,7 +21,7 @@ public class Crosshair : Entity, IMouseEventListener
         SpriteRenderer = new SpriteRenderer(
             spriteSheet, 
             new[] { activeAnimation, inactiveAnimation }, 
-            LayerDepth.UI);
+            LayerDepth.Crosshair);
 
         OutOfBoundsBehavior = OutOfBounds.DoNothing;
     }

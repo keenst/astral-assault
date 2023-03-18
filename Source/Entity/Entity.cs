@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -17,7 +18,7 @@ public class Entity : IUpdateEventListener
     protected float MaxHP;
     protected float HP;
     protected float ContactDamage;
-    protected float HighlightAlpha;
+    protected DrawTaskEffect DrawTaskEffect = DrawTaskEffect.None;
 
     public bool IsFriendly;
 
@@ -52,11 +53,6 @@ public class Entity : IUpdateEventListener
             return;
         }
 
-        if (HighlightAlpha > 0)
-        {
-            HighlightAlpha -= e.DeltaTime * 7;
-        }
-        
         Position += Velocity * e.DeltaTime;
         Collider?.SetPosition(Position.ToPoint());
 
@@ -109,14 +105,16 @@ public class Entity : IUpdateEventListener
         if (!IsActor || other.Parent.IsFriendly == IsFriendly) return;
 
         HP = Math.Max(0, HP - other.Parent.ContactDamage);
-        
-        HighlightAlpha = 0.5F;
     }
     
-    public void Draw(SpriteBatch spriteBatch)
+    public List<DrawTask> GetDrawTasks()
     {
-        if (IsActor) DrawHealthBar(spriteBatch);
-        SpriteRenderer.Draw(spriteBatch, Position, Rotation, HighlightAlpha);
+        List<DrawTask> drawTasks = new();
+        
+        if (IsActor) drawTasks.AddRange(CreateHealthBarDrawTasks());
+        drawTasks.Add(SpriteRenderer.CreateDrawTask(Position, Rotation));
+
+        return drawTasks;
     }
 
     public virtual void Destroy()
@@ -139,7 +137,7 @@ public class Entity : IUpdateEventListener
         _healthBarTexture.SetData(data);
     }
 
-    private void DrawHealthBar(SpriteBatch spriteBatch)
+    private List<DrawTask> CreateHealthBarDrawTasks()
     {
         const int width = 20;
         const int height = 3;
@@ -155,34 +153,33 @@ public class Entity : IUpdateEventListener
         
         Rectangle source = new(0, 0, 1, 1);
         
-        spriteBatch.Draw(
+        DrawTask background = new(
             _healthBarTexture, 
-            outline, 
             source, 
-            Color.Black, 
+            outline,
             0, 
-            Vector2.Zero, 
-            SpriteEffects.None, 
-            0.03F);
+            LayerDepth.HUD, 
+            DrawTaskEffect.None,
+            Color.Black);
         
-        spriteBatch.Draw(
+        DrawTask empty = new(
             _healthBarTexture, 
-            emptyHealthBar, 
             source, 
-            Color.Red, 
+            emptyHealthBar,
             0, 
-            Vector2.Zero, 
-            SpriteEffects.None, 
-            0.02F);
+            LayerDepth.HUD, 
+            DrawTaskEffect,
+            Color.Red);
         
-        spriteBatch.Draw(
+        DrawTask full = new(
             _healthBarTexture, 
-            fullHealthBar, 
             source, 
-            Color.LimeGreen, 
+            fullHealthBar,
             0, 
-            Vector2.Zero, 
-            SpriteEffects.None, 
-            0.01F);
+            LayerDepth.HUD, 
+            DrawTaskEffect,
+            Color.LimeGreen);
+        
+        return new List<DrawTask> { background, empty, full };
     }
 }

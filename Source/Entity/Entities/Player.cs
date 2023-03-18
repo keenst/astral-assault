@@ -61,7 +61,7 @@ public class Player : Entity, IInputEventListener
 
         Animation animation = new(new[] { frame }, true);
 
-        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation });
+        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
     }
 
     private void StartListening()

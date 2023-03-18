@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using System.Collections.Generic;
 
 namespace AstralAssault;
 
@@ -19,8 +19,8 @@ public class GameStateMachine
         _currentState.Enter();
     }
     
-    public void Draw(SpriteBatch spriteBatch)
+    public List<DrawTask> GetDrawTasks()
     {
-        _currentState.Draw(spriteBatch);
+        return _currentState.GetDrawTasks();
     }
 }

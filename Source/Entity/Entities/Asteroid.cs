@@ -72,7 +72,7 @@ public class Asteroid : Entity
 
         Animation animation = new(new[] { frame }, true);
 
-        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation });
+        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
         
         Collider = new Collider(
             this, 

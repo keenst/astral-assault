@@ -7,19 +7,18 @@ namespace AstralAssault;
 
 public class SpriteRenderer : IUpdateEventListener
 {
-    private readonly float _layerDepth;
+    private readonly LayerDepth _layerDepth;
     private readonly Animation[] _animations;
     private readonly Texture2D _spriteSheet;
     private Animation _activeAnimation;
     public int ActiveAnimationIndex => _animations.ToList().IndexOf(_activeAnimation);
     private int _activeFrame;
     private long _lastFrameUpdate;
-
-    private readonly Effect _highlightEffect;
+    public DrawTaskEffect DrawTaskEffect = DrawTaskEffect.None;
     
     private const float Pi = 3.14F;
 
-    public SpriteRenderer(Texture2D spriteSheet, Animation[] animations, float layerDepth = LayerDepth.Foreground)
+    public SpriteRenderer(Texture2D spriteSheet, Animation[] animations, LayerDepth layerDepth)
     {
         _animations = animations;
         _spriteSheet = spriteSheet;
@@ -27,8 +26,6 @@ public class SpriteRenderer : IUpdateEventListener
         
         UpdateEventSource.UpdateEvent += OnUpdate;
         _activeAnimation = _animations[0];
-        
-        _highlightEffect = AssetManager.Load<Effect>("highlight");
     }
 
     public void OnUpdate(object sender, UpdateEventArgs e)
@@ -54,57 +51,21 @@ public class SpriteRenderer : IUpdateEventListener
         _lastFrameUpdate = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
     }
     
-    
-
-    public void Draw(SpriteBatch spriteBatch, Vector2 position, float rotation, float highlightAlpha = 0)
+    public DrawTask CreateDrawTask(Vector2 position, float rotation)
     {
-        if (highlightAlpha > 0)
-        {
-            _highlightEffect.CurrentTechnique.Passes[0].Apply();
-            _highlightEffect.Parameters["blendAlpha"].SetValue(highlightAlpha);
-        }
-        
-        if (_activeAnimation.HasRotation)
-            DrawRotatable(spriteBatch, position, rotation);
-        else
-            DrawStatic(spriteBatch, position);
-
-        if (highlightAlpha > 0)
-        {
-            _highlightEffect.CurrentTechnique.Passes[1].Apply();
-        }
+        return _activeAnimation.HasRotation ? DrawRotatable(position, rotation) : DrawStatic(position);
     }
 
-    private void DrawStatic(SpriteBatch spriteBatch, Vector2 position)
+    private DrawTask DrawStatic(Vector2 position)
     {
         Rectangle source = _activeAnimation.Frames[_activeFrame].Source;
-        
-        spriteBatch.Draw(
-            _spriteSheet, 
-            position, 
-            source, 
-            Color.White, 
-            0, 
-            new Vector2(source.Height / 2F, source.Width / 2F),
-            new Vector2(1, 1),
-            SpriteEffects.None,
-            _layerDepth);
+        return new DrawTask(_spriteSheet, source, position, 0, _layerDepth, DrawTaskEffect);
     }
 
-    private void DrawRotatable(SpriteBatch spriteBatch, Vector2 position, float rotation)
+    private DrawTask DrawRotatable(Vector2 position, float rotation)
     {
         (float spriteRotation, Rectangle source) = GetRotation(rotation);
-
-        spriteBatch.Draw(
-            _spriteSheet, 
-            position, 
-            source, 
-            Color.White, 
-            spriteRotation, 
-            new Vector2(source.Height / 2F, source.Width / 2F),
-            new Vector2(1, 1),
-            SpriteEffects.None,
-            _layerDepth);
+        return new DrawTask(_spriteSheet, source, position, spriteRotation, _layerDepth, DrawTaskEffect);
     }
 
     private Tuple<float, Rectangle> GetRotation(float rotation)
