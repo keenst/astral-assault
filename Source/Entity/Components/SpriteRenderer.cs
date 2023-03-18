@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -7,18 +8,18 @@ namespace AstralAssault;
 
 public class SpriteRenderer : IUpdateEventListener
 {
-    private readonly float _layerDepth;
+    private readonly LayerDepth _layerDepth;
     private readonly Animation[] _animations;
     private readonly Texture2D _spriteSheet;
     private Animation _activeAnimation;
     public int ActiveAnimationIndex => _animations.ToList().IndexOf(_activeAnimation);
     private int _activeFrame;
-
     private long _lastFrameUpdate;
-
+    private readonly List<IDrawTaskEffect> _drawTaskEffects = new();
+    
     private const float Pi = 3.14F;
 
-    public SpriteRenderer(Texture2D spriteSheet, Animation[] animations, float layerDepth = LayerDepth.Foreground)
+    public SpriteRenderer(Texture2D spriteSheet, Animation[] animations, LayerDepth layerDepth)
     {
         _animations = animations;
         _spriteSheet = spriteSheet;
@@ -50,45 +51,43 @@ public class SpriteRenderer : IUpdateEventListener
         _activeFrame = 0;
         _lastFrameUpdate = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
     }
-
-    public void Draw(SpriteBatch spriteBatch, Vector2 position, float rotation)
+    
+    public DrawTask CreateDrawTask(Vector2 position, float rotation)
     {
-        if (_activeAnimation.HasRotation)
-            DrawRotatable(spriteBatch, position, rotation);
-        else
-            DrawStatic(spriteBatch, position);
+        return _activeAnimation.HasRotation ? DrawRotatable(position, rotation) : DrawStatic(position);
     }
 
-    private void DrawStatic(SpriteBatch spriteBatch, Vector2 position)
+    public void SetEffect<TEffect, TParameter>(TParameter parameter)
+    {
+        if (!_drawTaskEffects.OfType<TEffect>().Any())
+        {
+            _drawTaskEffects.Add((IDrawTaskEffect)Activator.CreateInstance(typeof(TEffect), parameter));
+        }
+        else
+        {
+            int index = _drawTaskEffects.IndexOf((IDrawTaskEffect)_drawTaskEffects.OfType<TEffect>().First());
+            _drawTaskEffects[index] = (IDrawTaskEffect)Activator.CreateInstance(typeof(TEffect), parameter);
+        }
+    }
+    
+    public void RemoveEffect<TEffect>()
+    {
+        if (!_drawTaskEffects.OfType<TEffect>().Any()) return;
+        
+        int index = _drawTaskEffects.IndexOf((IDrawTaskEffect)_drawTaskEffects.OfType<TEffect>().First());
+        _drawTaskEffects.RemoveAt(index);
+    }
+
+    private DrawTask DrawStatic(Vector2 position)
     {
         Rectangle source = _activeAnimation.Frames[_activeFrame].Source;
-        
-        spriteBatch.Draw(
-            _spriteSheet, 
-            position, 
-            source, 
-            Color.White, 
-            0, 
-            new Vector2(source.Height / 2F, source.Width / 2F),
-            new Vector2(1, 1),
-            SpriteEffects.None,
-            _layerDepth);
+        return new DrawTask(_spriteSheet, source, position, 0, _layerDepth, _drawTaskEffects);
     }
 
-    private void DrawRotatable(SpriteBatch spriteBatch, Vector2 position, float rotation)
+    private DrawTask DrawRotatable(Vector2 position, float rotation)
     {
         (float spriteRotation, Rectangle source) = GetRotation(rotation);
-
-        spriteBatch.Draw(
-            _spriteSheet, 
-            position, 
-            source, 
-            Color.White, 
-            spriteRotation, 
-            new Vector2(source.Height / 2F, source.Width / 2F),
-            new Vector2(1, 1),
-            SpriteEffects.None,
-            _layerDepth);
+        return new DrawTask(_spriteSheet, source, position, spriteRotation, _layerDepth, _drawTaskEffects);
     }
 
     private Tuple<float, Rectangle> GetRotation(float rotation)

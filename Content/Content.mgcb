@@ -109,3 +109,15 @@
 /processorParam:TextureFormat=Color
 /build:assets/restart.png
 
+#begin shaders/color.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/color.fx
+
+#begin shaders/highlight.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/highlight.fx
+

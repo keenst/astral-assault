@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
+using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace AstralAssault;
 
@@ -26,6 +30,8 @@ public class Game1 : Game
     // render
     private SpriteBatch _spriteBatch;
     private RenderTarget2D _renderTarget;
+    private static readonly Effect HighlightEffect = AssetManager.Load<Effect>("highlight");
+    private static readonly Effect ColorEffect = AssetManager.Load<Effect>("color");
 
     // display
     private static readonly Color BackgroundColor = new(28, 23, 41);
@@ -78,6 +84,7 @@ public class Game1 : Game
         AssetManager.Init(this);
         TextRenderer.Init();
         InputEventSource.Init();
+        Palette.Init();
         
         GameStateMachine = new GameStateMachine(new GameplayState(this));
 
@@ -111,11 +118,9 @@ public class Game1 : Game
         GraphicsDevice.SetRenderTarget(_renderTarget);
         
         GraphicsDevice.Clear(BackgroundColor);
-        
-        _spriteBatch.Begin(SpriteSortMode.BackToFront, null, SamplerState.PointWrap);
 
-        GameStateMachine.Draw(_spriteBatch);
-        
+        List<DrawTask> drawTasks = GameStateMachine.GetDrawTasks().OrderBy(dt => (int)dt.LayerDepth).ToList();
+
         if (ShowDebug)
         {
             long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
@@ -124,19 +129,56 @@ public class Game1 : Game
             {
                 _frameRate = 1 / (float)gameTime.ElapsedGameTime.TotalSeconds;
                 _renderTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-
+        
                 _lastStatUpdate = timeNow;
             }
             
-            _spriteBatch.Write(
-                Math.Round(_frameRate).ToString(), 
-                new Vector2(0, 0), 
-                Color.Yellow);
+            string frameRate = Math.Round(_frameRate).ToString();
+            string renderTime = _renderTime.ToString();
             
-            _spriteBatch.Write(
-                _renderTime.ToString(), 
-                new Vector2(0, 9), 
-                Color.Yellow);
+            List<DrawTask> frameRateTask = 
+                frameRate.CreateDrawTasks(Vector2.Zero, Color.Yellow, LayerDepth.Debug);
+            List<DrawTask> renderTimeTask = 
+                renderTime.CreateDrawTasks(new Vector2(0, 9), Color.Yellow, LayerDepth.Debug);
+            
+            drawTasks.AddRange(frameRateTask);
+            drawTasks.AddRange(renderTimeTask);
+        }
+        
+        _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointWrap);
+        
+        foreach (DrawTask drawTask in drawTasks)
+        {
+            foreach (IDrawTaskEffect effect in drawTask.Effects)
+            {
+                switch (effect)
+                {
+                    case HighlightEffect highlightEffect:
+                        HighlightEffect.CurrentTechnique.Passes[1].Apply();
+                        HighlightEffect.Parameters["blendAlpha"].SetValue(highlightEffect.Alpha);
+                        HighlightEffect.CurrentTechnique.Passes[0].Apply();
+                        break;
+                    
+                    case ColorEffect colorEffect:
+                        ColorEffect.CurrentTechnique.Passes[1].Apply();
+                        ColorEffect.Parameters["newColor"].SetValue(colorEffect.Color);
+                        ColorEffect.CurrentTechnique.Passes[0].Apply();
+                        break;
+                }
+            }
+
+            _spriteBatch.Draw(
+                drawTask.Texture,
+                drawTask.Destination,
+                drawTask.Source,
+                Color.White,
+                drawTask.Rotation,
+                drawTask.Origin,
+                SpriteEffects.None,
+                0);
+            
+            HighlightEffect.CurrentTechnique.Passes[1].Apply();
+            ColorEffect.CurrentTechnique.Passes[1].Apply();
         }
         
         _spriteBatch.End();

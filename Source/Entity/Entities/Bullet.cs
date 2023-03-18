@@ -23,7 +23,7 @@ public class Bullet : Entity
 
         Animation animation = new(new[] { frame }, false);
         
-        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation });
+        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
         
         Collider = new Collider(
             this, 

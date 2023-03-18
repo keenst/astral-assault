@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
 
@@ -67,10 +67,14 @@ public class WaveController : IUpdateEventListener
         _waveTextTimer = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
     }
     
-    public void Draw(SpriteBatch spriteBatch)
+    public List<DrawTask> GetDrawTasks()
     {
-        if (!_drawWaveText) return;
-        spriteBatch.Write($"Wave: {_currentWave}", new Vector2(10, 10), Color.White);
+        if (!_drawWaveText) return new List<DrawTask>();
+        
+        string text = $"Wave: {_currentWave}";
+        List<DrawTask> drawTasks = text.CreateDrawTasks(new Vector2(10, 10), Color.White, LayerDepth.HUD);
+        
+        return drawTasks;
     }
 
     public void OnUpdate(object sender, UpdateEventArgs e)

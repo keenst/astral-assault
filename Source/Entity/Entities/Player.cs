@@ -51,7 +51,7 @@ public class Player : Entity, IInputEventListener
 
     private void InitSpriteRenderer()
     {
-        Texture2D spriteSheet = AssetManager.LoadTexture("player");
+        Texture2D spriteSheet = AssetManager.Load<Texture2D>("player");
         
         Frame frame = new(
             new Rectangle(0, 0, 32, 32),
@@ -61,7 +61,7 @@ public class Player : Entity, IInputEventListener
 
         Animation animation = new(new[] { frame }, true);
 
-        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation });
+        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
     }
 
     private void StartListening()
@@ -135,18 +135,6 @@ public class Player : Entity, IInputEventListener
                 BulletSpeed));
             
         _lastCannon = !_lastCannon;
-    }
-
-    public override void OnCollision(Collider other)
-    {
-        base.OnCollision(other);
-
-        if (IsFriendly == other.Parent.IsFriendly) return;
-        
-        Vector2 direction = Position - other.Parent.Position;
-        direction.Normalize();
-
-        //Velocity = direction * 50;
     }
 
     public override void Destroy()
