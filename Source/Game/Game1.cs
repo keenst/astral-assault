@@ -67,8 +67,6 @@ public class Game1 : Game
         IsFixedTimeStep = false;
         
         ShowDebug = false;
-        
-        AssetManager.Init(this);
     }
 
     protected override void Initialize()
