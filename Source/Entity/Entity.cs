@@ -131,7 +131,7 @@ public class Entity : IUpdateEventListener
         SpriteRenderer.SetEffect<HighlightEffect, float>(_highlightAlpha);
     }
     
-    public List<DrawTask> GetDrawTasks()
+    public virtual List<DrawTask> GetDrawTasks()
     {
         List<DrawTask> drawTasks = new();
         

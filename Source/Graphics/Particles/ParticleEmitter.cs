@@ -16,23 +16,26 @@ public class ParticleEmitter : IUpdateEventListener
     private readonly IParticleProperty[] _particleProperties;
     private Vector2 _position;
     private float _rotation;
-    private bool _isSpawning;
     private float TimeBetweenParticles => 1000F / _particlesPerSecond;
     private int _particlesSpawned;
     private int _particlesToSpawn;
     private long _lastTimeSpawned;
     
+    public bool IsSpawning { get; private set; }
+
     public ParticleEmitter(
         Texture2D spriteSheet, 
         Rectangle[] textureSources, 
         int particlesPerSecond, 
         Vector2 position,
+        float rotation,
         IParticleProperty[] particleProperties)
     {
         _spriteSheet = spriteSheet;
         _textureSources = textureSources;
         _particlesPerSecond = particlesPerSecond;
         _position = position;
+        _rotation = rotation;
         _particleProperties = particleProperties;
 
         List<Type> particlePropertyTypes = new();
@@ -59,7 +62,7 @@ public class ParticleEmitter : IUpdateEventListener
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
         if (timeNow - _lastTimeSpawned > TimeBetweenParticles && 
-            _isSpawning &&
+            IsSpawning &&
             (_particlesSpawned < _particlesToSpawn || _particlesToSpawn == 0))
         {
             Vector2 velocity = Vector2.Zero;
@@ -67,6 +70,7 @@ public class ParticleEmitter : IUpdateEventListener
             if (_particleProperties.OfType<VelocityProperty>().Any())
             {
                 velocity = _particleProperties.OfType<VelocityProperty>().First().GetVelocity();
+                velocity = Vector2.Transform(velocity, Matrix.CreateRotationZ(_rotation));
             }
 
             ActivateParticle(
@@ -87,7 +91,7 @@ public class ParticleEmitter : IUpdateEventListener
     {
         _particlesToSpawn = particlesToSpawn;
         _particlesSpawned = 0;
-        _isSpawning = true;
+        IsSpawning = true;
     }
     
     public void StopListening()
@@ -97,7 +101,7 @@ public class ParticleEmitter : IUpdateEventListener
 
     public void StopSpawning()
     {
-        _isSpawning = false;
+        IsSpawning = false;
     }
 
     public void SetTransform(Vector2 position, float rotation)

@@ -13,49 +13,12 @@ public class GameplayState : GameState
     
     public Player Player => (Player) Entities.Find(entity => entity is Player);
 
-    private readonly ParticleEmitter _particleEmitter;
-
     public GameplayState(Game1 root) : base(root)
     {
         Entities = new List<Entity>();
         WaveController = new WaveController(this, Root);
 
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("particle");
-        
-        Rectangle[] textureSources =
-        {
-            new(24, 0, 8, 8),
-            new(16, 0, 8, 8),
-            new(8, 0, 8, 8),
-            new(0, 0, 8, 8)
-        };
-
-        IParticleProperty[] particleProperties =
-        {
-            new CauseOfDeathProperty(CauseOfDeathProperty.CausesOfDeath.LifeSpan, 1500),
-            new ColorChangeProperty(
-                new[]
-                {
-                    Palette.Colors.Blue7,
-                    Palette.Colors.Blue6,
-                    Palette.Colors.Blue5,
-                    Palette.Colors.Blue4,
-                    Palette.Colors.Blue3
-                },
-                200),
-            new SpriteChangeProperty(0, textureSources.Length, 200),
-            new VelocityProperty(0, (float)Math.PI * 2, 0.04F, 0.1F)
-        };
-        
-        _particleEmitter = new ParticleEmitter(
-            spriteSheet,
-            textureSources,
-            5,
-            new Vector2(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F),
-            particleProperties
-        );
-        
-        _particleEmitter.StartSpawning(100);
     }
 
     public override List<DrawTask> GetDrawTasks()
@@ -68,8 +31,6 @@ public class GameplayState : GameState
         }
 
         drawTasks.AddRange(WaveController.GetDrawTasks());
-        
-        drawTasks.AddRange(_particleEmitter.CreateDrawTasks());
 
         if (!Root.ShowDebug) return drawTasks;
         
@@ -107,6 +68,5 @@ public class GameplayState : GameState
     public override void Exit()
     {
         while (Entities.Count > 0) Entities[0].Destroy();
-        _particleEmitter.StopListening();
     }
 }
