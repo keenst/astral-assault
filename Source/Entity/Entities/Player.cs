@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace AstralAssault;
 
 public class Player : Entity, IInputEventListener
 {
     private Vector2 _cursorPosition;
-    private Tuple<Vector2, Vector2> _muzzle;
+    private Tuple<Vector2, Vector2> _muzzle = new(Vector2.Zero, Vector2.Zero);
     private bool _lastCannon;
     private bool _isCrosshairActive = true;
     private bool _thrusterIsOn;
