@@ -67,6 +67,7 @@ public class GameplayState : GameState
 
     public override void Exit()
     {
+        WaveController.StopListening();
         while (Entities.Count > 0) Entities[0].Destroy();
     }
 }

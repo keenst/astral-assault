@@ -79,7 +79,8 @@ public class Player : Entity, IInputEventListener
             20,
             Position,
             Rotation,
-            particleProperties);
+            particleProperties,
+            LayerDepth.ThrusterFlame);
         
         _particleEmitter.StartSpawning();
 
