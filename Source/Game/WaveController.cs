@@ -62,8 +62,12 @@ public class WaveController : IUpdateEventListener
             
             Vector2 position = new(x, y);
             Asteroid.Sizes size = (Asteroid.Sizes)rnd.Next(0, 3);
+
+            Vector2 gameCenter = new(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F);
+            float angleToCenter = MathF.Atan2(gameCenter.Y - position.Y, gameCenter.X - position.X);
+            angleToCenter += MathHelper.ToRadians(rnd.Next(-45, 45));
             
-            GameState.Entities.Add(new Asteroid(GameState, position, size, _debrisController));
+            GameState.Entities.Add(new Asteroid(GameState, position, angleToCenter, size, _debrisController));
         }
 
         _drawWaveText = true;
