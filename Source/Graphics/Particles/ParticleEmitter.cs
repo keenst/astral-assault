@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -117,9 +116,6 @@ public class ParticleEmitter : IUpdateEventListener
 
     public List<DrawTask> CreateDrawTasks()
     {
-        Debug.WriteLine($"Total:  {_particles.Count}");
-        Debug.WriteLine($"Active: {_particles.Count(p => p.IsActive)}");
-        
         List<DrawTask> drawTasks = new();
 
         foreach (Particle particle in _particles.Where(p => p.IsActive))
