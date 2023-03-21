@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,14 +13,14 @@ public class ParticleEmitter : IUpdateEventListener
     private readonly int _particlesPerSecond;
     private readonly List<Particle> _particles = new();
     private readonly IParticleProperty[] _particleProperties;
+    private readonly LayerDepth _layerDepth;
     private Vector2 _position;
     private float _rotation;
     private float TimeBetweenParticles => 1000F / _particlesPerSecond;
     private int _particlesSpawned;
     private int _particlesToSpawn;
     private long _lastTimeSpawned;
-    
-    public bool IsSpawning { get; private set; }
+    private bool _isSpawning;
 
     public ParticleEmitter(
         Texture2D spriteSheet, 
@@ -29,7 +28,8 @@ public class ParticleEmitter : IUpdateEventListener
         int particlesPerSecond, 
         Vector2 position,
         float rotation,
-        IParticleProperty[] particleProperties)
+        IParticleProperty[] particleProperties,
+        LayerDepth layerDepth)
     {
         _spriteSheet = spriteSheet;
         _textureSources = textureSources;
@@ -37,7 +37,8 @@ public class ParticleEmitter : IUpdateEventListener
         _position = position;
         _rotation = rotation;
         _particleProperties = particleProperties;
-
+        _layerDepth = layerDepth;
+        
         List<Type> particlePropertyTypes = new();
         foreach (IParticleProperty particleProperty in particleProperties)
         {
@@ -61,8 +62,8 @@ public class ParticleEmitter : IUpdateEventListener
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-        if (timeNow - _lastTimeSpawned > TimeBetweenParticles && 
-            IsSpawning &&
+        if ((timeNow - _lastTimeSpawned > TimeBetweenParticles || _particlesPerSecond == 0) && 
+            _isSpawning &&
             (_particlesSpawned < _particlesToSpawn || _particlesToSpawn == 0))
         {
             Vector2 velocity = Vector2.Zero;
@@ -72,11 +73,19 @@ public class ParticleEmitter : IUpdateEventListener
                 velocity = _particleProperties.OfType<VelocityProperty>().First().GetVelocity();
                 velocity = Vector2.Transform(velocity, Matrix.CreateRotationZ(_rotation));
             }
+            
+            int textureIndex = _textureSources.Length - 1;
+            
+            if (_particleProperties.OfType<RandomSpriteProperty>().Any())
+            {
+                textureIndex = _particleProperties.OfType<RandomSpriteProperty>().First().SpriteIndex;
+            }
 
             ActivateParticle(
-                _textureSources.Length - 1,
+                textureIndex,
                 _position,
                 velocity);
+            
             _lastTimeSpawned = timeNow;
             _particlesSpawned++;
         }
@@ -91,7 +100,7 @@ public class ParticleEmitter : IUpdateEventListener
     {
         _particlesToSpawn = particlesToSpawn;
         _particlesSpawned = 0;
-        IsSpawning = true;
+        _isSpawning = true;
     }
     
     public void StopListening()
@@ -101,7 +110,7 @@ public class ParticleEmitter : IUpdateEventListener
 
     public void StopSpawning()
     {
-        IsSpawning = false;
+        _isSpawning = false;
     }
 
     public void SetTransform(Vector2 position, float rotation)
@@ -110,16 +119,13 @@ public class ParticleEmitter : IUpdateEventListener
         _rotation = rotation;
     }
 
-    public void SetTransform(Vector2 position)
+    public void SetPosition(Vector2 position)
     {
         _position = position;
     }
 
     public List<DrawTask> CreateDrawTasks()
     {
-        Debug.WriteLine($"Total:  {_particles.Count}");
-        Debug.WriteLine($"Active: {_particles.Count(p => p.IsActive)}");
-        
         List<DrawTask> drawTasks = new();
 
         foreach (Particle particle in _particles.Where(p => p.IsActive))
@@ -129,7 +135,7 @@ public class ParticleEmitter : IUpdateEventListener
                 _textureSources[particle.TextureIndex],
                 particle.Position,
                 0,
-                LayerDepth.Foreground,
+                _layerDepth,
                 particle.Effects));
         }
         

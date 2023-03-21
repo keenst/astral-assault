@@ -7,8 +7,9 @@ namespace AstralAssault;
 
 public class WaveController : IUpdateEventListener
 {
-    private readonly GameplayState _gameState;
+    public readonly GameplayState GameState;
     private readonly Game1 _root;
+    private readonly DebrisController _debrisController;
     private int _currentWave;
 
     private bool _drawWaveText;
@@ -20,10 +21,12 @@ public class WaveController : IUpdateEventListener
     
     public WaveController(GameplayState gameState, Game1 root)
     {
-        _gameState = gameState;
+        GameState = gameState;
         _root = root;
 
         UpdateEventSource.UpdateEvent += OnUpdate;
+        
+        _debrisController = new DebrisController(gameState);
         
         StartNextWave();
     }
@@ -60,7 +63,7 @@ public class WaveController : IUpdateEventListener
             Vector2 position = new(x, y);
             Asteroid.Sizes size = (Asteroid.Sizes)rnd.Next(0, 3);
             
-            _gameState.Entities.Add(new Asteroid(_gameState, position, size));
+            GameState.Entities.Add(new Asteroid(GameState, position, size, _debrisController));
         }
 
         _drawWaveText = true;
@@ -69,11 +72,13 @@ public class WaveController : IUpdateEventListener
     
     public List<DrawTask> GetDrawTasks()
     {
-        if (!_drawWaveText) return new List<DrawTask>();
+        List<DrawTask> drawTasks = _debrisController.GetDrawTasks();
+        
+        if (!_drawWaveText) return drawTasks;
         
         string text = $"Wave: {_currentWave}";
-        List<DrawTask> drawTasks = text.CreateDrawTasks(new Vector2(10, 10), Color.White, LayerDepth.HUD);
-        
+        drawTasks.AddRange(text.CreateDrawTasks(new Vector2(10, 10), Color.White, LayerDepth.HUD));
+
         return drawTasks;
     }
 
@@ -85,7 +90,7 @@ public class WaveController : IUpdateEventListener
             _drawWaveText = false;
         }
 
-        int enemiesAlive = _gameState.Entities.Count(x => x is Asteroid);
+        int enemiesAlive = GameState.Entities.Count(x => x is Asteroid);
         if (enemiesAlive == 0)
         {
             if (timeNow - _waveTimer < WaveDelay) return;
@@ -93,5 +98,10 @@ public class WaveController : IUpdateEventListener
             StartNextWave();
             _waveTimer = timeNow;
         }
+    }
+
+    public void StopListening()
+    {
+        UpdateEventSource.UpdateEvent -= OnUpdate;
     }
 }
