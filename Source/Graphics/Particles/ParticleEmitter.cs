@@ -13,15 +13,14 @@ public class ParticleEmitter : IUpdateEventListener
     private readonly int _particlesPerSecond;
     private readonly List<Particle> _particles = new();
     private readonly IParticleProperty[] _particleProperties;
+    private readonly LayerDepth _layerDepth;
     private Vector2 _position;
     private float _rotation;
     private float TimeBetweenParticles => 1000F / _particlesPerSecond;
     private int _particlesSpawned;
     private int _particlesToSpawn;
     private long _lastTimeSpawned;
-    private LayerDepth _layerDepth;
-    
-    public bool IsSpawning { get; private set; }
+    private bool _isSpawning;
 
     public ParticleEmitter(
         Texture2D spriteSheet, 
@@ -64,7 +63,7 @@ public class ParticleEmitter : IUpdateEventListener
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
         if ((timeNow - _lastTimeSpawned > TimeBetweenParticles || _particlesPerSecond == 0) && 
-            IsSpawning &&
+            _isSpawning &&
             (_particlesSpawned < _particlesToSpawn || _particlesToSpawn == 0))
         {
             Vector2 velocity = Vector2.Zero;
@@ -101,7 +100,7 @@ public class ParticleEmitter : IUpdateEventListener
     {
         _particlesToSpawn = particlesToSpawn;
         _particlesSpawned = 0;
-        IsSpawning = true;
+        _isSpawning = true;
     }
     
     public void StopListening()
@@ -111,7 +110,7 @@ public class ParticleEmitter : IUpdateEventListener
 
     public void StopSpawning()
     {
-        IsSpawning = false;
+        _isSpawning = false;
     }
 
     public void SetTransform(Vector2 position, float rotation)
