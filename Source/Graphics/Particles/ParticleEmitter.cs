@@ -71,11 +71,19 @@ public class ParticleEmitter : IUpdateEventListener
                 velocity = _particleProperties.OfType<VelocityProperty>().First().GetVelocity();
                 velocity = Vector2.Transform(velocity, Matrix.CreateRotationZ(_rotation));
             }
+            
+            int textureIndex = _textureSources.Length - 1;
+            
+            if (_particleProperties.OfType<RandomSpriteProperty>().Any())
+            {
+                textureIndex = _particleProperties.OfType<RandomSpriteProperty>().First().SpriteIndex;
+            }
 
             ActivateParticle(
-                _textureSources.Length - 1,
+                textureIndex,
                 _position,
                 velocity);
+            
             _lastTimeSpawned = timeNow;
             _particlesSpawned++;
         }
