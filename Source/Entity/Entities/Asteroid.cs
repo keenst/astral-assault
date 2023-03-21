@@ -18,7 +18,12 @@ public class Asteroid : Entity
         Medium
     }
 
-    public Asteroid(GameplayState gameState, Vector2 position, Sizes size, DebrisController debrisController) 
+    public Asteroid(
+        GameplayState gameState, 
+        Vector2 position, 
+        float direction, 
+        Sizes size, 
+        DebrisController debrisController) 
         :base(gameState, position)
     {
         _debrisController = debrisController;
@@ -27,9 +32,10 @@ public class Asteroid : Entity
 
         Random rnd = new();
         _rotSpeed = rnd.Next(5, 20) / 10F;
-        Velocity.X = rnd.Next(-100, 100);
-        Velocity.Y = rnd.Next(-100, 100);
+        int speed = rnd.Next(30, 100);
 
+        Velocity = new Vector2((float)Math.Cos(direction), (float)Math.Sin(direction)) * speed;
+        
         Texture2D spriteSheet;
         int colliderSize;
         int spriteSize;
@@ -98,10 +104,16 @@ public class Asteroid : Entity
         {
             Random rnd = new();
             int amount = rnd.Next(1, 4);
-            
+
+            Vector2 playerPosition = GameState.Player.Position;
+            float angleToPlayer = MathF.Atan2(Position.Y - playerPosition.Y, Position.X - playerPosition.X);
+
             for (int i = 0; i < amount; i++)
             {
-                GameState.Entities.Add(new Asteroid(GameState, Position, _size - 1, _debrisController));
+                angleToPlayer += (float)rnd.NextDouble() * MathF.PI / 1 - MathF.PI / 2;
+                
+                GameState.Entities.Add(
+                    new Asteroid(GameState, Position, angleToPlayer, _size - 1, _debrisController));
             }
         }
         
