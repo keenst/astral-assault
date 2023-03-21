@@ -19,6 +19,7 @@ public class ParticleEmitter : IUpdateEventListener
     private int _particlesSpawned;
     private int _particlesToSpawn;
     private long _lastTimeSpawned;
+    private LayerDepth _layerDepth;
     
     public bool IsSpawning { get; private set; }
 
@@ -28,7 +29,8 @@ public class ParticleEmitter : IUpdateEventListener
         int particlesPerSecond, 
         Vector2 position,
         float rotation,
-        IParticleProperty[] particleProperties)
+        IParticleProperty[] particleProperties,
+        LayerDepth layerDepth)
     {
         _spriteSheet = spriteSheet;
         _textureSources = textureSources;
@@ -36,7 +38,8 @@ public class ParticleEmitter : IUpdateEventListener
         _position = position;
         _rotation = rotation;
         _particleProperties = particleProperties;
-
+        _layerDepth = layerDepth;
+        
         List<Type> particlePropertyTypes = new();
         foreach (IParticleProperty particleProperty in particleProperties)
         {
@@ -60,7 +63,7 @@ public class ParticleEmitter : IUpdateEventListener
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-        if (timeNow - _lastTimeSpawned > TimeBetweenParticles && 
+        if ((timeNow - _lastTimeSpawned > TimeBetweenParticles || _particlesPerSecond == 0) && 
             IsSpawning &&
             (_particlesSpawned < _particlesToSpawn || _particlesToSpawn == 0))
         {
@@ -117,7 +120,7 @@ public class ParticleEmitter : IUpdateEventListener
         _rotation = rotation;
     }
 
-    public void SetTransform(Vector2 position)
+    public void SetPosition(Vector2 position)
     {
         _position = position;
     }
@@ -133,7 +136,7 @@ public class ParticleEmitter : IUpdateEventListener
                 _textureSources[particle.TextureIndex],
                 particle.Position,
                 0,
-                LayerDepth.Foreground,
+                _layerDepth,
                 particle.Effects));
         }
         
