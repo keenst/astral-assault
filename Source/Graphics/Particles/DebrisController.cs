@@ -15,7 +15,7 @@ public class DebrisController
     {
         _gameplayState = gameplayState;
         
-        Texture2D particleSpriteSheet = AssetManager.Load<Texture2D>("asteroid debris");
+        Texture2D particleSpriteSheet = AssetManager.Load<Texture2D>("AsteroidDebris");
         
         Rectangle[] textureSources =
         {

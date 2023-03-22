@@ -46,7 +46,7 @@ public class Player : Entity, IInputEventListener
             10);
         GameState.CollisionSystem.AddCollider(Collider);
 
-        Texture2D particleSpriteSheet = AssetManager.Load<Texture2D>("particle");
+        Texture2D particleSpriteSheet = AssetManager.Load<Texture2D>("Particle");
         
         Rectangle[] textureSources =
         {
@@ -96,7 +96,7 @@ public class Player : Entity, IInputEventListener
 
     private void InitSpriteRenderer()
     {
-        Texture2D spriteSheet = AssetManager.Load<Texture2D>("player");
+        Texture2D spriteSheet = AssetManager.Load<Texture2D>("Player");
         
         Frame frame = new(
             new Rectangle(0, 0, 32, 32),

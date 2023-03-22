@@ -17,8 +17,6 @@ public class GameplayState : GameState
     {
         Entities = new List<Entity>();
         WaveController = new WaveController(this, Root);
-
-        Texture2D spriteSheet = AssetManager.Load<Texture2D>("particle");
     }
 
     public override List<DrawTask> GetDrawTasks()

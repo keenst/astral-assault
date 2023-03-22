@@ -30,8 +30,8 @@ public class Game1 : Game
     // render
     private SpriteBatch _spriteBatch;
     private RenderTarget2D _renderTarget;
-    private static readonly Effect HighlightEffect = AssetManager.Load<Effect>("highlight");
-    private static readonly Effect ColorEffect = AssetManager.Load<Effect>("color");
+    private static readonly Effect HighlightEffect = AssetManager.Load<Effect>("Highlight");
+    private static readonly Effect ColorEffect = AssetManager.Load<Effect>("Color");
 
     // display
     private static readonly Color BackgroundColor = new(28, 23, 41);

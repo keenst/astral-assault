@@ -49,8 +49,8 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
 
     public override void Enter()
     {
-        _gameOverText = AssetManager.Load<Texture2D>("game over");
-        _restartPrompt = AssetManager.Load<Texture2D>("restart");
+        _gameOverText = AssetManager.Load<Texture2D>("GameOver");
+        _restartPrompt = AssetManager.Load<Texture2D>("Restart");
     }
 
     public override void Exit()

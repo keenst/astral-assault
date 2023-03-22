@@ -23,12 +23,12 @@ public static class AssetManager
         if (typeof(T) == typeof(Texture2D))
         {
             activeDictionary = Textures as Dictionary<string, T>;
-            activeDirectory = "assets";
+            activeDirectory = "Assets";
         }
         else if (typeof(T) == typeof(Effect))
         {
             activeDictionary = Effects as Dictionary<string, T>;
-            activeDirectory = "shaders";
+            activeDirectory = "Shaders";
         }
         else
         {
