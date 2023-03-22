@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
@@ -22,6 +23,7 @@ public class Entity : IUpdateEventListener
     protected float ContactDamage;
     
     private bool _isHighlighted;
+    private long _timeStartedHighlightingMS;
     private float _highlightAlpha;
 
     public bool IsFriendly;
@@ -51,21 +53,6 @@ public class Entity : IUpdateEventListener
     
     public virtual void OnUpdate(object sender, UpdateEventArgs e)
     {
-        if (_isHighlighted)
-        {
-            _highlightAlpha -= e.DeltaTime * 4;
-            if (_highlightAlpha <= 0)
-            {
-                _isHighlighted = false;
-                _highlightAlpha = 0;
-                SpriteRenderer.RemoveEffect<HighlightEffect>();
-            }
-            else
-            {
-                SpriteRenderer.SetEffect<HighlightEffect, float>(_highlightAlpha);
-            }
-        }
-        
         if (IsActor && HP <= 0)
         {
             OnDeath();
@@ -126,6 +113,7 @@ public class Entity : IUpdateEventListener
         HP = Math.Max(0, HP - other.Parent.ContactDamage);
 
         _isHighlighted = true;
+        _timeStartedHighlightingMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         _highlightAlpha = 0.7F;
         
         SpriteRenderer.SetEffect<HighlightEffect, float>(_highlightAlpha);
@@ -134,6 +122,27 @@ public class Entity : IUpdateEventListener
     public virtual List<DrawTask> GetDrawTasks()
     {
         List<DrawTask> drawTasks = new();
+        
+        if (_isHighlighted)
+        {
+            const float decayRate = 0.005F;
+            
+            long timeNowMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            float timeSinceStartedS = (timeNowMS - _timeStartedHighlightingMS) / 1000F;
+            
+            _highlightAlpha = 0.7F * MathF.Pow(decayRate, timeSinceStartedS);
+            
+            if (_highlightAlpha <= 0.01)
+            {
+                _isHighlighted = false;
+                _highlightAlpha = 0;
+                SpriteRenderer.RemoveEffect<HighlightEffect>();
+            }
+            else
+            {
+                SpriteRenderer.SetEffect<HighlightEffect, float>(_highlightAlpha);
+            }
+        }
         
         if (IsActor) drawTasks.AddRange(CreateHealthBarDrawTasks());
         drawTasks.Add(SpriteRenderer.CreateDrawTask(Position, Rotation));
