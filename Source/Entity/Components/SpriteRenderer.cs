@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,37 +9,62 @@ namespace AstralAssault;
 
 public class SpriteRenderer : IUpdateEventListener
 {
+    public int ActiveAnimation { get; private set; }
+
     private readonly LayerDepth _layerDepth;
     private readonly Animation[] _animations;
     private readonly Texture2D _spriteSheet;
-    private Animation _activeAnimation;
-    public int ActiveAnimationIndex => _animations.ToList().IndexOf(_activeAnimation);
+    private Animation CurrentAnimation => _animations[ActiveAnimation];
     private int _activeFrame;
     private long _lastFrameUpdate;
     private readonly List<IDrawTaskEffect> _drawTaskEffects = new();
+    private readonly Dictionary<Tuple<int, int>, Transition> _animationPaths = new();
+    private int[] _animationQueue;
+    private int _indexInQueue;
     
     private const float Pi = 3.14F;
 
-    public SpriteRenderer(Texture2D spriteSheet, Animation[] animations, LayerDepth layerDepth)
+    public SpriteRenderer(Texture2D spriteSheet, Animation[] animations, LayerDepth layerDepth, 
+        Transition[] transitions = null)
     {
         _animations = animations;
         _spriteSheet = spriteSheet;
         _layerDepth = layerDepth;
+
+        if (transitions != null)
+        {
+            foreach (Transition transition in transitions)
+            {
+                _animationPaths.Add(transition.FromTo, transition);
+            }
+        }
         
         UpdateEventSource.UpdateEvent += OnUpdate;
-        _activeAnimation = _animations[0];
+        ActiveAnimation = 0;
     }
 
     public void OnUpdate(object sender, UpdateEventArgs e)
     {
-        if (_activeAnimation.Frames.Length == 1) return;
+        if (_animationQueue == null) return;
         
-        int frameLength = _activeAnimation.Frames[_activeFrame].Time;
+        int frameLength = CurrentAnimation.Frames[_activeFrame].Time;
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
         if (timeNow < _lastFrameUpdate + frameLength) return;
 
-        _activeFrame = (_activeFrame + 1) % _activeAnimation.Frames.Length;
+        if (_activeFrame + 1 == CurrentAnimation.Frames.Length &&
+            _indexInQueue + 1 == _animationQueue.Length - 1)
+        {
+            ActiveAnimation = _animationQueue[++_indexInQueue];
+            _activeFrame = 0;
+            Debug.WriteLine("end of animation");
+        }
+        else
+        {
+            _activeFrame = (_activeFrame + 1) % CurrentAnimation.Frames.Length;
+            //Debug.WriteLine($"next frame: {_activeFrame}");
+        }
+        
         _lastFrameUpdate = timeNow;
     }
 
@@ -47,14 +73,16 @@ public class SpriteRenderer : IUpdateEventListener
         if (index >= _animations.Length || index < 0) 
             throw new ArgumentOutOfRangeException();
 
-        _activeAnimation = _animations[index];
-        _activeFrame = 0;
-        _lastFrameUpdate = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        if (index == ActiveAnimation) return;
+        
+        Debug.WriteLine($"playing animation: {index}, from animation: {ActiveAnimation}");
+
+        _animationQueue = GetTransition(ActiveAnimation, index).AnimationPath;
     }
     
     public DrawTask CreateDrawTask(Vector2 position, float rotation)
     {
-        return _activeAnimation.HasRotation ? DrawRotatable(position, rotation) : DrawStatic(position);
+        return CurrentAnimation.HasRotation ? DrawRotatable(position, rotation) : DrawStatic(position);
     }
 
     public void SetEffect<TEffect, TParameter>(TParameter parameter)
@@ -80,7 +108,7 @@ public class SpriteRenderer : IUpdateEventListener
 
     private DrawTask DrawStatic(Vector2 position)
     {
-        Rectangle source = _activeAnimation.Frames[_activeFrame].Source;
+        Rectangle source = CurrentAnimation.Frames[_activeFrame].Source;
         return new DrawTask(_spriteSheet, source, position, 0, _layerDepth, _drawTaskEffects);
     }
 
@@ -99,7 +127,7 @@ public class SpriteRenderer : IUpdateEventListener
         
         if (rot % 4 == 0)
         {
-            source = _activeAnimation.Frames[_activeFrame].Rotations[0];
+            source = CurrentAnimation.Frames[_activeFrame].Rotations[0];
             spriteRotation = Pi / 8 * rot;
             return new Tuple<float, Rectangle>(spriteRotation, source);
         }
@@ -113,8 +141,13 @@ public class SpriteRenderer : IUpdateEventListener
             _ => 0
         };
 
-        source = _activeAnimation.Frames[_activeFrame].Rotations[rot.Mod(4)];
+        source = CurrentAnimation.Frames[_activeFrame].Rotations[rot.Mod(4)];
 
         return new Tuple<float, Rectangle>(spriteRotation, source);
+    }
+
+    private Transition GetTransition(int from, int to)
+    {
+        return _animationPaths[new Tuple<int, int>(from, to)];
     }
 }
