@@ -15,11 +15,21 @@ public class Crosshair : Entity, IMouseEventListener
         Frame activeFrame   = new(new Rectangle(0,  0, 16, 16));
         Frame inactiveFrame = new(new Rectangle(64, 0, 16, 16));
 
-        Animation inactivateAnimation = new(new[]
+        Animation inactivateAnimation = new(
+            new[]
             {
-                new Frame(new Rectangle(16, 0, 16, 16), 100),
-                new Frame(new Rectangle(32, 0, 16, 16), 100),
-                new Frame(new Rectangle(48, 0, 16, 16), 100)
+                new Frame(new Rectangle(16, 0, 16, 16), 30),
+                new Frame(new Rectangle(32, 0, 16, 16), 30),
+                new Frame(new Rectangle(48, 0, 16, 16), 30)
+            },
+            false);
+
+        Animation activateAnimation = new(
+            new[]
+            {
+                new Frame(new Rectangle(48, 0, 16, 16), 30),
+                new Frame(new Rectangle(32, 0, 16, 16), 30),
+                new Frame(new Rectangle(16, 0, 16, 16), 30)
             },
             false);
 
@@ -27,13 +37,13 @@ public class Crosshair : Entity, IMouseEventListener
         Animation inactiveAnimation = new(new[] { inactiveFrame }, false);
 
         Transition[] transitions = {
-            new(0, 1, new[] { 2, 1 }, false),
-            new(1, 0, new[] { 2, 0 }, true)
+            new(0, 1, new[] { 2, 1 }),
+            new(1, 0, new[] { 3, 0 })
         };
 
         SpriteRenderer = new SpriteRenderer(
             spriteSheet, 
-            new[] { activeAnimation, inactiveAnimation, inactivateAnimation }, 
+            new[] { activeAnimation, inactiveAnimation, inactivateAnimation, activateAnimation }, 
             LayerDepth.Crosshair,
             transitions);
 
@@ -54,8 +64,17 @@ public class Crosshair : Entity, IMouseEventListener
         
         Vector2 playerPosition = GameState.Player.Position;
         float distance = Vector2.Distance(playerPosition, Position);
-        if (distance < 12) SpriteRenderer.PlayAnimation(1);
-        else if (SpriteRenderer.ActiveAnimation != 0) SpriteRenderer.PlayAnimation(0);
+
+        if (SpriteRenderer.ActiveAnimation is 2 or 3) return;
+        
+        if (distance < 12)
+        {
+            SpriteRenderer.PlayAnimation(1);
+        }
+        else if (SpriteRenderer.ActiveAnimation != 0)
+        {
+            SpriteRenderer.PlayAnimation(0);
+        }
     }
 
     public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)

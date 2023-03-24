@@ -53,16 +53,14 @@ public class SpriteRenderer : IUpdateEventListener
         if (timeNow < _lastFrameUpdate + frameLength) return;
 
         if (_activeFrame + 1 == CurrentAnimation.Frames.Length &&
-            _indexInQueue + 1 == _animationQueue.Length - 1)
+            _indexInQueue + 1 < _animationQueue.Length)
         {
             ActiveAnimation = _animationQueue[++_indexInQueue];
             _activeFrame = 0;
-            Debug.WriteLine("end of animation");
         }
         else
         {
             _activeFrame = (_activeFrame + 1) % CurrentAnimation.Frames.Length;
-            //Debug.WriteLine($"next frame: {_activeFrame}");
         }
         
         _lastFrameUpdate = timeNow;
@@ -75,9 +73,10 @@ public class SpriteRenderer : IUpdateEventListener
 
         if (index == ActiveAnimation) return;
         
-        Debug.WriteLine($"playing animation: {index}, from animation: {ActiveAnimation}");
-
         _animationQueue = GetTransition(ActiveAnimation, index).AnimationPath;
+        _indexInQueue = 0;
+        ActiveAnimation = _animationQueue[0];
+        _activeFrame = 0;
     }
     
     public DrawTask CreateDrawTask(Vector2 position, float rotation)
