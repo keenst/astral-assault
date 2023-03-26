@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -108,12 +109,22 @@ public class Asteroid : Entity
             Vector2 playerPosition = GameState.Player.Position;
             float angleToPlayer = MathF.Atan2(Position.Y - playerPosition.Y, Position.X - playerPosition.X);
 
+            var angles = new List<float>();
+
             for (int i = 0; i < amount; i++)
             {
-                angleToPlayer += (float)rnd.NextDouble() * MathF.PI / 1 - MathF.PI / 2;
+                do
+                {
+                    angleToPlayer += (float)rnd.NextDouble() * MathF.PI - MathF.PI / 2;
+                } while (angles.Contains(angleToPlayer));
+
+                angles.Add(angleToPlayer);
+                
+                Vector2 offset = ExtensionMethods.RotatedUnit(angleToPlayer) * 25;
+                
                 
                 GameState.Entities.Add(
-                    new Asteroid(GameState, Position, angleToPlayer, _size - 1, _debrisController));
+                    new Asteroid(GameState, Position + offset, angleToPlayer, _size - 1, _debrisController));
             }
         }
         
