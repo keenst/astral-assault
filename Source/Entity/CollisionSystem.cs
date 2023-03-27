@@ -35,11 +35,11 @@ public class CollisionSystem : IUpdateEventListener
                         out Vector2 totalImpulseOther)) 
                     continue;
 
-                if (collider.IsSolid && other.IsSolid)
+                if (collider.IsSolid && other.IsSolid && (other.Parent.TimeSinceSpawned > 250))
                 {
                     collider.Parent.Position += initialImpulseThis * e.DeltaTime;
                     other.Parent.Position += initialImpulseOther * e.DeltaTime;
-                    
+
                     collider.Parent.Velocity += totalImpulseThis * e.DeltaTime * 1000F;
                     other.Parent.Velocity += totalImpulseOther * e.DeltaTime * 1000F;
                     

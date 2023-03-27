@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -109,29 +108,59 @@ public class Asteroid : Entity
             Vector2 playerPosition = GameState.Player.Position;
             float angleToPlayer = MathF.Atan2(Position.Y - playerPosition.Y, Position.X - playerPosition.X);
 
-            var angles = new List<float>();
-
-            for (int i = 0; i < amount; i++)
+            (int, int, int) offsets = amount switch
             {
-                do
+                1 => (0, 0, 0),
+                2 => (6, -6, 0),
+                3 => (13, -13, 0),
+
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            switch (amount)
+            {
+                case 1:
                 {
                     angleToPlayer += (float)rnd.NextDouble() * MathF.PI - MathF.PI / 2;
-                } while (angles.Contains(angleToPlayer));
+                    GameState.Entities.Add(
+                        new Asteroid(GameState, Position, angleToPlayer, _size - 1, _debrisController));
+                    break;
+                }
 
-                angles.Add(angleToPlayer);
-                
-                Vector2 offset = ExtensionMethods.RotatedUnit(angleToPlayer) * 25;
-                
-                
-                GameState.Entities.Add(
-                    new Asteroid(GameState, Position + offset, angleToPlayer, _size - 1, _debrisController));
+                case 2:
+                {
+                    float ast1Angle = angleToPlayer + (float)rnd.NextDouble() * MathF.PI - MathF.PI / 2;
+                    float ast2Angle = angleToPlayer + (float)rnd.NextDouble() * MathF.PI - MathF.PI / 2;
+
+                    GameState.Entities.Add(
+                        new Asteroid(GameState, Position + ExtensionMethods.RotatedUnit(ast1Angle) * offsets.Item1, ast1Angle, _size - 1, _debrisController));
+                    GameState.Entities.Add(
+                        new Asteroid(GameState, Position + ExtensionMethods.RotatedUnit(ast2Angle) * offsets.Item2, ast2Angle, _size - 1, _debrisController));
+
+                    break;
+                }
+
+                case 3:
+                {
+                    float ast1Angle = angleToPlayer + (float)rnd.NextDouble() * MathF.PI - MathF.PI / 2;
+                    float ast2Angle = angleToPlayer + (float)rnd.NextDouble() * MathF.PI - MathF.PI / 2;
+                    float ast3Angle = (ast1Angle + ast2Angle) / 2;
+
+                    GameState.Entities.Add(
+                        new Asteroid(GameState, Position + ExtensionMethods.RotatedUnit(ast1Angle) * offsets.Item1, ast1Angle, _size - 1, _debrisController));
+                    GameState.Entities.Add(
+                        new Asteroid(GameState, Position + ExtensionMethods.RotatedUnit(ast2Angle) * offsets.Item2, ast2Angle, _size - 1, _debrisController));
+                    GameState.Entities.Add(
+                        new Asteroid(GameState, Position + ExtensionMethods.RotatedUnit(ast3Angle) * offsets.Item3, ast3Angle, _size - 1, _debrisController));
+                    break;
+                }
             }
         }
-        
+
         _hasExploded = true;
 
         _debrisController.SpawnDebris(Position, (int)_size);
-        
+
         base.OnDeath();
     }
 
