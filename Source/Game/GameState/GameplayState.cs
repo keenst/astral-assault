@@ -68,4 +68,16 @@ public class GameplayState : GameState
         WaveController.StopListening();
         while (Entities.Count > 0) Entities[0].Destroy();
     }
+
+    public override void Update(float deltaTime)
+    {
+        for (int i = 0; i < Entities.Count; i++)
+        {
+            Entities[i].Update(deltaTime);
+        }
+
+        WaveController.Update(deltaTime);
+        CollisionSystem.Update(deltaTime);
+        
+    }
 }

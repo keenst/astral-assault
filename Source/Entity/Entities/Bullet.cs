@@ -45,9 +45,9 @@ public class Bullet : Entity
         Destroy();
     }
 
-    public override void OnUpdate(object sender, UpdateEventArgs e)
+    public override void Update(float deltaTime)
     {
-        base.OnUpdate(sender, e);
+        base.Update(deltaTime);
 
         if (Position.X is > Game1.TargetWidth or < 0 ||
             Position.Y is > Game1.TargetHeight or < 0)

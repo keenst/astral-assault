@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
 
-public class SpriteRenderer : IUpdateEventListener
+public class SpriteRenderer
 {
     private readonly LayerDepth _layerDepth;
     private readonly Animation[] _animations;
@@ -25,11 +25,10 @@ public class SpriteRenderer : IUpdateEventListener
         _spriteSheet = spriteSheet;
         _layerDepth = layerDepth;
         
-        UpdateEventSource.UpdateEvent += OnUpdate;
         _activeAnimation = _animations[0];
     }
 
-    public void OnUpdate(object sender, UpdateEventArgs e)
+    public void Update(float deltaTime)
     {
         if (_activeAnimation.Frames.Length == 1) return;
         

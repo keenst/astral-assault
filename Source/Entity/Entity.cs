@@ -8,7 +8,7 @@ using Vector4 = Microsoft.Xna.Framework.Vector4;
 
 namespace AstralAssault;
 
-public class Entity : IUpdateEventListener
+public class Entity
 {
     public Vector2 Position;
     public Vector2 Velocity;
@@ -46,20 +46,20 @@ public class Entity : IUpdateEventListener
         Position = position;
         _timeSpawned = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         
-        UpdateEventSource.UpdateEvent += OnUpdate;
-        
         CreateHealthBarTexture();
     }
     
-    public virtual void OnUpdate(object sender, UpdateEventArgs e)
+    public virtual void Update(float deltaTime)
     {
+        SpriteRenderer.Update(deltaTime);
+        
         if (IsActor && HP <= 0)
         {
             OnDeath();
             return;
         }
 
-        Position += Velocity * e.DeltaTime;
+        Position += Velocity * deltaTime;
         Collider?.SetPosition(Position.ToPoint());
 
         switch (OutOfBoundsBehavior)
@@ -155,7 +155,7 @@ public class Entity : IUpdateEventListener
         GameState.Entities.Remove(this);
         GameState.CollisionSystem.RemoveCollider(Collider);
         
-        UpdateEventSource.UpdateEvent -= OnUpdate;
+
     }
 
     protected virtual void OnDeath()

@@ -26,6 +26,7 @@ public class Game1 : Game
     }
     
     public GameStateMachine GameStateMachine;
+    public InputCollector InputCollector;
     
     // render
     private SpriteBatch _spriteBatch;
@@ -81,8 +82,8 @@ public class Game1 : Game
 
         AssetManager.Init(this);
         TextRenderer.Init();
-        InputEventSource.Init();
         Palette.Init();
+        InputCollector = new InputCollector();
         
         GameStateMachine = new GameStateMachine(new GameplayState(this));
 
@@ -105,8 +106,10 @@ public class Game1 : Game
 
         _prevKeyState = Keyboard.GetState();
 
-        UpdateEventSource.Update(gameTime);
+        InputCollector.Update();
 
+        GameStateMachine.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+        
         base.Update(gameTime);
     }
 

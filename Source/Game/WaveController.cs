@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
 
-public class WaveController : IUpdateEventListener
+public class WaveController
 {
     public readonly GameplayState GameState;
     private readonly Game1 _root;
@@ -24,8 +24,6 @@ public class WaveController : IUpdateEventListener
         GameState = gameState;
         _root = root;
 
-        UpdateEventSource.UpdateEvent += OnUpdate;
-        
         _debrisController = new DebrisController(gameState);
         
         StartNextWave();
@@ -86,7 +84,7 @@ public class WaveController : IUpdateEventListener
         return drawTasks;
     }
 
-    public void OnUpdate(object sender, UpdateEventArgs e)
+    public void Update(float deltaTime)
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         if (_drawWaveText && timeNow - _waveTextTimer > WaveTextDuration)
@@ -106,6 +104,5 @@ public class WaveController : IUpdateEventListener
 
     public void StopListening()
     {
-        UpdateEventSource.UpdateEvent -= OnUpdate;
     }
 }

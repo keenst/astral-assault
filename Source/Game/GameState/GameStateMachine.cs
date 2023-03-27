@@ -23,4 +23,9 @@ public class GameStateMachine
     {
         return _currentState.GetDrawTasks();
     }
+
+    public void Update(float deltaTime)
+    {
+        _currentState.Update(deltaTime);
+    }
 }

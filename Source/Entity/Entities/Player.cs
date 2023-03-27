@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -9,7 +7,7 @@ using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace AstralAssault;
 
-public class Player : Entity, IInputEventListener
+public class Player : Entity
 {
     private Vector2 _cursorPosition;
     private Tuple<Vector2, Vector2> _muzzle = new(Vector2.Zero, Vector2.Zero);
@@ -34,9 +32,7 @@ public class Player : Entity, IInputEventListener
         Rotation = Pi / 2;
 
         InitSpriteRenderer();
-        
-        StartListening();
-        
+
         Collider = new Collider(
             this, 
             new Rectangle(
@@ -130,18 +126,8 @@ public class Player : Entity, IInputEventListener
         return drawTasks;
     }
 
-    private void StartListening()
-    {
-        InputEventSource.KeyboardEvent += OnKeyboardEvent;
-        InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
-        InputEventSource.MouseButtonEvent += OnMouseButtonEvent;
-    }
-    
     private void StopListening()
     {
-        InputEventSource.KeyboardEvent -= OnKeyboardEvent;
-        InputEventSource.MouseMoveEvent -= OnMouseMoveEvent;
-        InputEventSource.MouseButtonEvent -= OnMouseButtonEvent;
         _particleEmitter.StopListening();
     }
 
@@ -220,19 +206,19 @@ public class Player : Entity, IInputEventListener
         base.OnDeath();
     }
 
-    public void OnKeyboardEvent(object sender, KeyboardEventArgs e)
+    private void HandleKeyboard()
     {
         int xAxis = 0;
         int yAxis = 0;
 
-        if (e.Keys.Contains(Keys.D))
+        if (GameState.Root.InputCollector._keysDown.Contains(Keys.D))
             xAxis = 1;
-        else if (e.Keys.Contains(Keys.A))
+        else if (GameState.Root.InputCollector._keysDown.Contains(Keys.A))
             xAxis = -1;
 
-        if (e.Keys.Contains(Keys.W))
+        if (GameState.Root.InputCollector._keysDown.Contains(Keys.W))
             yAxis = 1;
-        else if (e.Keys.Contains(Keys.S))
+        else if (GameState.Root.InputCollector._keysDown.Contains(Keys.S))
             yAxis = -1;
 
         if (yAxis == 1)
@@ -243,26 +229,30 @@ public class Player : Entity, IInputEventListener
         HandleMovement(xAxis, yAxis);
     }
 
-    public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
+    private void HandleMouseMove()
     {
         Point scale = new((int)GameState.Root.ScaleX, (int)GameState.Root.ScaleY);
-        _cursorPosition.X = e.Position.ToVector2().X / scale.X;
-        _cursorPosition.Y = e.Position.ToVector2().Y / scale.Y;
+        _cursorPosition.X = GameState.Root.InputCollector._mousePos.ToVector2().X / scale.X;
+        _cursorPosition.Y = GameState.Root.InputCollector._mousePos.ToVector2().Y / scale.Y;
     }
 
-    public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)
+    private void HandleMouseButton()
     {
-        if (e.Button == InputEventSource.MouseButtons.Left)
+        if (GameState.Root.InputCollector.MouseDown.Contains(InputCollector.MouseButtons.Left))
         {
             HandleFiring();
         }
     }
 
-    public override void OnUpdate(object sender, UpdateEventArgs e)
+    public override void Update(float deltaTime)
     {
-        base.OnUpdate(sender, e);
+        base.Update(deltaTime);
+
+        HandleKeyboard();
+        HandleMouseMove();
+        HandleMouseButton();
         
-        _delta = e.DeltaTime;
+        _delta = deltaTime;
 
         // check range to cursor
         float distance = Vector2.Distance(Position, _cursorPosition);
@@ -328,5 +318,7 @@ public class Player : Entity, IInputEventListener
         }
         
         _particleEmitter.SetTransform(emitterPosition, emitterRotation);
+        
+        _particleEmitter.Update(deltaTime);
     }
 }

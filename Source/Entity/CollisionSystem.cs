@@ -4,17 +4,16 @@ using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
 
-public class CollisionSystem : IUpdateEventListener 
+public class CollisionSystem 
 {
     public List<Collider> Colliders { get; } = new();
     private List<Tuple<Collider, Collider>> _lastCollisions = new();
 
     public CollisionSystem()
     {
-        UpdateEventSource.UpdateEvent += OnUpdate;
     }
 
-    public void OnUpdate(object sender, UpdateEventArgs e)
+    public void Update(float deltaTime)
     {
         List<Tuple<Collider, Collider>> currentCollisions = new();
 
@@ -28,7 +27,7 @@ public class CollisionSystem : IUpdateEventListener
 
                 if (!collider.CollidesWith(
                         other, 
-                        e.DeltaTime,
+                        deltaTime,
                         out Vector2 initialImpulseThis,
                         out Vector2 initialImpulseOther,
                         out Vector2 totalImpulseThis,
@@ -37,11 +36,11 @@ public class CollisionSystem : IUpdateEventListener
 
                 if (collider.IsSolid && other.IsSolid && collider.Parent.TimeSinceSpawned > 1000)
                 {
-                    collider.Parent.Position += initialImpulseThis * e.DeltaTime;
-                    other.Parent.Position += initialImpulseOther * e.DeltaTime;
+                    collider.Parent.Position += initialImpulseThis * deltaTime;
+                    other.Parent.Position += initialImpulseOther * deltaTime;
                     
-                    collider.Parent.Velocity += totalImpulseThis * e.DeltaTime * 1000F;
-                    other.Parent.Velocity += totalImpulseOther * e.DeltaTime * 1000F;
+                    collider.Parent.Velocity += totalImpulseThis * deltaTime * 1000F;
+                    other.Parent.Velocity += totalImpulseOther * deltaTime * 1000F;
                     
                     collider.SetPosition(collider.Parent.Position.ToPoint());
                     other.SetPosition(other.Parent.Position.ToPoint());

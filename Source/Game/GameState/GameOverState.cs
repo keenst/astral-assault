@@ -5,16 +5,23 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
 
-public class GameOverState : GameState, IKeyboardPressedEventListener
+public class GameOverState : GameState
 {
     private Texture2D _gameOverText;
     private Texture2D _restartPrompt;
-    
+
     public GameOverState(Game1 root) : base(root)
     {
-        InputEventSource.KeyboardPressedEvent += OnKeyboardPressedEvent;
     }
-    
+
+    public override void Update(float deltaTime)
+    {
+        if (Root.InputCollector._keysDown.Count != 0)
+        {
+            Root.GameStateMachine.ChangeState(new GameplayState(Root));
+        }
+    }
+
     public override List<DrawTask> GetDrawTasks()
     {
         Vector2 textPosition = new(
@@ -29,7 +36,7 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
             _gameOverText, 
             textPosition, 
             0, 
-            LayerDepth.HUD, 
+            LayerDepth.HUD,
             new List<IDrawTaskEffect>());
 
         DrawTask restartPrompt = new(
@@ -42,11 +49,6 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
         return new List<DrawTask> { gameOverText, restartPrompt };
     }
 
-    public void OnKeyboardPressedEvent(object sender, KeyboardEventArgs e)
-    {
-        Root.GameStateMachine.ChangeState(new GameplayState(Root));
-    }
-
     public override void Enter()
     {
         _gameOverText = AssetManager.Load<Texture2D>("GameOver");
@@ -55,6 +57,5 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
 
     public override void Exit()
     {
-        InputEventSource.KeyboardPressedEvent -= OnKeyboardPressedEvent;
     }
 }

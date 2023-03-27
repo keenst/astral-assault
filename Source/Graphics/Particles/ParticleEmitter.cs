@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
 
-public class ParticleEmitter : IUpdateEventListener
+public class ParticleEmitter
 {
     private readonly Texture2D _spriteSheet;
     private readonly Rectangle[] _textureSources;
@@ -54,11 +54,9 @@ public class ParticleEmitter : IUpdateEventListener
         {
             throw new ArgumentException();
         }
-        
-        UpdateEventSource.UpdateEvent += OnUpdate;
     }
     
-    public void OnUpdate(object sender, UpdateEventArgs e)
+    public void Update(float deltaTime)
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
@@ -105,7 +103,6 @@ public class ParticleEmitter : IUpdateEventListener
     
     public void StopListening()
     {
-        UpdateEventSource.UpdateEvent -= OnUpdate;
     }
 
     public void StopSpawning()

@@ -10,6 +10,8 @@ public abstract class GameState
     {
         Root = root;
     }
+
+    public abstract void Update(float deltaTime);
     
     public abstract List<DrawTask> GetDrawTasks();
     public abstract void Enter();
