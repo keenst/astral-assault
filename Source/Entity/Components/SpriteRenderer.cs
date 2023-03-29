@@ -20,13 +20,18 @@ public class SpriteRenderer : IUpdateEventListener
     private readonly List<IDrawTaskEffect> _drawTaskEffects = new();
     private readonly Dictionary<Tuple<int, int>, Transition> _animationPaths = new();
     private int[] _animationQueue;
-    private int[] _animationConditions;
     private int _indexInQueue;
-    
+    private readonly Dictionary<string, float> _animationConditions = new();
+    private readonly List<Tuple<int, int>> _previousTransitionConditionsMet = new(); 
+
     private const float Pi = 3.14F;
 
-    public SpriteRenderer(Texture2D spriteSheet, Animation[] animations, LayerDepth layerDepth, 
-        Transition[] transitions = null)
+    public SpriteRenderer(
+        Texture2D spriteSheet, 
+        Animation[] animations, 
+        LayerDepth layerDepth,
+        Transition[] transitions = null, 
+        string[] animationConditions = null)
     {
         _animations = animations;
         _spriteSheet = spriteSheet;
@@ -40,6 +45,8 @@ public class SpriteRenderer : IUpdateEventListener
             }
         }
         
+        if (animationConditions != null) InitAnimationConditions(animationConditions);
+
         UpdateEventSource.UpdateEvent += OnUpdate;
         ActiveAnimation = 0;
     }
@@ -48,6 +55,8 @@ public class SpriteRenderer : IUpdateEventListener
     {
         if (_animationQueue == null) return;
         
+        
+
         int frameLength = CurrentAnimation.Frames[_activeFrame].Time;
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
@@ -63,23 +72,23 @@ public class SpriteRenderer : IUpdateEventListener
         {
             _activeFrame = (_activeFrame + 1) % CurrentAnimation.Frames.Length;
         }
-        
+
         _lastFrameUpdate = timeNow;
     }
 
     public void PlayAnimation(int index)
     {
-        if (index >= _animations.Length || index < 0) 
+        if (index >= _animations.Length || index < 0)
             throw new ArgumentOutOfRangeException();
 
         if (index == ActiveAnimation) return;
-        
+
         _animationQueue = GetTransition(ActiveAnimation, index).AnimationPath;
         _indexInQueue = 0;
         ActiveAnimation = _animationQueue[0];
         _activeFrame = 0;
     }
-    
+
     public DrawTask CreateDrawTask(Vector2 position, float rotation)
     {
         return CurrentAnimation.HasRotation ? DrawRotatable(position, rotation) : DrawStatic(position);
@@ -97,11 +106,11 @@ public class SpriteRenderer : IUpdateEventListener
             _drawTaskEffects[index] = (IDrawTaskEffect)Activator.CreateInstance(typeof(TEffect), parameter);
         }
     }
-    
+
     public void RemoveEffect<TEffect>()
     {
         if (!_drawTaskEffects.OfType<TEffect>().Any()) return;
-        
+
         int index = _drawTaskEffects.IndexOf((IDrawTaskEffect)_drawTaskEffects.OfType<TEffect>().First());
         _drawTaskEffects.RemoveAt(index);
     }
@@ -124,7 +133,7 @@ public class SpriteRenderer : IUpdateEventListener
 
         float spriteRotation;
         Rectangle source;
-        
+
         if (rot % 4 == 0)
         {
             source = CurrentAnimation.Frames[_activeFrame].Rotations[0];
@@ -134,10 +143,10 @@ public class SpriteRenderer : IUpdateEventListener
 
         spriteRotation = rotation switch
         {
-            >= 0         and < Pi / 2    => 0,
-            >= Pi / 2    and < Pi        => Pi / 2,
-            <= 0         and > -Pi / 2   => -Pi / 2,
-            <= -Pi / 2   and > -Pi       => -Pi,
+            >= 0 and < Pi / 2 => 0,
+            >= Pi / 2 and < Pi => Pi / 2,
+            <= 0 and > -Pi / 2 => -Pi / 2,
+            <= -Pi / 2 and > -Pi => -Pi,
             _ => 0
         };
 
@@ -150,4 +159,34 @@ public class SpriteRenderer : IUpdateEventListener
     {
         return _animationPaths[new Tuple<int, int>(from, to)];
     }
+
+    private void CheckConditions()
+    {
+        if (_animationConditions.Count == 0) return;
+        
+        List<string> conditionsMet = new();
+        foreach (KeyValuePair<string, float> condition in _animationConditions)
+        {
+            
+        }
+    }
+
+    public void SetAnimationCondition(string name, float value)
+    {
+        if (_animationConditions.ContainsKey(name))
+            _animationConditions[name] = value;
+        else
+            _animationConditions.Add(name, value);
+    }
+
+    private void InitAnimationConditions(string[] name)
+    {
+        if (_animationConditions.Count != 0)
+            throw new InvalidOperationException("Animation conditions already initialized");
+        
+        foreach (string s in name)
+        {
+            _animationConditions.Add(s, 0);
+        }
+    } 
 }
