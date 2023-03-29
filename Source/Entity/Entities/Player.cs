@@ -98,15 +98,54 @@ public class Player : Entity, IInputEventListener
     {
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Player");
         
-        Frame frame = new(
-            new Rectangle(0, 0, 32, 32),
-            new Rectangle(32, 0, 32, 32),
-            new Rectangle(64, 0, 32, 32),
-            new Rectangle(96, 0, 32, 32));
+        Animation idleAnimation = new(
+            new[]
+            {
+                new Frame(
+                    new Rectangle(0, 0,  32, 32),
+                    new Rectangle(0, 32, 32, 32),
+                    new Rectangle(0, 64, 32, 32),
+                    new Rectangle(0, 96, 32, 32))
+            }, 
+            true);
 
-        Animation animation = new(new[] { frame }, true);
+        Animation tiltRightAnimation = new(
+            new[]
+            {
+                new Frame(
+                    new Rectangle(32, 0,  32, 32),
+                    new Rectangle(32, 32, 32, 32),
+                    new Rectangle(32, 64, 32, 32),
+                    new Rectangle(32, 96, 32, 32))
+            },
+            true);
 
-        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
+        Animation tiltLeftAnimation = new(
+            new[]
+            {
+                new Frame(
+                    new Rectangle(384, 0,  32, 32),
+                    new Rectangle(384, 32, 32, 32),
+                    new Rectangle(384, 64, 32, 32),
+                    new Rectangle(384, 96, 32, 32))
+            },
+            true);
+
+        Transition[] transitions =
+        {
+            new(0, 1, new[] { 1 }),
+            new(1, 0, new[] { 0 }),
+            new(0, 2, new[] { 2 }),
+            new(2, 0, new[] { 0 }),
+            new(2, 1, new[] { 0, 1 }),
+            new(1, 2, new[] { 0, 2 })
+        };
+        
+        SpriteRenderer = new SpriteRenderer(
+            spriteSheet, 
+            new[] { idleAnimation, tiltRightAnimation, tiltLeftAnimation }, 
+            LayerDepth.Foreground,
+            transitions);
     }
     
     public override List<DrawTask> GetDrawTasks()

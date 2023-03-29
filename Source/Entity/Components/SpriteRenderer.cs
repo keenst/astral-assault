@@ -20,6 +20,7 @@ public class SpriteRenderer : IUpdateEventListener
     private readonly List<IDrawTaskEffect> _drawTaskEffects = new();
     private readonly Dictionary<Tuple<int, int>, Transition> _animationPaths = new();
     private int[] _animationQueue;
+    private int[] _animationConditions;
     private int _indexInQueue;
     
     private const float Pi = 3.14F;
