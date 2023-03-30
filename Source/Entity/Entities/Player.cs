@@ -133,12 +133,12 @@ public class Player : Entity, IInputEventListener
 
         Transition[] transitions =
         {
-            new(0, 1, new[] { 1 }),
-            new(1, 0, new[] { 0 }),
-            new(0, 2, new[] { 2 }),
-            new(2, 0, new[] { 0 }),
-            new(2, 1, new[] { 0, 1 }),
-            new(1, 2, new[] { 0, 2 })
+            new(1, 0, new[] { 0 },    "Tilt",  0),
+            new(0, 1, new[] { 1 },    "Tilt",  1),
+            new(0, 2, new[] { 2 },    "Tilt", -1),
+            new(2, 0, new[] { 0 },    "Tilt",  0),
+            new(2, 1, new[] { 0, 1 }, "Tilt",  1),
+            new(1, 2, new[] { 0, 2 }, "Tilt", -1)
         };
         
         SpriteRenderer = new SpriteRenderer(

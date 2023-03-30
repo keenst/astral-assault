@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -22,7 +21,7 @@ public class SpriteRenderer : IUpdateEventListener
     private int[] _animationQueue;
     private int _indexInQueue;
     private readonly Dictionary<string, float> _animationConditions = new();
-    private readonly List<Tuple<int, int>> _previousTransitionConditionsMet = new(); 
+    private List<Tuple<string, float>> _previousConditionValues = new(); 
 
     private const float Pi = 3.14F;
 
@@ -54,8 +53,6 @@ public class SpriteRenderer : IUpdateEventListener
     public void OnUpdate(object sender, UpdateEventArgs e)
     {
         if (_animationQueue == null) return;
-        
-        
 
         int frameLength = CurrentAnimation.Frames[_activeFrame].Time;
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
@@ -163,12 +160,34 @@ public class SpriteRenderer : IUpdateEventListener
     private void CheckConditions()
     {
         if (_animationConditions.Count == 0) return;
-        
-        List<string> conditionsMet = new();
-        foreach (KeyValuePair<string, float> condition in _animationConditions)
+
+        List<Tuple<string, float>> conditionsMet = new();
+        foreach (Tuple<string, float> condition in _animationConditions
+                     .Select(x => new Tuple<string, float>(x.Key, x.Value))
+                     .ToList())
         {
-            
+            conditionsMet.Add(condition);
         }
+        
+        foreach (Tuple<string, float> conditionMet in conditionsMet)
+        {
+            if (conditionMet == _previousConditionValues.Select(x => 
+                    x.Item2 == conditionMet.))
+                continue;
+        }
+
+        Tuple<int, int> path = _animationPaths.First(x => 
+            _animationConditions[] == x.Key.Item2).Key
+        
+        if (conditionsMet.Any(transition => !_previousConditionValues.Contains(transition)))
+        {
+            _animationQueue = GetTransition(ActiveAnimation, conditionsMet.First().Item2).AnimationPath;
+            _indexInQueue = 0;
+            ActiveAnimation = _animationQueue[0];
+            _activeFrame = 0;
+        }
+
+        _previousConditionValues = condi;
     }
 
     public void SetAnimationCondition(string name, float value)
