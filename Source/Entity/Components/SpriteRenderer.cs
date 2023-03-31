@@ -14,14 +14,14 @@ public class SpriteRenderer : IUpdateEventListener
     private readonly Animation[] _animations;
     private readonly Texture2D _spriteSheet;
     private Animation CurrentAnimation => _animations[ActiveAnimation];
-    private int _activeFrame;
+    private int _currentAnimationIndex;
     private long _lastFrameUpdate;
     private readonly List<IDrawTaskEffect> _drawTaskEffects = new();
     private readonly Dictionary<Tuple<int, int>, Transition> _animationPaths = new();
     private int[] _animationQueue;
     private int _indexInQueue;
     private readonly Dictionary<string, float> _animationConditions = new();
-    private List<Tuple<string, float>> _previousConditionValues = new(); 
+    private List<Tuple<string, float>> _previousConditionValues = new();
 
     private const float Pi = 3.14F;
 
@@ -54,20 +54,20 @@ public class SpriteRenderer : IUpdateEventListener
     {
         if (_animationQueue == null) return;
 
-        int frameLength = CurrentAnimation.Frames[_activeFrame].Time;
+        int frameLength = CurrentAnimation.Frames[_currentAnimationIndex].Time;
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
         if (timeNow < _lastFrameUpdate + frameLength) return;
 
-        if (_activeFrame + 1 == CurrentAnimation.Frames.Length &&
+        if (_currentAnimationIndex + 1 == CurrentAnimation.Frames.Length &&
             _indexInQueue + 1 < _animationQueue.Length)
         {
             ActiveAnimation = _animationQueue[++_indexInQueue];
-            _activeFrame = 0;
+            _currentAnimationIndex = 0;
         }
         else
         {
-            _activeFrame = (_activeFrame + 1) % CurrentAnimation.Frames.Length;
+            _currentAnimationIndex = (_currentAnimationIndex + 1) % CurrentAnimation.Frames.Length;
         }
 
         _lastFrameUpdate = timeNow;
@@ -83,7 +83,7 @@ public class SpriteRenderer : IUpdateEventListener
         _animationQueue = GetTransition(ActiveAnimation, index).AnimationPath;
         _indexInQueue = 0;
         ActiveAnimation = _animationQueue[0];
-        _activeFrame = 0;
+        _currentAnimationIndex = 0;
     }
 
     public DrawTask CreateDrawTask(Vector2 position, float rotation)
@@ -114,7 +114,7 @@ public class SpriteRenderer : IUpdateEventListener
 
     private DrawTask DrawStatic(Vector2 position)
     {
-        Rectangle source = CurrentAnimation.Frames[_activeFrame].Source;
+        Rectangle source = CurrentAnimation.Frames[_currentAnimationIndex].Source;
         return new DrawTask(_spriteSheet, source, position, 0, _layerDepth, _drawTaskEffects);
     }
 
@@ -133,7 +133,7 @@ public class SpriteRenderer : IUpdateEventListener
 
         if (rot % 4 == 0)
         {
-            source = CurrentAnimation.Frames[_activeFrame].Rotations[0];
+            source = CurrentAnimation.Frames[_currentAnimationIndex].Rotations[0];
             spriteRotation = Pi / 8 * rot;
             return new Tuple<float, Rectangle>(spriteRotation, source);
         }
@@ -147,7 +147,7 @@ public class SpriteRenderer : IUpdateEventListener
             _ => 0
         };
 
-        source = CurrentAnimation.Frames[_activeFrame].Rotations[rot.Mod(4)];
+        source = CurrentAnimation.Frames[_currentAnimationIndex].Rotations[rot.Mod(4)];
 
         return new Tuple<float, Rectangle>(spriteRotation, source);
     }
@@ -157,37 +157,22 @@ public class SpriteRenderer : IUpdateEventListener
         return _animationPaths[new Tuple<int, int>(from, to)];
     }
 
-    private void CheckConditions()
+    private Transition? CheckConditions()
     {
-        if (_animationConditions.Count == 0) return;
-
-        List<Tuple<string, float>> conditionsMet = new();
-        foreach (Tuple<string, float> condition in _animationConditions
-                     .Select(x => new Tuple<string, float>(x.Key, x.Value))
-                     .ToList())
+        bool conditionsAreSame = true;
+        for (int i = 0; i < _previousConditionValues.Count; i++)
         {
-            conditionsMet.Add(condition);
+            Tuple<string, float> condition = _previousConditionValues[i];
+            if (_previousConditionValues[condition.Item1] != condition.Item2)
+            {
+                conditionsAreSame = false;
+                break;
+            }
         }
+
+        if (!conditionsAreSame) return null;
         
-        foreach (Tuple<string, float> conditionMet in conditionsMet)
-        {
-            if (conditionMet == _previousConditionValues.Select(x => 
-                    x.Item2 == conditionMet.))
-                continue;
-        }
-
-        Tuple<int, int> path = _animationPaths.First(x => 
-            _animationConditions[] == x.Key.Item2).Key
         
-        if (conditionsMet.Any(transition => !_previousConditionValues.Contains(transition)))
-        {
-            _animationQueue = GetTransition(ActiveAnimation, conditionsMet.First().Item2).AnimationPath;
-            _indexInQueue = 0;
-            ActiveAnimation = _animationQueue[0];
-            _activeFrame = 0;
-        }
-
-        _previousConditionValues = condi;
     }
 
     public void SetAnimationCondition(string name, float value)
