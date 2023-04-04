@@ -15,7 +15,7 @@ public class SpriteRenderer : IUpdateEventListener
     public int ActiveAnimationIndex => _animations.ToList().IndexOf(_activeAnimation);
     private int _activeFrame;
     private long _lastFrameUpdate;
-    private readonly List<IDrawTaskEffect> _drawTaskEffects = new();
+    public readonly EffectContainer EffectContainer = new();
     
     private const float Pi = 3.14F;
 
@@ -57,37 +57,16 @@ public class SpriteRenderer : IUpdateEventListener
         return _activeAnimation.HasRotation ? DrawRotatable(position, rotation) : DrawStatic(position);
     }
 
-    public void SetEffect<TEffect, TParameter>(TParameter parameter)
-    {
-        if (!_drawTaskEffects.OfType<TEffect>().Any())
-        {
-            _drawTaskEffects.Add((IDrawTaskEffect)Activator.CreateInstance(typeof(TEffect), parameter));
-        }
-        else
-        {
-            int index = _drawTaskEffects.IndexOf((IDrawTaskEffect)_drawTaskEffects.OfType<TEffect>().First());
-            _drawTaskEffects[index] = (IDrawTaskEffect)Activator.CreateInstance(typeof(TEffect), parameter);
-        }
-    }
-    
-    public void RemoveEffect<TEffect>()
-    {
-        if (!_drawTaskEffects.OfType<TEffect>().Any()) return;
-        
-        int index = _drawTaskEffects.IndexOf((IDrawTaskEffect)_drawTaskEffects.OfType<TEffect>().First());
-        _drawTaskEffects.RemoveAt(index);
-    }
-
     private DrawTask DrawStatic(Vector2 position)
     {
         Rectangle source = _activeAnimation.Frames[_activeFrame].Source;
-        return new DrawTask(_spriteSheet, source, position, 0, _layerDepth, _drawTaskEffects);
+        return new DrawTask(_spriteSheet, source, position, 0, _layerDepth, EffectContainer.Effects);
     }
 
     private DrawTask DrawRotatable(Vector2 position, float rotation)
     {
         (float spriteRotation, Rectangle source) = GetRotation(rotation);
-        return new DrawTask(_spriteSheet, source, position, spriteRotation, _layerDepth, _drawTaskEffects);
+        return new DrawTask(_spriteSheet, source, position, spriteRotation, _layerDepth, EffectContainer.Effects);
     }
 
     private Tuple<float, Rectangle> GetRotation(float rotation)

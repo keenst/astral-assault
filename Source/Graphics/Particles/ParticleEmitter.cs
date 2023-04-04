@@ -136,7 +136,7 @@ public class ParticleEmitter : IUpdateEventListener
                 particle.Position,
                 0,
                 _layerDepth,
-                particle.Effects));
+                particle.EffectContainer.Effects));
         }
         
         return drawTasks;
@@ -210,7 +210,7 @@ public class ParticleEmitter : IUpdateEventListener
         
         if (colorIndex >= property.Colors.Length) return;
         
-        particle.SetEffect<ColorEffect, Vector4>(Palette.GetColorVector(property.Colors[colorIndex]));
+        particle.EffectContainer.SetEffect<ColorEffect, Vector4>(Palette.GetColorVector(property.Colors[colorIndex]));
     }
 
     private static void HandleSpriteChangeProperty(Particle particle, SpriteChangeProperty property)
