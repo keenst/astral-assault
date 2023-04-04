@@ -116,7 +116,7 @@ public class Entity : IUpdateEventListener
         _timeStartedHighlightingMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         _highlightAlpha = 0.7F;
         
-        SpriteRenderer. EffectContainer.SetEffect<HighlightEffect, float>(_highlightAlpha);
+        SpriteRenderer.EffectContainer.SetEffect<HighlightEffect, float>(_highlightAlpha);
     }
     
     public virtual List<DrawTask> GetDrawTasks()
