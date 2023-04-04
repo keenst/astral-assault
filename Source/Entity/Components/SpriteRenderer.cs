@@ -60,13 +60,13 @@ public class SpriteRenderer : IUpdateEventListener
     private DrawTask DrawStatic(Vector2 position)
     {
         Rectangle source = _activeAnimation.Frames[_activeFrame].Source;
-        return new DrawTask(_spriteSheet, source, position, 0, _layerDepth, this.EffectContainer.Effects);
+        return new DrawTask(_spriteSheet, source, position, 0, _layerDepth, EffectContainer.Effects);
     }
 
     private DrawTask DrawRotatable(Vector2 position, float rotation)
     {
         (float spriteRotation, Rectangle source) = GetRotation(rotation);
-        return new DrawTask(_spriteSheet, source, position, spriteRotation, _layerDepth, this.EffectContainer.Effects);
+        return new DrawTask(_spriteSheet, source, position, spriteRotation, _layerDepth, EffectContainer.Effects);
     }
 
     private Tuple<float, Rectangle> GetRotation(float rotation)
