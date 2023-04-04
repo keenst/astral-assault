@@ -116,7 +116,7 @@ public class Entity : IUpdateEventListener
         _timeStartedHighlightingMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         _highlightAlpha = 0.7F;
         
-        SpriteRenderer.SetEffect<HighlightEffect, float>(_highlightAlpha);
+        SpriteRenderer. EffectContainer.SetEffect<HighlightEffect, float>(_highlightAlpha);
     }
     
     public virtual List<DrawTask> GetDrawTasks()
@@ -136,11 +136,11 @@ public class Entity : IUpdateEventListener
             {
                 _isHighlighted = false;
                 _highlightAlpha = 0;
-                SpriteRenderer.RemoveEffect<HighlightEffect>();
+                SpriteRenderer.EffectContainer.RemoveEffect<HighlightEffect>();
             }
             else
             {
-                SpriteRenderer.SetEffect<HighlightEffect, float>(_highlightAlpha);
+                SpriteRenderer.EffectContainer.SetEffect<HighlightEffect, float>(_highlightAlpha);
             }
         }
         

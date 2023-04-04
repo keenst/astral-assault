@@ -12,7 +12,7 @@ public struct DrawTask
     public Rectangle Destination { get; }
     public float Rotation { get; }
     public LayerDepth LayerDepth { get; }
-    public List<IDrawTaskEffect> Effects { get; }
+    public EffectContainer EffectContainer = new();
     public Color Color { get; }
     public Vector2 Origin { get; }
 
@@ -30,7 +30,7 @@ public struct DrawTask
         Destination = destination;
         Rotation = rotation;
         LayerDepth = layerDepth;
-        Effects = effects;
+        this.EffectContainer = new(effects);
         Color = color;
         Origin = new Vector2(
             (float)Math.Round(Source.Width / 2D),
@@ -56,7 +56,7 @@ public struct DrawTask
             source.Height);
         Rotation = rotation;
         LayerDepth = layerDepth;
-        Effects = effects;
+        this.EffectContainer = new(effects);
         Color = color;
         Origin = origin;
     }
@@ -83,7 +83,7 @@ public struct DrawTask
             Source.Height);
         Rotation = rotation;
         LayerDepth = layerDepth;
-        Effects = effects;
+        this.EffectContainer = new(effects);
         Color = color;
         Origin = origin;
     }
@@ -105,7 +105,7 @@ public struct DrawTask
             source.Height);
         Rotation = rotation;
         LayerDepth = layerDepth;
-        Effects = effects;
+        this.EffectContainer = new(effects);
         Color = Color.White;
         Origin = new Vector2(
             (float)Math.Round(Source.Width / 2D),
@@ -132,7 +132,7 @@ public struct DrawTask
             Source.Height);
         Rotation = rotation;
         LayerDepth = layerDepth;
-        Effects = effects;
+        this.EffectContainer = new(effects);
         Color = Color.White;
         Origin = new Vector2(
             (float)Math.Round(Source.Width / 2D),
