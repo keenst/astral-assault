@@ -59,8 +59,8 @@ public class Game1 : Game
         graphics.PreferredBackBufferWidth = (int)Width.Half;
         graphics.PreferredBackBufferHeight = (int)Height.Half;
 
-        ScaleX = graphics.PreferredBackBufferWidth / (float)TargetWidth;
-        ScaleY = graphics.PreferredBackBufferHeight / (float)TargetHeight;
+        ScaleX = graphics.PreferredBackBufferWidth / (float)Game1.TargetWidth;
+        ScaleY = graphics.PreferredBackBufferHeight / (float)Game1.TargetHeight;
         _scale = Matrix.CreateScale(new Vector3(ScaleX, ScaleY, 1));
 
         graphics.SynchronizeWithVerticalRetrace = false;
@@ -115,7 +115,7 @@ public class Game1 : Game
         // draw sprites to render target
         GraphicsDevice.SetRenderTarget(_renderTarget);
 
-        GraphicsDevice.Clear(BackgroundColor);
+        GraphicsDevice.Clear(Game1.BackgroundColor);
 
         List<DrawTask> drawTasks = GameStateMachine.GetDrawTasks().OrderBy(dt => (int)dt.LayerDepth).ToList();
 
@@ -123,7 +123,7 @@ public class Game1 : Game
         {
             long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-            if (_lastStatUpdate + StatUpdateInterval < timeNow)
+            if (_lastStatUpdate + Game1.StatUpdateInterval < timeNow)
             {
                 _frameRate = 1 / (float)gameTime.ElapsedGameTime.TotalSeconds;
                 _renderTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
@@ -135,9 +135,9 @@ public class Game1 : Game
             string renderTime = _renderTime.ToString();
 
             List<DrawTask> frameRateTask =
-                frameRate.CreateDrawTasks(Vector2.Zero, Color.Yellow, LayerDepth.Debug);
+                frameRate.CreateDrawTasks(Vector2.Zero, Palette.GetColor(Palette.Colors.Yellow9), LayerDepth.Debug);
             List<DrawTask> renderTimeTask =
-                renderTime.CreateDrawTasks(new(0, 9), Color.Yellow, LayerDepth.Debug);
+                renderTime.CreateDrawTasks(new(0, 9), Palette.GetColor(Palette.Colors.Yellow9), LayerDepth.Debug);
 
             drawTasks.AddRange(frameRateTask);
             drawTasks.AddRange(renderTimeTask);
@@ -152,16 +152,16 @@ public class Game1 : Game
                 switch (effect)
                 {
                     case HighlightEffect highlightEffect:
-                        HighlightEffect.CurrentTechnique.Passes[1].Apply();
-                        HighlightEffect.Parameters["blendAlpha"].SetValue(highlightEffect.Alpha);
-                        HighlightEffect.CurrentTechnique.Passes[0].Apply();
+                        Game1.HighlightEffect.CurrentTechnique.Passes[1].Apply();
+                        Game1.HighlightEffect.Parameters["blendAlpha"].SetValue(highlightEffect.Alpha);
+                        Game1.HighlightEffect.CurrentTechnique.Passes[0].Apply();
 
                         break;
 
                     case ColorEffect colorEffect:
-                        ColorEffect.CurrentTechnique.Passes[1].Apply();
-                        ColorEffect.Parameters["newColor"].SetValue(colorEffect.Color);
-                        ColorEffect.CurrentTechnique.Passes[0].Apply();
+                        Game1.ColorEffect.CurrentTechnique.Passes[1].Apply();
+                        Game1.ColorEffect.Parameters["newColor"].SetValue(colorEffect.Color);
+                        Game1.ColorEffect.CurrentTechnique.Passes[0].Apply();
 
                         break;
                 }
@@ -177,8 +177,8 @@ public class Game1 : Game
                 SpriteEffects.None,
                 0);
 
-            HighlightEffect.CurrentTechnique.Passes[1].Apply();
-            ColorEffect.CurrentTechnique.Passes[1].Apply();
+            Game1.HighlightEffect.CurrentTechnique.Passes[1].Apply();
+            Game1.ColorEffect.CurrentTechnique.Passes[1].Apply();
         }
 
         _spriteBatch.End();

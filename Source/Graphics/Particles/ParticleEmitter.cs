@@ -160,17 +160,17 @@ public class ParticleEmitter
             switch (particleProperty)
             {
                 case CauseOfDeathProperty causeOfDeathProperty:
-                    HandleCauseOfDeathProperty(particle, causeOfDeathProperty);
+                    ParticleEmitter.HandleCauseOfDeathProperty(particle, causeOfDeathProperty);
 
                     break;
 
                 case ColorChangeProperty colorChangeProperty:
-                    HandleColorChangeProperty(particle, colorChangeProperty);
+                    ParticleEmitter.HandleColorChangeProperty(particle, colorChangeProperty);
 
                     break;
 
                 case SpriteChangeProperty spriteChangeProperty:
-                    HandleSpriteChangeProperty(particle, spriteChangeProperty);
+                    ParticleEmitter.HandleSpriteChangeProperty(particle, spriteChangeProperty);
 
                     break;
             }

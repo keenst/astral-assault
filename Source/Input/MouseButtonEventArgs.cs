@@ -5,9 +5,9 @@ namespace AstralAssault;
 
 public class MouseButtonEventArgs : EventArgs
 {
-    public InputEventSource.MouseButtons Button { get; }
+    public MouseButtons Button { get; }
 
-    public MouseButtonEventArgs(InputEventSource.MouseButtons button)
+    public MouseButtonEventArgs(MouseButtons button)
     {
         Button = button;
     }

@@ -102,20 +102,20 @@ public static class Palette
             byte g = byte.Parse(line[2..4], System.Globalization.NumberStyles.HexNumber);
             byte b = byte.Parse(line[4..6], System.Globalization.NumberStyles.HexNumber);
 
-            PaletteColors.Add(new(r, g, b));
+            Palette.PaletteColors.Add(new(r, g, b));
         }
     }
 
     public static Color GetColor(Colors name, float alpha = 1)
     {
-        PaletteColor color = PaletteColors[(int)name];
+        PaletteColor color = Palette.PaletteColors[(int)name];
 
         return new(color.R, color.G, color.B, (byte)(alpha * 255));
     }
 
     public static Vector4 GetColorVector(Colors name)
     {
-        PaletteColor color = PaletteColors[(int)name];
+        PaletteColor color = Palette.PaletteColors[(int)name];
 
         return new(color.R / 255F, color.G / 255F, color.B / 255F, 1);
     }

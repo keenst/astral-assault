@@ -41,7 +41,7 @@ public class GameplayState : GameState
 
             Color[] data = new Color[width * height];
 
-            Array.Fill(data, new(Color.White, 0.2F));
+            Array.Fill(data, new(Palette.GetColor(Palette.Colors.Grey9), 0.15F));
             rect.SetData(data);
 
             drawTasks.Add(new(
@@ -50,7 +50,7 @@ public class GameplayState : GameState
                 0,
                 LayerDepth.Debug,
                 new(),
-                Color.Blue,
+                Palette.GetColor(Palette.Colors.Blue9),
                 Vector2.Zero));
         }
 

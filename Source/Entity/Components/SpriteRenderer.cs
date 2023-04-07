@@ -73,7 +73,7 @@ public class SpriteRenderer
 
     private Tuple<float, Rectangle> GetRotation(float rotation)
     {
-        int rot = (int)Math.Round(rotation / (Pi / 8));
+        int rot = (int)Math.Round(rotation / (SpriteRenderer.Pi / 8));
 
         float spriteRotation;
         Rectangle source;
@@ -81,17 +81,17 @@ public class SpriteRenderer
         if (rot % 4 == 0)
         {
             source = _activeAnimation.Frames[_activeFrame].Rotations[0];
-            spriteRotation = Pi / 8 * rot;
+            spriteRotation = SpriteRenderer.Pi / 8 * rot;
 
             return new(spriteRotation, source);
         }
 
         spriteRotation = rotation switch
         {
-            >= 0 and < Pi / 2 => 0,
-            >= Pi / 2 and < Pi => Pi / 2,
-            <= 0 and > -Pi / 2 => -Pi / 2,
-            <= -Pi / 2 and > -Pi => -Pi,
+            >= 0 and < SpriteRenderer.Pi / 2 => 0,
+            >= SpriteRenderer.Pi / 2 and < SpriteRenderer.Pi => SpriteRenderer.Pi / 2,
+            <= 0 and > -SpriteRenderer.Pi / 2 => -SpriteRenderer.Pi / 2,
+            <= -SpriteRenderer.Pi / 2 and > -SpriteRenderer.Pi => -SpriteRenderer.Pi,
             _ => 0
         };
 

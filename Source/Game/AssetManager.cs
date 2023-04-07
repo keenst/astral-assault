@@ -12,7 +12,7 @@ public static class AssetManager
 
     public static void Init(Game1 root)
     {
-        _root = root;
+        AssetManager._root = root;
     }
 
     public static T Load<T>(string path)
@@ -22,12 +22,12 @@ public static class AssetManager
 
         if (typeof(T) == typeof(Texture2D))
         {
-            activeDictionary = Textures as Dictionary<string, T>;
+            activeDictionary = AssetManager.Textures as Dictionary<string, T>;
             activeDirectory = "Assets";
         }
         else if (typeof(T) == typeof(Effect))
         {
-            activeDictionary = Effects as Dictionary<string, T>;
+            activeDictionary = AssetManager.Effects as Dictionary<string, T>;
             activeDirectory = "Shaders";
         }
         else
@@ -38,7 +38,7 @@ public static class AssetManager
         if (activeDictionary.ContainsKey(path))
             return activeDictionary[path];
 
-        T asset = _root.Content.Load<T>($"{activeDirectory}/{path}");
+        T asset = AssetManager._root.Content.Load<T>($"{activeDirectory}/{path}");
 
         return asset;
     }

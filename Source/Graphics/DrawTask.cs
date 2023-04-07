@@ -106,7 +106,7 @@ public struct DrawTask
         Rotation = rotation;
         LayerDepth = layerDepth;
         EffectContainer = new(effects);
-        Color = Color.White;
+        Color = Palette.GetColor(Palette.Colors.Grey9);
         Origin = new(
             (float)Math.Round(Source.Width / 2D),
             (float)Math.Round(Source.Height / 2D));
@@ -133,7 +133,7 @@ public struct DrawTask
         Rotation = rotation;
         LayerDepth = layerDepth;
         EffectContainer = new(effects);
-        Color = Color.White;
+        Color = Palette.GetColor(Palette.Colors.Grey9);
         Origin = new(
             (float)Math.Round(Source.Width / 2D),
             (float)Math.Round(Source.Height / 2D));

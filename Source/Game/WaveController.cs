@@ -80,7 +80,7 @@ public class WaveController
         if (!_drawWaveText) return drawTasks;
 
         string text = $"Wave: {_currentWave}";
-        drawTasks.AddRange(text.CreateDrawTasks(new(10, 10), Color.White, LayerDepth.HUD));
+        drawTasks.AddRange(text.CreateDrawTasks(new(10, 10), Palette.GetColor(Palette.Colors.Grey9), LayerDepth.HUD));
 
         return drawTasks;
     }
@@ -89,7 +89,7 @@ public class WaveController
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-        if (_drawWaveText && timeNow - _waveTextTimer > WaveTextDuration)
+        if (_drawWaveText && timeNow - _waveTextTimer > WaveController.WaveTextDuration)
         {
             _drawWaveText = false;
         }
@@ -98,7 +98,7 @@ public class WaveController
 
         if (enemiesAlive == 0)
         {
-            if (timeNow - _waveTimer < WaveDelay) return;
+            if (timeNow - _waveTimer < WaveController.WaveDelay) return;
 
             StartNextWave();
             _waveTimer = timeNow;

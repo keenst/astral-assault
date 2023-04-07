@@ -166,7 +166,7 @@ public class Entity
     private void CreateHealthBarTexture()
     {
         _healthBarTexture = new(GameState.Root.GraphicsDevice, 1, 1);
-        Color[] data = { Color.White };
+        Color[] data = { Palette.GetColor(Palette.Colors.Grey9) };
         _healthBarTexture.SetData(data);
     }
 
@@ -197,7 +197,7 @@ public class Entity
             0,
             LayerDepth.HUD,
             new() { new ColorEffect(outlineColor) },
-            Color.Black);
+            Palette.GetColor(Palette.Colors.Black));
 
         DrawTask empty = new(
             _healthBarTexture,
@@ -206,7 +206,7 @@ public class Entity
             0,
             LayerDepth.HUD,
             new() { new ColorEffect(emptyColor) },
-            Color.Red);
+            Palette.GetColor(Palette.Colors.Red9));
 
         DrawTask full = new(
             _healthBarTexture,
@@ -215,7 +215,7 @@ public class Entity
             0,
             LayerDepth.HUD,
             new() { new ColorEffect(fullColor) },
-            Color.LimeGreen);
+            Palette.GetColor(Palette.Colors.Green9));
 
         return new() { background, empty, full };
     }

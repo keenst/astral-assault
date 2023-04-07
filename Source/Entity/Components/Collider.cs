@@ -19,8 +19,8 @@ public class Collider
         Parent = parent;
         Rectangle = rectangle;
         IsSolid = isSolid;
-        _corners = GetCorners(Rectangle);
-        _axes = GetAxes(_corners);
+        _corners = Collider.GetCorners(Rectangle);
+        _axes = Collider.GetAxes(_corners);
         _mass = mass;
     }
 
@@ -29,8 +29,8 @@ public class Collider
         Parent = parent;
         Rectangle = rectangle;
         IsSolid = false;
-        _corners = GetCorners(Rectangle);
-        _axes = GetAxes(_corners);
+        _corners = Collider.GetCorners(Rectangle);
+        _axes = Collider.GetAxes(_corners);
         _mass = 0;
     }
 
@@ -49,8 +49,8 @@ public class Collider
 
         float minOverlap = float.MaxValue;
 
-        Vector2 centerThis = GetCenter(_corners);
-        Vector2 centerOther = GetCenter(other._corners);
+        Vector2 centerThis = Collider.GetCenter(_corners);
+        Vector2 centerOther = Collider.GetCenter(other._corners);
 
         Vector2 relativeVelocity = centerOther - centerThis;
 
@@ -128,8 +128,8 @@ public class Collider
         Rectangle.X = position.X - Rectangle.Width / 2;
         Rectangle.Y = position.Y - Rectangle.Height / 2;
 
-        _corners = GetCorners(Rectangle);
-        _axes = GetAxes(_corners);
+        _corners = Collider.GetCorners(Rectangle);
+        _axes = Collider.GetAxes(_corners);
     }
 
     private static Vector2[] GetCorners(Rectangle rect)

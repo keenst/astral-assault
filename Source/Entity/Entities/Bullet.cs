@@ -16,7 +16,7 @@ public class Bullet : Entity
         Texture2D spriteSheet = new(GameState.Root.GraphicsDevice, 2, 2);
 
         Color[] data = new Color[2 * 2];
-        for (int i = 0; i < data.Length; ++i) data[i] = Color.White;
+        for (int i = 0; i < data.Length; ++i) data[i] = Palette.GetColor(Palette.Colors.Grey9);
         spriteSheet.SetData(data);
 
         Frame frame = new(new(0, 0, 2, 2));
