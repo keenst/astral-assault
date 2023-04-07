@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
 
-public class SpriteRenderer : IUpdateEventListener
+public class SpriteRenderer
 {
     private readonly LayerDepth _layerDepth;
     private readonly Animation[] _animations;

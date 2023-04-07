@@ -134,6 +134,8 @@ public class Asteroid : Entity
     {
         base.OnUpdate(sender, e);
 
+        _debrisController._particleEmitter.OnUpdate(sender, e);
+
         Rotation += _rotSpeed * e.DeltaTime;
         if (Rotation > Math.PI) Rotation = (float)-Math.PI;
     }

@@ -61,11 +61,23 @@ public class GameplayState : GameState
     {
         Entities.Add(new Player(this, new(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F)));
         Entities.Add(new Crosshair(this));
+        UpdateEventSource.UpdateEvent += this.OnUpdate;
     }
 
     public override void Exit()
     {
-        WaveController.StopListening();
         while (Entities.Count > 0) Entities[0].Destroy();
+        UpdateEventSource.UpdateEvent -= this.OnUpdate;
+    }
+
+    public override void OnUpdate(object sender, UpdateEventArgs e)
+    {
+        CollisionSystem.OnUpdate(sender, e);
+        WaveController.OnUpdate(sender, e);
+
+        for (int i = 0; i < this.Entities.Count; i++)
+        {
+            this.Entities[i].OnUpdate(sender, e);
+        }
     }
 }

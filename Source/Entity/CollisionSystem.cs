@@ -4,15 +4,10 @@ using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
 
-public class CollisionSystem : IUpdateEventListener
+public class CollisionSystem
 {
     public List<Collider> Colliders { get; } = new();
     private List<Tuple<Collider, Collider>> _lastCollisions = new();
-
-    public CollisionSystem()
-    {
-        UpdateEventSource.UpdateEvent += OnUpdate;
-    }
 
     public void OnUpdate(object sender, UpdateEventArgs e)
     {

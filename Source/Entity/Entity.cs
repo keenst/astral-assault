@@ -8,13 +8,14 @@ using Vector4 = Microsoft.Xna.Framework.Vector4;
 
 namespace AstralAssault;
 
-public class Entity : IUpdateEventListener
+public class Entity
 {
     public Vector2 Position;
     public Vector2 Velocity;
     protected float Rotation;
     protected Collider Collider;
-    protected SpriteRenderer SpriteRenderer;
+    public SpriteRenderer SpriteRenderer;
+    public ParticleEmitter ParticleEmitter;
     protected readonly GameplayState GameState;
     protected OutOfBounds OutOfBoundsBehavior = OutOfBounds.Wrap;
     protected bool IsActor = false;
@@ -46,13 +47,13 @@ public class Entity : IUpdateEventListener
         Position = position;
         _timeSpawned = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-        UpdateEventSource.UpdateEvent += OnUpdate;
-
         CreateHealthBarTexture();
     }
 
     public virtual void OnUpdate(object sender, UpdateEventArgs e)
     {
+        SpriteRenderer.OnUpdate(sender, e);
+
         if (IsActor && HP <= 0)
         {
             OnDeath();
@@ -155,8 +156,6 @@ public class Entity : IUpdateEventListener
     {
         GameState.Entities.Remove(this);
         GameState.CollisionSystem.RemoveCollider(Collider);
-
-        UpdateEventSource.UpdateEvent -= OnUpdate;
     }
 
     protected virtual void OnDeath()

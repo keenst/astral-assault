@@ -57,4 +57,6 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
     {
         InputEventSource.KeyboardPressedEvent -= OnKeyboardPressedEvent;
     }
+
+    public override void OnUpdate(object sender, UpdateEventArgs e) { }
 }

@@ -7,7 +7,7 @@ namespace AstralAssault;
 
 public class DebrisController
 {
-    private readonly ParticleEmitter _particleEmitter;
+    public readonly ParticleEmitter _particleEmitter;
     private readonly Random _rnd = new();
     private readonly GameplayState _gameplayState;
 

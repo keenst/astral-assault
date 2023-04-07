@@ -2,7 +2,7 @@
 
 namespace AstralAssault;
 
-public abstract class GameState
+public abstract class GameState : IUpdateEventListener
 {
     public readonly Game1 Root;
 
@@ -14,4 +14,5 @@ public abstract class GameState
     public abstract List<DrawTask> GetDrawTasks();
     public abstract void Enter();
     public abstract void Exit();
+    public abstract void OnUpdate(object sender, UpdateEventArgs e);
 }

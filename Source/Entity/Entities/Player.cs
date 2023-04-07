@@ -142,7 +142,6 @@ public class Player : Entity, IInputEventListener
         InputEventSource.KeyboardEvent -= OnKeyboardEvent;
         InputEventSource.MouseMoveEvent -= OnMouseMoveEvent;
         InputEventSource.MouseButtonEvent -= OnMouseButtonEvent;
-        _particleEmitter.StopListening();
     }
 
     private void HandleMovement(int xAxis, int yAxis)
@@ -261,6 +260,8 @@ public class Player : Entity, IInputEventListener
     public override void OnUpdate(object sender, UpdateEventArgs e)
     {
         base.OnUpdate(sender, e);
+
+        _particleEmitter.OnUpdate(sender, e);
 
         _delta = e.DeltaTime;
 
