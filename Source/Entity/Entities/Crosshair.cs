@@ -19,8 +19,8 @@ public class Crosshair : Entity, IMouseEventListener
             new[]
             {
                 new Frame(new Rectangle(16, 0, 16, 16), 30),
-                new Frame(new Rectangle(32, 0, 16, 16), 30),
-                new Frame(new Rectangle(48, 0, 16, 16), 30)
+                new Frame(new Rectangle(32, 0, 16, 16), 20),
+                new Frame(new Rectangle(48, 0, 16, 16), 10)
             },
             false);
 
@@ -28,8 +28,8 @@ public class Crosshair : Entity, IMouseEventListener
             new[]
             {
                 new Frame(new Rectangle(48, 0, 16, 16), 30),
-                new Frame(new Rectangle(32, 0, 16, 16), 30),
-                new Frame(new Rectangle(16, 0, 16, 16), 30)
+                new Frame(new Rectangle(32, 0, 16, 16), 20),
+                new Frame(new Rectangle(16, 0, 16, 16), 10)
             },
             false);
 
