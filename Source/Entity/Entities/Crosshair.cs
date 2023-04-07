@@ -15,7 +15,7 @@ public class Crosshair : Entity, IMouseEventListener
         Frame activeFrame   = new(new Rectangle(0,  0, 16, 16));
         Frame inactiveFrame = new(new Rectangle(64, 0, 16, 16));
 
-        Animation inactivateAnimation = new(
+        Animation deactivateAnimation = new(
             new[]
             {
                 new Frame(new Rectangle(16, 0, 16, 16), 30),
@@ -43,7 +43,7 @@ public class Crosshair : Entity, IMouseEventListener
 
         SpriteRenderer = new SpriteRenderer(
             spriteSheet, 
-            new[] { activeAnimation, inactiveAnimation, inactivateAnimation, activateAnimation }, 
+            new[] { activeAnimation, inactiveAnimation, deactivateAnimation, activateAnimation }, 
             LayerDepth.Crosshair,
             transitions,
             new[] { "IsActive" });
