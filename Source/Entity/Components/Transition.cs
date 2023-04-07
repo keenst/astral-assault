@@ -2,21 +2,21 @@
 
 namespace AstralAssault;
 
-public struct Transition
+public readonly struct Transition
 {
     public string ConditionName { get; }
     public float ConditionThreshold { get; }
     
-    private int _from;
-    private int _to;
+    public int From { get; }
+    public int To { get; }
     
     public int[] AnimationPath { get; }
-    public Tuple<int, int> FromTo => new(_from, _to);
+    public Tuple<int, int> FromTo => new(From, To);
 
     public Transition(int from, int to, int[] animationPath, string conditionName, float conditionThreshold)
     {
-        _from = from;
-        _to = to;
+        From = from;
+        To = to;
         AnimationPath = animationPath;
         ConditionName = conditionName;
         ConditionThreshold = conditionThreshold;
