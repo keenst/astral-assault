@@ -147,24 +147,17 @@ public class Player : Entity, IInputEventListener
     private void HandleMovement(int xAxis, int yAxis)
     {
         // acceleration and deceleration
-        Vector2 forward = new Vector2(
-            (float)Math.Cos(Rotation),
-            (float)Math.Sin(Rotation)
-        ) * Player.MoveSpeed * _delta;
-
-        Velocity = new(
-            Math.Clamp(Velocity.X + forward.X * yAxis, -Player.MaxSpeed, Player.MaxSpeed),
-            Math.Clamp(Velocity.Y + forward.Y * yAxis, -Player.MaxSpeed, Player.MaxSpeed));
+        Vector2 forward = -Vector2.UnitY.RotateVector(Rotation + Player.Pi / 2) *
+            Player.MoveSpeed * _delta;
 
         // tilting
-        Vector2 right = new Vector2(
-            (float)Math.Cos(Rotation + Player.Pi / 2),
-            (float)Math.Sin(Rotation + Player.Pi / 2)
-        ) * Player.TiltSpeed * _delta;
+        Vector2 right = Vector2.UnitX.RotateVector(Rotation + Player.Pi / 2) * Player.TiltSpeed *
+            _delta;
 
+        // apply velocity vectors
         Velocity = new(
-            Math.Clamp(Velocity.X + right.X * xAxis, -Player.MaxSpeed, Player.MaxSpeed),
-            Math.Clamp(Velocity.Y + right.Y * xAxis, -Player.MaxSpeed, Player.MaxSpeed));
+            Math.Clamp(Velocity.X + forward.X * yAxis + right.X * xAxis, -Player.MaxSpeed, Player.MaxSpeed),
+            Math.Clamp(Velocity.Y + forward.Y * yAxis + right.Y * xAxis, -Player.MaxSpeed, Player.MaxSpeed));
 
         if (Velocity.Length() > Player.MaxSpeed)
         {
@@ -286,47 +279,18 @@ public class Player : Entity, IInputEventListener
             float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
 
             Velocity -=
-                new Vector2((float)Math.Cos(direction), (float)Math.Sin(direction)) * Player.Friction * _delta * sign;
+                ExtensionMethods.RotateVector(Vector2.UnitX, direction) * Player.Friction * _delta * sign;
         }
 
         // rotate the points for the cannon muzzles
-        Vector2 muzzle1;
-        Vector2 muzzle2;
+        float rot = Player.Pi / 8 * (float)Math.Round(Rotation / (Player.Pi / 8));
 
-        const float x = 8;
-        const float y = 10;
-
-        {
-            float rot = Player.Pi / 8 * (float)Math.Round(Rotation / (Player.Pi / 8));
-
-            float x2 = (float)(x * Math.Cos(rot) - y * Math.Sin(rot));
-            float y2 = (float)(y * Math.Cos(rot) + x * Math.Sin(rot));
-
-            muzzle1 = new(Position.X + x2, Position.Y + y2);
-        }
-
-        {
-            float rot = Player.Pi / 8 * (float)Math.Round(Rotation / (Player.Pi / 8));
-
-            float x2 = (float)(x * Math.Cos(rot) + y * Math.Sin(rot));
-            float y2 = (float)(-y * Math.Cos(rot) + x * Math.Sin(rot));
-
-            muzzle2 = new(Position.X + x2, Position.Y + y2);
-        }
-
-        _muzzle = new(muzzle1, muzzle2);
+        _muzzle = new(
+            Position + new Vector2(10, -8).RotateVector(rot),
+            Position + new Vector2(8, 10).RotateVector(rot));
 
         float emitterRotation = (Rotation + Player.Pi) % (2 * Player.Pi);
-        Vector2 emitterPosition = new(11, 0);
-
-        {
-            float x2 =
-                (float)(emitterPosition.X * Math.Cos(emitterRotation) + emitterPosition.Y * Math.Sin(emitterRotation));
-            float y2 =
-                (float)(emitterPosition.Y * Math.Cos(emitterRotation) + emitterPosition.X * Math.Sin(emitterRotation));
-
-            emitterPosition = new(Position.X + x2, Position.Y + y2);
-        }
+        Vector2 emitterPosition = this.Position + new Vector2(11, 0).RotateVector(emitterRotation);
 
         _particleEmitter.SetTransform(emitterPosition, emitterRotation);
     }

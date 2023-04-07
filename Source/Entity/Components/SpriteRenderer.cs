@@ -17,7 +17,7 @@ public class SpriteRenderer
     private long _lastFrameUpdate;
     public readonly EffectContainer EffectContainer = new();
 
-    private const float Pi = 3.14F;
+    public const float Pi = 3.14F;
 
     public SpriteRenderer(Texture2D spriteSheet, Animation[] animations, LayerDepth layerDepth)
     {

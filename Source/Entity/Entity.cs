@@ -14,8 +14,7 @@ public class Entity
     public Vector2 Velocity;
     protected float Rotation;
     protected Collider Collider;
-    public SpriteRenderer SpriteRenderer;
-    public ParticleEmitter ParticleEmitter;
+    protected SpriteRenderer SpriteRenderer;
     protected readonly GameplayState GameState;
     protected OutOfBounds OutOfBoundsBehavior = OutOfBounds.Wrap;
     protected bool IsActor = false;

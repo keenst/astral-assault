@@ -34,7 +34,7 @@ public class Asteroid : Entity
         _rotSpeed = rnd.Next(5, 20) / 10F;
         int speed = rnd.Next(30, 100);
 
-        Velocity = new Vector2((float)Math.Cos(direction), (float)Math.Sin(direction)) * speed;
+        Velocity = Vector2.UnitY.RotateVector(direction) * speed;
 
         Texture2D spriteSheet;
         int colliderSize;
@@ -81,10 +81,10 @@ public class Asteroid : Entity
         }
 
         Frame frame = new(
-            e: new(0, 0, spriteSize, spriteSize),
-            see: new(spriteSize, 0, spriteSize, spriteSize),
-            se: new(spriteSize * 2, 0, spriteSize, spriteSize),
-            sse: new(spriteSize * 3, 0, spriteSize, spriteSize));
+            new(0, 0, spriteSize, spriteSize),
+            new(spriteSize, 0, spriteSize, spriteSize),
+            new(spriteSize * 2, 0, spriteSize, spriteSize),
+            new(spriteSize * 3, 0, spriteSize, spriteSize));
 
         Animation animation = new(new[] { frame }, true);
 

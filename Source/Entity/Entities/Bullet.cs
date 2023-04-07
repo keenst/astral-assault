@@ -8,10 +8,7 @@ public class Bullet : Entity
 {
     public Bullet(GameplayState gameState, Vector2 position, float rotation, float speed) : base(gameState, position)
     {
-        Velocity = new Vector2(
-            (float)Math.Cos(rotation),
-            (float)Math.Sin(rotation)
-        ) * speed;
+        Velocity = Vector2.UnitX.RotateVector(rotation) * speed;
 
         Texture2D spriteSheet = new(GameState.Root.GraphicsDevice, 2, 2);
 
