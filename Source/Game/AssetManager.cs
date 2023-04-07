@@ -9,7 +9,7 @@ public static class AssetManager
     private static readonly Dictionary<string, Texture2D> Textures = new();
     private static readonly Dictionary<string, Effect> Effects = new();
     private static Game1 _root;
-    
+
     public static void Init(Game1 root)
     {
         _root = root;
@@ -19,7 +19,7 @@ public static class AssetManager
     {
         Dictionary<string, T> activeDictionary;
         string activeDirectory;
-        
+
         if (typeof(T) == typeof(Texture2D))
         {
             activeDictionary = Textures as Dictionary<string, T>;
@@ -37,8 +37,9 @@ public static class AssetManager
 
         if (activeDictionary.ContainsKey(path))
             return activeDictionary[path];
-        
+
         T asset = _root.Content.Load<T>($"{activeDirectory}/{path}");
+
         return asset;
     }
 }

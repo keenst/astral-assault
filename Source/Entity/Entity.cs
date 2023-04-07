@@ -21,7 +21,7 @@ public class Entity : IUpdateEventListener
     protected float MaxHP;
     protected float HP;
     protected float ContactDamage;
-    
+
     private bool _isHighlighted;
     private long _timeStartedHighlightingMS;
     private float _highlightAlpha;
@@ -45,17 +45,18 @@ public class Entity : IUpdateEventListener
         GameState = gameState;
         Position = position;
         _timeSpawned = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        
+
         UpdateEventSource.UpdateEvent += OnUpdate;
-        
+
         CreateHealthBarTexture();
     }
-    
+
     public virtual void OnUpdate(object sender, UpdateEventArgs e)
     {
         if (IsActor && HP <= 0)
         {
             OnDeath();
+
             return;
         }
 
@@ -68,7 +69,7 @@ public class Entity : IUpdateEventListener
             {
                 break;
             }
-            
+
             case OutOfBounds.Destroy:
             {
                 if (Position.X is < 0 or > Game1.TargetWidth ||
@@ -79,7 +80,7 @@ public class Entity : IUpdateEventListener
 
                 break;
             }
-            
+
             case OutOfBounds.Wrap:
             {
                 Position.X = Position.X switch
@@ -95,10 +96,10 @@ public class Entity : IUpdateEventListener
                     > Game1.TargetHeight => 0,
                     _ => Position.Y
                 };
-                
+
                 break;
             }
-            
+
             default:
             {
                 throw new ArgumentOutOfRangeException();
@@ -115,23 +116,23 @@ public class Entity : IUpdateEventListener
         _isHighlighted = true;
         _timeStartedHighlightingMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         _highlightAlpha = 0.7F;
-        
+
         SpriteRenderer.EffectContainer.SetEffect<HighlightEffect, float>(_highlightAlpha);
     }
-    
+
     public virtual List<DrawTask> GetDrawTasks()
     {
         List<DrawTask> drawTasks = new();
-        
+
         if (_isHighlighted)
         {
             const float decayRate = 0.005F;
-            
+
             long timeNowMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             float timeSinceStartedS = (timeNowMS - _timeStartedHighlightingMS) / 1000F;
-            
+
             _highlightAlpha = 0.7F * MathF.Pow(decayRate, timeSinceStartedS);
-            
+
             if (_highlightAlpha <= 0.01)
             {
                 _isHighlighted = false;
@@ -143,7 +144,7 @@ public class Entity : IUpdateEventListener
                 SpriteRenderer.EffectContainer.SetEffect<HighlightEffect, float>(_highlightAlpha);
             }
         }
-        
+
         if (IsActor) drawTasks.AddRange(CreateHealthBarDrawTasks());
         drawTasks.Add(SpriteRenderer.CreateDrawTask(Position, Rotation));
 
@@ -154,7 +155,7 @@ public class Entity : IUpdateEventListener
     {
         GameState.Entities.Remove(this);
         GameState.CollisionSystem.RemoveCollider(Collider);
-        
+
         UpdateEventSource.UpdateEvent -= OnUpdate;
     }
 
@@ -176,10 +177,10 @@ public class Entity : IUpdateEventListener
         const int height = 3;
 
         int filled = (int)Math.Ceiling(HP / MaxHP * width);
-        
+
         int x = (int)Position.X - width / 2;
         int y = (int)Position.Y - 20;
-        
+
         Rectangle outline = new(x - 1, y - 1, width + 2, height + 2);
         Rectangle emptyHealthBar = new(x, y, width, height);
         Rectangle fullHealthBar = new(x, y, filled, height);
@@ -187,36 +188,36 @@ public class Entity : IUpdateEventListener
         Vector4 outlineColor = Palette.GetColorVector(Palette.Colors.Black);
         Vector4 emptyColor = Palette.GetColorVector(Palette.Colors.Red6);
         Vector4 fullColor = Palette.GetColorVector(Palette.Colors.Green7);
-        
+
         Rectangle source = new(0, 0, 1, 1);
-        
+
         DrawTask background = new(
-            _healthBarTexture, 
-            source, 
+            _healthBarTexture,
+            source,
             outline,
-            0, 
-            LayerDepth.HUD, 
+            0,
+            LayerDepth.HUD,
             new List<IDrawTaskEffect> { new ColorEffect(outlineColor) },
             Color.Black);
-        
+
         DrawTask empty = new(
-            _healthBarTexture, 
-            source, 
+            _healthBarTexture,
+            source,
             emptyHealthBar,
-            0, 
-            LayerDepth.HUD, 
+            0,
+            LayerDepth.HUD,
             new List<IDrawTaskEffect> { new ColorEffect(emptyColor) },
             Color.Red);
-        
+
         DrawTask full = new(
-            _healthBarTexture, 
-            source, 
+            _healthBarTexture,
+            source,
             fullHealthBar,
-            0, 
-            LayerDepth.HUD, 
-            new List<IDrawTaskEffect> { new ColorEffect(fullColor) }, 
+            0,
+            LayerDepth.HUD,
+            new List<IDrawTaskEffect> { new ColorEffect(fullColor) },
             Color.LimeGreen);
-        
+
         return new List<DrawTask> { background, empty, full };
     }
 }

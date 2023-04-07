@@ -12,15 +12,15 @@ public class Crosshair : Entity, IMouseEventListener
 
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Crosshair");
 
-        Frame activeFrame   = new(new Rectangle(0,  0, 16, 16));
+        Frame activeFrame = new(new Rectangle(0, 0, 16, 16));
         Frame inactiveFrame = new(new Rectangle(16, 0, 16, 16));
-        
-        Animation activeAnimation   = new(new[] { activeFrame },   false);
+
+        Animation activeAnimation = new(new[] { activeFrame }, false);
         Animation inactiveAnimation = new(new[] { inactiveFrame }, false);
 
         SpriteRenderer = new SpriteRenderer(
-            spriteSheet, 
-            new[] { activeAnimation, inactiveAnimation }, 
+            spriteSheet,
+            new[] { activeAnimation, inactiveAnimation },
             LayerDepth.Crosshair);
 
         OutOfBoundsBehavior = OutOfBounds.DoNothing;
@@ -30,24 +30,21 @@ public class Crosshair : Entity, IMouseEventListener
     {
         InputEventSource.MouseButtonEvent -= OnMouseButtonEvent;
         InputEventSource.MouseMoveEvent -= OnMouseMoveEvent;
-        
+
         base.Destroy();
     }
-    
+
     public override void OnUpdate(object sender, UpdateEventArgs e)
     {
         if (GameState.Player == null) return;
-        
+
         Vector2 playerPosition = GameState.Player.Position;
         float distance = Vector2.Distance(playerPosition, Position);
         if (distance < 12) SpriteRenderer.PlayAnimation(1);
         else if (SpriteRenderer.ActiveAnimationIndex != 0) SpriteRenderer.PlayAnimation(0);
     }
 
-    public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)
-    {
-        
-    }
+    public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e) { }
 
     public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
     {

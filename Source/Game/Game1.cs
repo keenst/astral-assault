@@ -24,9 +24,9 @@ public class Game1 : Game
         Half = 960,
         Quarter = 480
     }
-    
+
     public GameStateMachine GameStateMachine;
-    
+
     // render
     private SpriteBatch _spriteBatch;
     private RenderTarget2D _renderTarget;
@@ -65,7 +65,7 @@ public class Game1 : Game
 
         graphics.SynchronizeWithVerticalRetrace = false;
         IsFixedTimeStep = false;
-        
+
         ShowDebug = false;
     }
 
@@ -83,7 +83,7 @@ public class Game1 : Game
         TextRenderer.Init();
         InputEventSource.Init();
         Palette.Init();
-        
+
         GameStateMachine = new GameStateMachine(new GameplayState(this));
 
         base.Initialize();
@@ -114,7 +114,7 @@ public class Game1 : Game
     {
         // draw sprites to render target
         GraphicsDevice.SetRenderTarget(_renderTarget);
-        
+
         GraphicsDevice.Clear(BackgroundColor);
 
         List<DrawTask> drawTasks = GameStateMachine.GetDrawTasks().OrderBy(dt => (int)dt.LayerDepth).ToList();
@@ -122,29 +122,29 @@ public class Game1 : Game
         if (ShowDebug)
         {
             long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-            
+
             if (_lastStatUpdate + StatUpdateInterval < timeNow)
             {
                 _frameRate = 1 / (float)gameTime.ElapsedGameTime.TotalSeconds;
                 _renderTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-        
+
                 _lastStatUpdate = timeNow;
             }
-            
+
             string frameRate = Math.Round(_frameRate).ToString();
             string renderTime = _renderTime.ToString();
-            
-            List<DrawTask> frameRateTask = 
+
+            List<DrawTask> frameRateTask =
                 frameRate.CreateDrawTasks(Vector2.Zero, Color.Yellow, LayerDepth.Debug);
-            List<DrawTask> renderTimeTask = 
+            List<DrawTask> renderTimeTask =
                 renderTime.CreateDrawTasks(new Vector2(0, 9), Color.Yellow, LayerDepth.Debug);
-            
+
             drawTasks.AddRange(frameRateTask);
             drawTasks.AddRange(renderTimeTask);
         }
-        
+
         _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointWrap);
-        
+
         foreach (DrawTask drawTask in drawTasks)
         {
             foreach (IDrawTaskEffect effect in drawTask.EffectContainer.Effects)
@@ -155,12 +155,14 @@ public class Game1 : Game
                         HighlightEffect.CurrentTechnique.Passes[1].Apply();
                         HighlightEffect.Parameters["blendAlpha"].SetValue(highlightEffect.Alpha);
                         HighlightEffect.CurrentTechnique.Passes[0].Apply();
+
                         break;
-                    
+
                     case ColorEffect colorEffect:
                         ColorEffect.CurrentTechnique.Passes[1].Apply();
                         ColorEffect.Parameters["newColor"].SetValue(colorEffect.Color);
                         ColorEffect.CurrentTechnique.Passes[0].Apply();
+
                         break;
                 }
             }
@@ -174,11 +176,11 @@ public class Game1 : Game
                 drawTask.Origin,
                 SpriteEffects.None,
                 0);
-            
+
             HighlightEffect.CurrentTechnique.Passes[1].Apply();
             ColorEffect.CurrentTechnique.Passes[1].Apply();
         }
-        
+
         _spriteBatch.End();
 
         // draw render target to screen
@@ -191,7 +193,7 @@ public class Game1 : Game
             new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height),
             Color.White);
         _spriteBatch.End();
-        
+
         base.Draw(gameTime);
     }
 }

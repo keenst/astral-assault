@@ -1,5 +1,3 @@
 namespace AstralAssault;
 
-public interface IParticleProperty
-{
-}
+public interface IParticleProperty { }

@@ -10,17 +10,17 @@ public class DebrisController
     private readonly ParticleEmitter _particleEmitter;
     private readonly Random _rnd = new();
     private readonly GameplayState _gameplayState;
-    
+
     public DebrisController(GameplayState gameplayState)
     {
         _gameplayState = gameplayState;
-        
+
         Texture2D particleSpriteSheet = AssetManager.Load<Texture2D>("AsteroidDebris");
-        
+
         Rectangle[] textureSources =
         {
-            new(0,  0, 8, 8),
-            new(8,  0, 8, 8),
+            new(0, 0, 8, 8),
+            new(8, 0, 8, 8),
             new(16, 0, 8, 8),
             new(32, 0, 8, 8)
         };
@@ -41,11 +41,11 @@ public class DebrisController
             particleProperties,
             LayerDepth.Debris);
     }
-    
+
     public void SpawnDebris(Vector2 position, int asteroidSize)
     {
         int amount = _rnd.Next(4, (1 + asteroidSize) * 4);
-        
+
         float angleFromPlayer = MathF.Atan2(
             position.Y - _gameplayState.Player.Position.Y,
             position.X - _gameplayState.Player.Position.X);
@@ -53,7 +53,7 @@ public class DebrisController
         _particleEmitter.SetTransform(position, angleFromPlayer);
         _particleEmitter.StartSpawning(amount);
     }
-    
+
     public List<DrawTask> GetDrawTasks()
     {
         return _particleEmitter.CreateDrawTasks();

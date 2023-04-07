@@ -10,8 +10,8 @@ public class GameplayState : GameState
     public readonly List<Entity> Entities;
     public readonly CollisionSystem CollisionSystem = new();
     public WaveController WaveController;
-    
-    public Player Player => (Player) Entities.Find(entity => entity is Player);
+
+    public Player Player => (Player)Entities.Find(entity => entity is Player);
 
     public GameplayState(Game1 root) : base(root)
     {
@@ -22,7 +22,7 @@ public class GameplayState : GameState
     public override List<DrawTask> GetDrawTasks()
     {
         List<DrawTask> drawTasks = new();
-        
+
         foreach (Entity entity in Entities)
         {
             drawTasks.AddRange(entity.GetDrawTasks());
@@ -31,24 +31,24 @@ public class GameplayState : GameState
         drawTasks.AddRange(WaveController.GetDrawTasks());
 
         if (!Root.ShowDebug) return drawTasks;
-        
+
         foreach (Collider collider in CollisionSystem.Colliders)
         {
             int width = collider.Rectangle.Width;
             int height = collider.Rectangle.Height;
-                
+
             Texture2D rect = new(Root.GraphicsDevice, width, height);
 
             Color[] data = new Color[width * height];
-                
+
             Array.Fill(data, new Color(Color.White, 0.2F));
             rect.SetData(data);
-            
+
             drawTasks.Add(new DrawTask(
-                rect, 
-                collider.Rectangle.Location.ToVector2(), 
-                0, 
-                LayerDepth.Debug, 
+                rect,
+                collider.Rectangle.Location.ToVector2(),
+                0,
+                LayerDepth.Debug,
                 new List<IDrawTaskEffect>(),
                 Color.Blue,
                 Vector2.Zero));

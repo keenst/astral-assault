@@ -18,7 +18,7 @@ public class GameStateMachine
         _currentState = newState;
         _currentState.Enter();
     }
-    
+
     public List<DrawTask> GetDrawTasks()
     {
         return _currentState.GetDrawTasks();

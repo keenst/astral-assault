@@ -14,9 +14,10 @@ public class Particle
     public int TextureIndex { get; set; }
     public long TimeSpawned { get; private set; }
     public bool IsActive { get; private set; }
-    public Vector2 Position => 
+
+    public Vector2 Position =>
         _startingPosition + _velocity * (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - TimeSpawned);
-    
+
     public Particle(int textureIndex, Vector2 startingPosition, Vector2 velocity, long timeSpawned)
     {
         TextureIndex = textureIndex;

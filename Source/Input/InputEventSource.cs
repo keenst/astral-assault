@@ -8,20 +8,20 @@ namespace AstralAssault;
 
 public static class InputEventSource
 {
-    public static event EventHandler<KeyboardEventArgs> 
-        KeyboardEvent, 
+    public static event EventHandler<KeyboardEventArgs>
+        KeyboardEvent,
         KeyboardPressedEvent;
-    
-    public static event EventHandler<MouseButtonEventArgs> 
-        MouseButtonEvent, 
+
+    public static event EventHandler<MouseButtonEventArgs>
+        MouseButtonEvent,
         MouseButtonPressedEvent;
 
     public static event EventHandler<MouseMoveEventArgs>
         MouseMoveEvent;
 
-    private static List<Keys> _keysDown = new(); 
+    private static List<Keys> _keysDown = new();
     private static List<Keys> _prevKeysDown = new();
-    
+
     private static readonly List<MouseButtons> MouseDown = new();
     private static List<MouseButtons> _prevMouseDown = new();
 
@@ -57,27 +57,29 @@ public static class InputEventSource
         if (_keysDown.Count == 0)
         {
             _prevKeysDown.Clear();
+
             return;
         }
 
         List<Keys> keysDown = new();
         List<Keys> keysPressed = new();
-        
+
         foreach (Keys key in _keysDown)
         {
             keysDown.Add(key);
-            
+
             if (!_prevKeysDown.Contains(key))
             {
                 keysPressed.Add(key);
             }
         }
-        
+
         KeyboardEvent?.Invoke(null, new KeyboardEventArgs(keysDown.ToArray()));
+
         if (keysPressed.Count == 0) return;
         KeyboardPressedEvent?.Invoke(null, new KeyboardEventArgs(keysPressed.ToArray()));
     }
-    
+
     private static void HandleMouseButtons()
     {
         MouseState mouseState = Mouse.GetState();
@@ -97,7 +99,7 @@ public static class InputEventSource
             if (buttonStates[i] != ButtonState.Pressed) continue;
 
             MouseButtons button = (MouseButtons)i;
-            
+
             MouseDown.Add(button);
             MouseButtonEvent?.Invoke(null, new MouseButtonEventArgs(button));
 

@@ -23,9 +23,9 @@ public class ParticleEmitter : IUpdateEventListener
     private bool _isSpawning;
 
     public ParticleEmitter(
-        Texture2D spriteSheet, 
-        Rectangle[] textureSources, 
-        int particlesPerSecond, 
+        Texture2D spriteSheet,
+        Rectangle[] textureSources,
+        int particlesPerSecond,
         Vector2 position,
         float rotation,
         IParticleProperty[] particleProperties,
@@ -38,11 +38,13 @@ public class ParticleEmitter : IUpdateEventListener
         _rotation = rotation;
         _particleProperties = particleProperties;
         _layerDepth = layerDepth;
-        
+
         List<Type> particlePropertyTypes = new();
+
         foreach (IParticleProperty particleProperty in particleProperties)
         {
             Type particlePropertyType = particleProperty.GetType();
+
             if (particlePropertyTypes.Contains(particlePropertyType))
             {
                 throw new ArgumentException();
@@ -50,32 +52,33 @@ public class ParticleEmitter : IUpdateEventListener
         }
 
         Type causeOfDeathPropertyType = typeof(CauseOfDeathProperty);
+
         if (!particleProperties.Any(p => causeOfDeathPropertyType.IsInstanceOfType(p)))
         {
             throw new ArgumentException();
         }
-        
+
         UpdateEventSource.UpdateEvent += OnUpdate;
     }
-    
+
     public void OnUpdate(object sender, UpdateEventArgs e)
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-        if ((timeNow - _lastTimeSpawned > TimeBetweenParticles || _particlesPerSecond == 0) && 
+        if ((timeNow - _lastTimeSpawned > TimeBetweenParticles || _particlesPerSecond == 0) &&
             _isSpawning &&
             (_particlesSpawned < _particlesToSpawn || _particlesToSpawn == 0))
         {
             Vector2 velocity = Vector2.Zero;
-            
+
             if (_particleProperties.OfType<VelocityProperty>().Any())
             {
                 velocity = _particleProperties.OfType<VelocityProperty>().First().GetVelocity();
                 velocity = Vector2.Transform(velocity, Matrix.CreateRotationZ(_rotation));
             }
-            
+
             int textureIndex = _textureSources.Length - 1;
-            
+
             if (_particleProperties.OfType<RandomSpriteProperty>().Any())
             {
                 textureIndex = _particleProperties.OfType<RandomSpriteProperty>().First().SpriteIndex;
@@ -85,11 +88,11 @@ public class ParticleEmitter : IUpdateEventListener
                 textureIndex,
                 _position,
                 velocity);
-            
+
             _lastTimeSpawned = timeNow;
             _particlesSpawned++;
         }
-        
+
         foreach (Particle particle in _particles.Where(particle => particle.IsActive))
         {
             HandleParticleProperties(particle);
@@ -102,7 +105,7 @@ public class ParticleEmitter : IUpdateEventListener
         _particlesSpawned = 0;
         _isSpawning = true;
     }
-    
+
     public void StopListening()
     {
         UpdateEventSource.UpdateEvent -= OnUpdate;
@@ -138,7 +141,7 @@ public class ParticleEmitter : IUpdateEventListener
                 _layerDepth,
                 particle.EffectContainer.Effects));
         }
-        
+
         return drawTasks;
     }
 
@@ -149,9 +152,10 @@ public class ParticleEmitter : IUpdateEventListener
         if (_particles.All(p => p.IsActive))
         {
             _particles.Add(new Particle(textureIndex, startingPosition, velocity, timeNow));
+
             return;
         }
-        
+
         int inactiveParticleIndex = _particles.FindIndex(p => !p.IsActive);
         _particles[inactiveParticleIndex].Set(textureIndex, startingPosition, velocity, timeNow);
     }
@@ -163,11 +167,19 @@ public class ParticleEmitter : IUpdateEventListener
             switch (particleProperty)
             {
                 case CauseOfDeathProperty causeOfDeathProperty:
-                    HandleCauseOfDeathProperty(particle, causeOfDeathProperty); break;
+                    HandleCauseOfDeathProperty(particle, causeOfDeathProperty);
+
+                    break;
+
                 case ColorChangeProperty colorChangeProperty:
-                    HandleColorChangeProperty(particle, colorChangeProperty); break;
+                    HandleColorChangeProperty(particle, colorChangeProperty);
+
+                    break;
+
                 case SpriteChangeProperty spriteChangeProperty:
-                    HandleSpriteChangeProperty(particle, spriteChangeProperty); break;
+                    HandleSpriteChangeProperty(particle, spriteChangeProperty);
+
+                    break;
             }
         }
     }
@@ -179,13 +191,15 @@ public class ParticleEmitter : IUpdateEventListener
             case CauseOfDeathProperty.CausesOfDeath.LifeSpan:
             {
                 long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+
                 if (timeNow - particle.TimeSpawned > property.LifeSpan)
                 {
                     particle.Deactivate();
                 }
+
                 break;
             }
-            
+
             case CauseOfDeathProperty.CausesOfDeath.OutOfBounds:
             {
                 if (particle.Position.X is < 0 or > Game1.TargetWidth ||
@@ -193,23 +207,24 @@ public class ParticleEmitter : IUpdateEventListener
                 {
                     particle.Deactivate();
                 }
+
                 break;
             }
-            
+
             default:
                 throw new ArgumentOutOfRangeException();
         }
     }
-    
+
     private static void HandleColorChangeProperty(Particle particle, ColorChangeProperty property)
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         float timeSinceSpawned = timeNow - particle.TimeSpawned;
 
         int colorIndex = (int)(timeSinceSpawned / property.TimeBetweenColorsMS);
-        
+
         if (colorIndex >= property.Colors.Length) return;
-        
+
         particle.EffectContainer.SetEffect<ColorEffect, Vector4>(Palette.GetColorVector(property.Colors[colorIndex]));
     }
 
@@ -219,9 +234,9 @@ public class ParticleEmitter : IUpdateEventListener
         float timeSinceSpawned = timeNow - particle.TimeSpawned;
 
         int spriteIndex = (int)(timeSinceSpawned / property.TimeBetweenChangesMS);
-        
+
         if (spriteIndex >= property.EndIndex) return;
-        
+
         particle.TextureIndex = spriteIndex;
     }
 }

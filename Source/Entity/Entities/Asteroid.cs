@@ -19,15 +19,15 @@ public class Asteroid : Entity
     }
 
     public Asteroid(
-        GameplayState gameState, 
-        Vector2 position, 
-        float direction, 
-        Sizes size, 
-        DebrisController debrisController) 
-        :base(gameState, position)
+        GameplayState gameState,
+        Vector2 position,
+        float direction,
+        Sizes size,
+        DebrisController debrisController)
+        : base(gameState, position)
     {
         _debrisController = debrisController;
-        
+
         _size = size;
 
         Random rnd = new();
@@ -35,7 +35,7 @@ public class Asteroid : Entity
         int speed = rnd.Next(30, 100);
 
         Velocity = new Vector2((float)Math.Cos(direction), (float)Math.Sin(direction)) * speed;
-        
+
         Texture2D spriteSheet;
         int colliderSize;
         int spriteSize;
@@ -51,7 +51,9 @@ public class Asteroid : Entity
                 HP = MaxHP;
                 ContactDamage = 5;
                 mass = 6;
+
                 break;
+
             case Sizes.Small:
                 spriteSheet = AssetManager.Load<Texture2D>("Asteroid2");
                 spriteSize = 24;
@@ -60,7 +62,9 @@ public class Asteroid : Entity
                 HP = MaxHP;
                 ContactDamage = 7;
                 mass = 12;
+
                 break;
+
             case Sizes.Medium:
                 spriteSheet = AssetManager.Load<Texture2D>("Asteroid3");
                 spriteSize = 32;
@@ -69,25 +73,27 @@ public class Asteroid : Entity
                 HP = MaxHP;
                 ContactDamage = 12;
                 mass = 18;
+
                 break;
+
             default:
                 throw new ArgumentOutOfRangeException();
         }
-        
+
         Frame frame = new(
-              e:new Rectangle(0,              0, spriteSize, spriteSize),
-            see:new Rectangle(spriteSize,     0, spriteSize, spriteSize),
-             se:new Rectangle(spriteSize * 2, 0, spriteSize, spriteSize),
-            sse:new Rectangle(spriteSize * 3, 0, spriteSize, spriteSize));
+            e: new Rectangle(0, 0, spriteSize, spriteSize),
+            see: new Rectangle(spriteSize, 0, spriteSize, spriteSize),
+            se: new Rectangle(spriteSize * 2, 0, spriteSize, spriteSize),
+            sse: new Rectangle(spriteSize * 3, 0, spriteSize, spriteSize));
 
         Animation animation = new(new[] { frame }, true);
 
         SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
-        
+
         Collider = new Collider(
-            this, 
+            this,
             new Rectangle(
-                new Point((int)Position.X - colliderSize / 2, (int)Position.Y - colliderSize / 2), 
+                new Point((int)Position.X - colliderSize / 2, (int)Position.Y - colliderSize / 2),
                 new Point(colliderSize, colliderSize)),
             true,
             mass);
@@ -111,23 +117,23 @@ public class Asteroid : Entity
             for (int i = 0; i < amount; i++)
             {
                 angleToPlayer += (float)rnd.NextDouble() * MathF.PI / 1 - MathF.PI / 2;
-                
+
                 GameState.Entities.Add(
                     new Asteroid(GameState, Position, angleToPlayer, _size - 1, _debrisController));
             }
         }
-        
+
         _hasExploded = true;
 
         _debrisController.SpawnDebris(Position, (int)_size);
-        
+
         base.OnDeath();
     }
 
     public override void OnUpdate(object sender, UpdateEventArgs e)
     {
         base.OnUpdate(sender, e);
-        
+
         Rotation += _rotSpeed * e.DeltaTime;
         if (Rotation > Math.PI) Rotation = (float)-Math.PI;
     }

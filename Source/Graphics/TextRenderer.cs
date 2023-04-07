@@ -60,8 +60,8 @@ public static class TextRenderer
     }
 
     public static List<DrawTask> CreateDrawTasks(
-        this string input, 
-        Vector2 position, 
+        this string input,
+        Vector2 position,
         Color color,
         LayerDepth layerDepth)
     {

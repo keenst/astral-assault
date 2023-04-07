@@ -7,10 +7,10 @@ public struct CauseOfDeathProperty : IParticleProperty
         OutOfBounds,
         LifeSpan
     }
-    
+
     public CausesOfDeath CauseOfDeath { get; }
     public int LifeSpan { get; }
-    
+
     public CauseOfDeathProperty(CausesOfDeath causeOfDeath, int lifeSpan = 0)
     {
         CauseOfDeath = causeOfDeath;

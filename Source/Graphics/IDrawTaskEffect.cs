@@ -1,5 +1,3 @@
 namespace AstralAssault;
 
-public interface IDrawTaskEffect
-{
-}
+public interface IDrawTaskEffect { }

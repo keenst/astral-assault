@@ -28,26 +28,26 @@ public class Player : Entity, IInputEventListener
     private const float BulletSpeed = 250;
     private const int ShootSpeed = 200;
 
-    public Player(GameplayState gameState, Vector2 position) :base(gameState, position)
+    public Player(GameplayState gameState, Vector2 position) : base(gameState, position)
     {
         Position = position;
         Rotation = Pi / 2;
 
         InitSpriteRenderer();
-        
+
         StartListening();
-        
+
         Collider = new Collider(
-            this, 
+            this,
             new Rectangle(
-                new Point((int)Position.X - 12, (int)Position.Y - 12), 
+                new Point((int)Position.X - 12, (int)Position.Y - 12),
                 new Point(24, 24)),
             true,
             10);
         GameState.CollisionSystem.AddCollider(Collider);
 
         Texture2D particleSpriteSheet = AssetManager.Load<Texture2D>("Particle");
-        
+
         Rectangle[] textureSources =
         {
             new(24, 0, 8, 8),
@@ -83,7 +83,7 @@ public class Player : Entity, IInputEventListener
             Rotation,
             particleProperties,
             LayerDepth.ThrusterFlame);
-        
+
         _particleEmitter.StartSpawning();
 
         OutOfBoundsBehavior = OutOfBounds.Wrap;
@@ -97,7 +97,7 @@ public class Player : Entity, IInputEventListener
     private void InitSpriteRenderer()
     {
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Player");
-        
+
         Frame frame = new(
             new Rectangle(0, 0, 32, 32),
             new Rectangle(32, 0, 32, 32),
@@ -108,9 +108,9 @@ public class Player : Entity, IInputEventListener
 
         SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
     }
-    
+
     public override List<DrawTask> GetDrawTasks()
-    { 
+    {
         List<DrawTask> drawTasks = new();
 
         if (_thrusterIsOn)
@@ -124,9 +124,9 @@ public class Player : Entity, IInputEventListener
 
         drawTasks.AddRange(_particleEmitter.CreateDrawTasks());
         drawTasks.AddRange(base.GetDrawTasks());
-        
+
         _thrusterIsOn = false;
-        
+
         return drawTasks;
     }
 
@@ -136,7 +136,7 @@ public class Player : Entity, IInputEventListener
         InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
         InputEventSource.MouseButtonEvent += OnMouseButtonEvent;
     }
-    
+
     private void StopListening()
     {
         InputEventSource.KeyboardEvent -= OnKeyboardEvent;
@@ -149,20 +149,20 @@ public class Player : Entity, IInputEventListener
     {
         // acceleration and deceleration
         Vector2 forward = new Vector2(
-            (float)Math.Cos(Rotation), 
+            (float)Math.Cos(Rotation),
             (float)Math.Sin(Rotation)
         ) * MoveSpeed * _delta;
-        
+
         Velocity = new Vector2(
             Math.Clamp(Velocity.X + forward.X * yAxis, -MaxSpeed, MaxSpeed),
             Math.Clamp(Velocity.Y + forward.Y * yAxis, -MaxSpeed, MaxSpeed));
 
         // tilting
         Vector2 right = new Vector2(
-            (float)Math.Cos(Rotation + Pi / 2), 
+            (float)Math.Cos(Rotation + Pi / 2),
             (float)Math.Sin(Rotation + Pi / 2)
         ) * TiltSpeed * _delta;
-        
+
         Velocity = new Vector2(
             Math.Clamp(Velocity.X + right.X * xAxis, -MaxSpeed, MaxSpeed),
             Math.Clamp(Velocity.Y + right.Y * xAxis, -MaxSpeed, MaxSpeed));
@@ -182,41 +182,41 @@ public class Player : Entity, IInputEventListener
     private void HandleFiring()
     {
         if (!_isCrosshairActive) return;
-        
+
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        
+
         if (_lastTimeFired + ShootSpeed > timeNow) return;
 
         _lastTimeFired = timeNow;
-        
+
         float xDiff = _cursorPosition.X - (_lastCannon ? _muzzle.Item1.X : _muzzle.Item2.X);
         float yDiff = _cursorPosition.Y - (_lastCannon ? _muzzle.Item1.Y : _muzzle.Item2.Y);
 
         float rot = (float)Math.Atan2(yDiff, xDiff);
-            
+
         GameState.Entities.Add(
             new Bullet(
-                GameState, 
-                _lastCannon ? _muzzle.Item1 : _muzzle.Item2, 
-                rot, 
+                GameState,
+                _lastCannon ? _muzzle.Item1 : _muzzle.Item2,
+                rot,
                 BulletSpeed));
-            
+
         _lastCannon = !_lastCannon;
     }
 
     public override void Destroy()
     {
         StopListening();
-        
+
         base.Destroy();
     }
-    
+
     protected override void OnDeath()
     {
         Game1 root = GameState.Root;
-        
+
         root.GameStateMachine.ChangeState(new GameOverState(root));
-        
+
         base.OnDeath();
     }
 
@@ -261,7 +261,7 @@ public class Player : Entity, IInputEventListener
     public override void OnUpdate(object sender, UpdateEventArgs e)
     {
         base.OnUpdate(sender, e);
-        
+
         _delta = e.DeltaTime;
 
         // check range to cursor
@@ -283,16 +283,16 @@ public class Player : Entity, IInputEventListener
         if (sign != 0)
         {
             float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
-            
-            Velocity -= 
+
+            Velocity -=
                 new Vector2((float)Math.Cos(direction), (float)Math.Sin(direction)) * Friction * _delta * sign;
         }
 
         // rotate the points for the cannon muzzles
         Vector2 muzzle1;
         Vector2 muzzle2;
-        
-        const float x =  8;
+
+        const float x = 8;
         const float y = 10;
 
         {
@@ -319,14 +319,14 @@ public class Player : Entity, IInputEventListener
         Vector2 emitterPosition = new(11, 0);
 
         {
-            float x2 = 
+            float x2 =
                 (float)(emitterPosition.X * Math.Cos(emitterRotation) + emitterPosition.Y * Math.Sin(emitterRotation));
-            float y2 = 
+            float y2 =
                 (float)(emitterPosition.Y * Math.Cos(emitterRotation) + emitterPosition.X * Math.Sin(emitterRotation));
 
             emitterPosition = new Vector2(Position.X + x2, Position.Y + y2);
         }
-        
+
         _particleEmitter.SetTransform(emitterPosition, emitterRotation);
     }
 }

@@ -16,7 +16,7 @@ public class SpriteRenderer : IUpdateEventListener
     private int _activeFrame;
     private long _lastFrameUpdate;
     public readonly EffectContainer EffectContainer = new();
-    
+
     private const float Pi = 3.14F;
 
     public SpriteRenderer(Texture2D spriteSheet, Animation[] animations, LayerDepth layerDepth)
@@ -24,7 +24,7 @@ public class SpriteRenderer : IUpdateEventListener
         _animations = animations;
         _spriteSheet = spriteSheet;
         _layerDepth = layerDepth;
-        
+
         UpdateEventSource.UpdateEvent += OnUpdate;
         _activeAnimation = _animations[0];
     }
@@ -32,7 +32,7 @@ public class SpriteRenderer : IUpdateEventListener
     public void OnUpdate(object sender, UpdateEventArgs e)
     {
         if (_activeAnimation.Frames.Length == 1) return;
-        
+
         int frameLength = _activeAnimation.Frames[_activeFrame].Time;
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
@@ -44,14 +44,14 @@ public class SpriteRenderer : IUpdateEventListener
 
     public void PlayAnimation(int index)
     {
-        if (index >= _animations.Length || index < 0) 
+        if (index >= _animations.Length || index < 0)
             throw new ArgumentOutOfRangeException();
 
         _activeAnimation = _animations[index];
         _activeFrame = 0;
         _lastFrameUpdate = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
     }
-    
+
     public DrawTask CreateDrawTask(Vector2 position, float rotation)
     {
         return _activeAnimation.HasRotation ? DrawRotatable(position, rotation) : DrawStatic(position);
@@ -60,12 +60,14 @@ public class SpriteRenderer : IUpdateEventListener
     private DrawTask DrawStatic(Vector2 position)
     {
         Rectangle source = _activeAnimation.Frames[_activeFrame].Source;
+
         return new DrawTask(_spriteSheet, source, position, 0, _layerDepth, EffectContainer.Effects);
     }
 
     private DrawTask DrawRotatable(Vector2 position, float rotation)
     {
         (float spriteRotation, Rectangle source) = GetRotation(rotation);
+
         return new DrawTask(_spriteSheet, source, position, spriteRotation, _layerDepth, EffectContainer.Effects);
     }
 
@@ -75,20 +77,21 @@ public class SpriteRenderer : IUpdateEventListener
 
         float spriteRotation;
         Rectangle source;
-        
+
         if (rot % 4 == 0)
         {
             source = _activeAnimation.Frames[_activeFrame].Rotations[0];
             spriteRotation = Pi / 8 * rot;
+
             return new Tuple<float, Rectangle>(spriteRotation, source);
         }
 
         spriteRotation = rotation switch
         {
-            >= 0         and < Pi / 2    => 0,
-            >= Pi / 2    and < Pi        => Pi / 2,
-            <= 0         and > -Pi / 2   => -Pi / 2,
-            <= -Pi / 2   and > -Pi       => -Pi,
+            >= 0 and < Pi / 2 => 0,
+            >= Pi / 2 and < Pi => Pi / 2,
+            <= 0 and > -Pi / 2 => -Pi / 2,
+            <= -Pi / 2 and > -Pi => -Pi,
             _ => 0
         };
 

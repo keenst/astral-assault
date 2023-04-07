@@ -6,29 +6,29 @@ namespace AstralAssault;
 
 public class Bullet : Entity
 {
-    public Bullet(GameplayState gameState, Vector2 position, float rotation, float speed) :base(gameState, position)
+    public Bullet(GameplayState gameState, Vector2 position, float rotation, float speed) : base(gameState, position)
     {
         Velocity = new Vector2(
             (float)Math.Cos(rotation),
             (float)Math.Sin(rotation)
-            ) * speed;
-        
+        ) * speed;
+
         Texture2D spriteSheet = new(GameState.Root.GraphicsDevice, 2, 2);
-        
+
         Color[] data = new Color[2 * 2];
-        for(int i = 0; i < data.Length; ++i) data[i] = Color.White;
+        for (int i = 0; i < data.Length; ++i) data[i] = Color.White;
         spriteSheet.SetData(data);
 
         Frame frame = new(new Rectangle(0, 0, 2, 2));
 
         Animation animation = new(new[] { frame }, false);
-        
+
         SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
-        
+
         Collider = new Collider(
-            this, 
+            this,
             new Rectangle(
-                new Point((int)Position.X - 1, (int)Position.Y - 1), 
+                new Point((int)Position.X - 1, (int)Position.Y - 1),
                 new Point(2, 2)));
         GameState.CollisionSystem.AddCollider(Collider);
 
@@ -41,7 +41,7 @@ public class Bullet : Entity
     public override void OnCollision(Collider other)
     {
         if (IsFriendly == other.Parent.IsFriendly) return;
-        
+
         Destroy();
     }
 

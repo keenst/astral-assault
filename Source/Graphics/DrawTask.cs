@@ -17,8 +17,8 @@ public struct DrawTask
     public Vector2 Origin { get; }
 
     public DrawTask(
-        Texture2D texture, 
-        Rectangle source, 
+        Texture2D texture,
+        Rectangle source,
         Rectangle destination,
         float rotation,
         LayerDepth layerDepth,
@@ -36,10 +36,10 @@ public struct DrawTask
             (float)Math.Round(Source.Width / 2D),
             (float)Math.Round(Source.Height / 2D));
     }
-    
+
     public DrawTask(
-        Texture2D texture, 
-        Rectangle source, 
+        Texture2D texture,
+        Rectangle source,
         Vector2 position,
         float rotation,
         LayerDepth layerDepth,
@@ -50,9 +50,9 @@ public struct DrawTask
         Texture = texture;
         Source = source;
         Destination = new Rectangle(
-            (int)position.X, 
-            (int)position.Y, 
-            source.Width, 
+            (int)position.X,
+            (int)position.Y,
+            source.Width,
             source.Height);
         Rotation = rotation;
         LayerDepth = layerDepth;
@@ -77,9 +77,9 @@ public struct DrawTask
             texture.Width,
             texture.Height);
         Destination = new Rectangle(
-            (int)position.X, 
-            (int)position.Y, 
-            Source.Width, 
+            (int)position.X,
+            (int)position.Y,
+            Source.Width,
             Source.Height);
         Rotation = rotation;
         LayerDepth = layerDepth;
@@ -87,7 +87,7 @@ public struct DrawTask
         Color = color;
         Origin = origin;
     }
-    
+
     public DrawTask(
         Texture2D texture,
         Rectangle source,
@@ -99,9 +99,9 @@ public struct DrawTask
         Texture = texture;
         Source = source;
         Destination = new Rectangle(
-            (int)position.X, 
-            (int)position.Y, 
-            source.Width, 
+            (int)position.X,
+            (int)position.Y,
+            source.Width,
             source.Height);
         Rotation = rotation;
         LayerDepth = layerDepth;
@@ -111,7 +111,7 @@ public struct DrawTask
             (float)Math.Round(Source.Width / 2D),
             (float)Math.Round(Source.Height / 2D));
     }
-    
+
     public DrawTask(
         Texture2D texture,
         Vector2 position,
@@ -121,14 +121,14 @@ public struct DrawTask
     {
         Texture = texture;
         Source = new Rectangle(
-            0, 
-            0, 
-            texture.Width, 
+            0,
+            0,
+            texture.Width,
             texture.Height);
         Destination = new Rectangle(
-            (int)position.X, 
-            (int)position.Y, 
-            Source.Width, 
+            (int)position.X,
+            (int)position.Y,
+            Source.Width,
             Source.Height);
         Rotation = rotation;
         LayerDepth = layerDepth;
