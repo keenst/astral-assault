@@ -71,7 +71,7 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        _renderTarget = new RenderTarget2D(
+        _renderTarget = new(
             GraphicsDevice,
             GraphicsDevice.PresentationParameters.BackBufferWidth,
             GraphicsDevice.PresentationParameters.BackBufferHeight,
@@ -84,14 +84,14 @@ public class Game1 : Game
         InputEventSource.Init();
         Palette.Init();
 
-        GameStateMachine = new GameStateMachine(new GameplayState(this));
+        GameStateMachine = new(new GameplayState(this));
 
         base.Initialize();
     }
 
     protected override void LoadContent()
     {
-        _spriteBatch = new SpriteBatch(GraphicsDevice);
+        _spriteBatch = new(GraphicsDevice);
     }
 
     protected override void Update(GameTime gameTime)
@@ -137,7 +137,7 @@ public class Game1 : Game
             List<DrawTask> frameRateTask =
                 frameRate.CreateDrawTasks(Vector2.Zero, Color.Yellow, LayerDepth.Debug);
             List<DrawTask> renderTimeTask =
-                renderTime.CreateDrawTasks(new Vector2(0, 9), Color.Yellow, LayerDepth.Debug);
+                renderTime.CreateDrawTasks(new(0, 9), Color.Yellow, LayerDepth.Debug);
 
             drawTasks.AddRange(frameRateTask);
             drawTasks.AddRange(renderTimeTask);

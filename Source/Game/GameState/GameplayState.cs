@@ -15,8 +15,8 @@ public class GameplayState : GameState
 
     public GameplayState(Game1 root) : base(root)
     {
-        Entities = new List<Entity>();
-        WaveController = new WaveController(this, Root);
+        Entities = new();
+        WaveController = new(this, Root);
     }
 
     public override List<DrawTask> GetDrawTasks()
@@ -41,15 +41,15 @@ public class GameplayState : GameState
 
             Color[] data = new Color[width * height];
 
-            Array.Fill(data, new Color(Color.White, 0.2F));
+            Array.Fill(data, new(Color.White, 0.2F));
             rect.SetData(data);
 
-            drawTasks.Add(new DrawTask(
+            drawTasks.Add(new(
                 rect,
                 collider.Rectangle.Location.ToVector2(),
                 0,
                 LayerDepth.Debug,
-                new List<IDrawTaskEffect>(),
+                new(),
                 Color.Blue,
                 Vector2.Zero));
         }
@@ -59,7 +59,7 @@ public class GameplayState : GameState
 
     public override void Enter()
     {
-        Entities.Add(new Player(this, new Vector2(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F)));
+        Entities.Add(new Player(this, new(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F)));
         Entities.Add(new Crosshair(this));
     }
 

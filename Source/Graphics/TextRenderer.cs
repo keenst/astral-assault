@@ -13,7 +13,7 @@ public static class TextRenderer
     public static void Init()
     {
         _font = AssetManager.Load<Texture2D>("font");
-        _dict = new Dictionary<char, int>
+        _dict = new()
         {
             { 'A', 0 },
             { 'B', 1 },
@@ -75,13 +75,13 @@ public static class TextRenderer
 
             Rectangle source = new(x * 10, y * 10, 10, 10);
 
-            drawTasks.Add(new DrawTask(
+            drawTasks.Add(new(
                 _font,
                 source,
-                new Vector2(position.X + i * 10, position.Y),
+                new(position.X + i * 10, position.Y),
                 0,
                 layerDepth,
-                new List<IDrawTaskEffect>(),
+                new(),
                 color,
                 Vector2.Zero));
         }

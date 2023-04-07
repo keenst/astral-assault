@@ -30,16 +30,16 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
             textPosition,
             0,
             LayerDepth.HUD,
-            new List<IDrawTaskEffect>());
+            new());
 
         DrawTask restartPrompt = new(
             _restartPrompt,
             promptPosition,
             0,
             LayerDepth.HUD,
-            new List<IDrawTaskEffect>());
+            new());
 
-        return new List<DrawTask> { gameOverText, restartPrompt };
+        return new() { gameOverText, restartPrompt };
     }
 
     public void OnKeyboardPressedEvent(object sender, KeyboardEventArgs e)

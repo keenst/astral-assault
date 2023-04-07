@@ -81,20 +81,20 @@ public class Asteroid : Entity
         }
 
         Frame frame = new(
-            e: new Rectangle(0, 0, spriteSize, spriteSize),
-            see: new Rectangle(spriteSize, 0, spriteSize, spriteSize),
-            se: new Rectangle(spriteSize * 2, 0, spriteSize, spriteSize),
-            sse: new Rectangle(spriteSize * 3, 0, spriteSize, spriteSize));
+            e: new(0, 0, spriteSize, spriteSize),
+            see: new(spriteSize, 0, spriteSize, spriteSize),
+            se: new(spriteSize * 2, 0, spriteSize, spriteSize),
+            sse: new(spriteSize * 3, 0, spriteSize, spriteSize));
 
         Animation animation = new(new[] { frame }, true);
 
-        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
+        SpriteRenderer = new(spriteSheet, new[] { animation }, LayerDepth.Foreground);
 
-        Collider = new Collider(
+        Collider = new(
             this,
-            new Rectangle(
-                new Point((int)Position.X - colliderSize / 2, (int)Position.Y - colliderSize / 2),
-                new Point(colliderSize, colliderSize)),
+            new(
+                new((int)Position.X - colliderSize / 2, (int)Position.Y - colliderSize / 2),
+                new(colliderSize, colliderSize)),
             true,
             mass);
         GameState.CollisionSystem.AddCollider(Collider);

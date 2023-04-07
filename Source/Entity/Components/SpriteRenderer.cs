@@ -61,14 +61,14 @@ public class SpriteRenderer : IUpdateEventListener
     {
         Rectangle source = _activeAnimation.Frames[_activeFrame].Source;
 
-        return new DrawTask(_spriteSheet, source, position, 0, _layerDepth, EffectContainer.Effects);
+        return new(_spriteSheet, source, position, 0, _layerDepth, EffectContainer.Effects);
     }
 
     private DrawTask DrawRotatable(Vector2 position, float rotation)
     {
         (float spriteRotation, Rectangle source) = GetRotation(rotation);
 
-        return new DrawTask(_spriteSheet, source, position, spriteRotation, _layerDepth, EffectContainer.Effects);
+        return new(_spriteSheet, source, position, spriteRotation, _layerDepth, EffectContainer.Effects);
     }
 
     private Tuple<float, Rectangle> GetRotation(float rotation)
@@ -83,7 +83,7 @@ public class SpriteRenderer : IUpdateEventListener
             source = _activeAnimation.Frames[_activeFrame].Rotations[0];
             spriteRotation = Pi / 8 * rot;
 
-            return new Tuple<float, Rectangle>(spriteRotation, source);
+            return new(spriteRotation, source);
         }
 
         spriteRotation = rotation switch
@@ -97,6 +97,6 @@ public class SpriteRenderer : IUpdateEventListener
 
         source = _activeAnimation.Frames[_activeFrame].Rotations[rot.Mod(4)];
 
-        return new Tuple<float, Rectangle>(spriteRotation, source);
+        return new(spriteRotation, source);
     }
 }

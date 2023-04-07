@@ -74,10 +74,10 @@ public static class InputEventSource
             }
         }
 
-        KeyboardEvent?.Invoke(null, new KeyboardEventArgs(keysDown.ToArray()));
+        KeyboardEvent?.Invoke(null, new(keysDown.ToArray()));
 
         if (keysPressed.Count == 0) return;
-        KeyboardPressedEvent?.Invoke(null, new KeyboardEventArgs(keysPressed.ToArray()));
+        KeyboardPressedEvent?.Invoke(null, new(keysPressed.ToArray()));
     }
 
     private static void HandleMouseButtons()
@@ -101,11 +101,11 @@ public static class InputEventSource
             MouseButtons button = (MouseButtons)i;
 
             MouseDown.Add(button);
-            MouseButtonEvent?.Invoke(null, new MouseButtonEventArgs(button));
+            MouseButtonEvent?.Invoke(null, new(button));
 
             if (!_prevMouseDown.Contains(button))
             {
-                MouseButtonPressedEvent?.Invoke(null, new MouseButtonEventArgs(button));
+                MouseButtonPressedEvent?.Invoke(null, new(button));
             }
         }
     }
@@ -117,7 +117,7 @@ public static class InputEventSource
 
         if (_mousePos != _prevMousePos)
         {
-            MouseMoveEvent?.Invoke(null, new MouseMoveEventArgs(_mousePos));
+            MouseMoveEvent?.Invoke(null, new(_mousePos));
         }
     }
 }

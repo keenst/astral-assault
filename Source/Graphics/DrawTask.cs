@@ -32,7 +32,7 @@ public struct DrawTask
         LayerDepth = layerDepth;
         EffectContainer = new(effects);
         Color = color;
-        Origin = new Vector2(
+        Origin = new(
             (float)Math.Round(Source.Width / 2D),
             (float)Math.Round(Source.Height / 2D));
     }
@@ -49,7 +49,7 @@ public struct DrawTask
     {
         Texture = texture;
         Source = source;
-        Destination = new Rectangle(
+        Destination = new(
             (int)position.X,
             (int)position.Y,
             source.Width,
@@ -71,12 +71,12 @@ public struct DrawTask
         Vector2 origin)
     {
         Texture = texture;
-        Source = new Rectangle(
+        Source = new(
             0,
             0,
             texture.Width,
             texture.Height);
-        Destination = new Rectangle(
+        Destination = new(
             (int)position.X,
             (int)position.Y,
             Source.Width,
@@ -98,7 +98,7 @@ public struct DrawTask
     {
         Texture = texture;
         Source = source;
-        Destination = new Rectangle(
+        Destination = new(
             (int)position.X,
             (int)position.Y,
             source.Width,
@@ -107,7 +107,7 @@ public struct DrawTask
         LayerDepth = layerDepth;
         EffectContainer = new(effects);
         Color = Color.White;
-        Origin = new Vector2(
+        Origin = new(
             (float)Math.Round(Source.Width / 2D),
             (float)Math.Round(Source.Height / 2D));
     }
@@ -120,12 +120,12 @@ public struct DrawTask
         List<IDrawTaskEffect> effects)
     {
         Texture = texture;
-        Source = new Rectangle(
+        Source = new(
             0,
             0,
             texture.Width,
             texture.Height);
-        Destination = new Rectangle(
+        Destination = new(
             (int)position.X,
             (int)position.Y,
             Source.Width,
@@ -134,7 +134,7 @@ public struct DrawTask
         LayerDepth = layerDepth;
         EffectContainer = new(effects);
         Color = Color.White;
-        Origin = new Vector2(
+        Origin = new(
             (float)Math.Round(Source.Width / 2D),
             (float)Math.Round(Source.Height / 2D));
     }

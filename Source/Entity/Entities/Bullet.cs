@@ -19,17 +19,17 @@ public class Bullet : Entity
         for (int i = 0; i < data.Length; ++i) data[i] = Color.White;
         spriteSheet.SetData(data);
 
-        Frame frame = new(new Rectangle(0, 0, 2, 2));
+        Frame frame = new(new(0, 0, 2, 2));
 
         Animation animation = new(new[] { frame }, false);
 
-        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
+        SpriteRenderer = new(spriteSheet, new[] { animation }, LayerDepth.Foreground);
 
-        Collider = new Collider(
+        Collider = new(
             this,
-            new Rectangle(
-                new Point((int)Position.X - 1, (int)Position.Y - 1),
-                new Point(2, 2)));
+            new(
+                new((int)Position.X - 1, (int)Position.Y - 1),
+                new(2, 2)));
         GameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Destroy;

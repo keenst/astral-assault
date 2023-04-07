@@ -32,7 +32,7 @@ public class DebrisController
             new CauseOfDeathProperty(CauseOfDeathProperty.CausesOfDeath.OutOfBounds)
         };
 
-        _particleEmitter = new ParticleEmitter(
+        _particleEmitter = new(
             particleSpriteSheet,
             textureSources,
             0,

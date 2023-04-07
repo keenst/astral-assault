@@ -10,6 +10,6 @@ public static class UpdateEventSource
     public static void Update(GameTime gameTime)
     {
         float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-        UpdateEvent?.Invoke(null, new UpdateEventArgs(deltaTime));
+        UpdateEvent?.Invoke(null, new(deltaTime));
     }
 }

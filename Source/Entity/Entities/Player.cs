@@ -37,11 +37,11 @@ public class Player : Entity, IInputEventListener
 
         StartListening();
 
-        Collider = new Collider(
+        Collider = new(
             this,
-            new Rectangle(
-                new Point((int)Position.X - 12, (int)Position.Y - 12),
-                new Point(24, 24)),
+            new(
+                new((int)Position.X - 12, (int)Position.Y - 12),
+                new(24, 24)),
             true,
             10);
         GameState.CollisionSystem.AddCollider(Collider);
@@ -75,7 +75,7 @@ public class Player : Entity, IInputEventListener
             new VelocityProperty(-1F, 1F, 0.04F, 0.1F)
         };
 
-        _particleEmitter = new ParticleEmitter(
+        _particleEmitter = new(
             particleSpriteSheet,
             textureSources,
             20,
@@ -99,14 +99,14 @@ public class Player : Entity, IInputEventListener
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Player");
 
         Frame frame = new(
-            new Rectangle(0, 0, 32, 32),
-            new Rectangle(32, 0, 32, 32),
-            new Rectangle(64, 0, 32, 32),
-            new Rectangle(96, 0, 32, 32));
+            new(0, 0, 32, 32),
+            new(32, 0, 32, 32),
+            new(64, 0, 32, 32),
+            new(96, 0, 32, 32));
 
         Animation animation = new(new[] { frame }, true);
 
-        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
+        SpriteRenderer = new(spriteSheet, new[] { animation }, LayerDepth.Foreground);
     }
 
     public override List<DrawTask> GetDrawTasks()
@@ -153,7 +153,7 @@ public class Player : Entity, IInputEventListener
             (float)Math.Sin(Rotation)
         ) * MoveSpeed * _delta;
 
-        Velocity = new Vector2(
+        Velocity = new(
             Math.Clamp(Velocity.X + forward.X * yAxis, -MaxSpeed, MaxSpeed),
             Math.Clamp(Velocity.Y + forward.Y * yAxis, -MaxSpeed, MaxSpeed));
 
@@ -163,7 +163,7 @@ public class Player : Entity, IInputEventListener
             (float)Math.Sin(Rotation + Pi / 2)
         ) * TiltSpeed * _delta;
 
-        Velocity = new Vector2(
+        Velocity = new(
             Math.Clamp(Velocity.X + right.X * xAxis, -MaxSpeed, MaxSpeed),
             Math.Clamp(Velocity.Y + right.Y * xAxis, -MaxSpeed, MaxSpeed));
 
@@ -301,7 +301,7 @@ public class Player : Entity, IInputEventListener
             float x2 = (float)(x * Math.Cos(rot) - y * Math.Sin(rot));
             float y2 = (float)(y * Math.Cos(rot) + x * Math.Sin(rot));
 
-            muzzle1 = new Vector2(Position.X + x2, Position.Y + y2);
+            muzzle1 = new(Position.X + x2, Position.Y + y2);
         }
 
         {
@@ -310,10 +310,10 @@ public class Player : Entity, IInputEventListener
             float x2 = (float)(x * Math.Cos(rot) + y * Math.Sin(rot));
             float y2 = (float)(-y * Math.Cos(rot) + x * Math.Sin(rot));
 
-            muzzle2 = new Vector2(Position.X + x2, Position.Y + y2);
+            muzzle2 = new(Position.X + x2, Position.Y + y2);
         }
 
-        _muzzle = new Tuple<Vector2, Vector2>(muzzle1, muzzle2);
+        _muzzle = new(muzzle1, muzzle2);
 
         float emitterRotation = (Rotation + Pi) % (2 * Pi);
         Vector2 emitterPosition = new(11, 0);
@@ -324,7 +324,7 @@ public class Player : Entity, IInputEventListener
             float y2 =
                 (float)(emitterPosition.Y * Math.Cos(emitterRotation) + emitterPosition.X * Math.Sin(emitterRotation));
 
-            emitterPosition = new Vector2(Position.X + x2, Position.Y + y2);
+            emitterPosition = new(Position.X + x2, Position.Y + y2);
         }
 
         _particleEmitter.SetTransform(emitterPosition, emitterRotation);

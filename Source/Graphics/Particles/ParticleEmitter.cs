@@ -133,7 +133,7 @@ public class ParticleEmitter : IUpdateEventListener
 
         foreach (Particle particle in _particles.Where(p => p.IsActive))
         {
-            drawTasks.Add(new DrawTask(
+            drawTasks.Add(new(
                 _spriteSheet,
                 _textureSources[particle.TextureIndex],
                 particle.Position,
@@ -151,7 +151,7 @@ public class ParticleEmitter : IUpdateEventListener
 
         if (_particles.All(p => p.IsActive))
         {
-            _particles.Add(new Particle(textureIndex, startingPosition, velocity, timeNow));
+            _particles.Add(new(textureIndex, startingPosition, velocity, timeNow));
 
             return;
         }

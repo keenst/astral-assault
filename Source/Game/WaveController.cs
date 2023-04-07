@@ -26,7 +26,7 @@ public class WaveController : IUpdateEventListener
 
         UpdateEventSource.UpdateEvent += OnUpdate;
 
-        _debrisController = new DebrisController(gameState);
+        _debrisController = new(gameState);
 
         StartNextWave();
     }
@@ -82,7 +82,7 @@ public class WaveController : IUpdateEventListener
         if (!_drawWaveText) return drawTasks;
 
         string text = $"Wave: {_currentWave}";
-        drawTasks.AddRange(text.CreateDrawTasks(new Vector2(10, 10), Color.White, LayerDepth.HUD));
+        drawTasks.AddRange(text.CreateDrawTasks(new(10, 10), Color.White, LayerDepth.HUD));
 
         return drawTasks;
     }

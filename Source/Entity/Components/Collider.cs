@@ -135,10 +135,10 @@ public class Collider
     private static Vector2[] GetCorners(Rectangle rect)
     {
         Vector2[] corners = new Vector2[4];
-        corners[0] = new Vector2(rect.Left, rect.Top);
-        corners[1] = new Vector2(rect.Right, rect.Top);
-        corners[2] = new Vector2(rect.Right, rect.Bottom);
-        corners[3] = new Vector2(rect.Left, rect.Bottom);
+        corners[0] = new(rect.Left, rect.Top);
+        corners[1] = new(rect.Right, rect.Top);
+        corners[2] = new(rect.Right, rect.Bottom);
+        corners[3] = new(rect.Left, rect.Bottom);
 
         return corners;
     }
@@ -163,7 +163,7 @@ public class Collider
 
     private static Vector2 GetCenter(Vector2[] corners)
     {
-        return new Vector2(
+        return new(
             (corners[0].X + corners[1].X + corners[2].X + corners[3].X) / 4,
             (corners[0].Y + corners[1].Y + corners[2].Y + corners[3].Y) / 4);
     }

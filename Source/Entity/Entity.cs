@@ -166,7 +166,7 @@ public class Entity : IUpdateEventListener
 
     private void CreateHealthBarTexture()
     {
-        _healthBarTexture = new Texture2D(GameState.Root.GraphicsDevice, 1, 1);
+        _healthBarTexture = new(GameState.Root.GraphicsDevice, 1, 1);
         Color[] data = { Color.White };
         _healthBarTexture.SetData(data);
     }
@@ -197,7 +197,7 @@ public class Entity : IUpdateEventListener
             outline,
             0,
             LayerDepth.HUD,
-            new List<IDrawTaskEffect> { new ColorEffect(outlineColor) },
+            new() { new ColorEffect(outlineColor) },
             Color.Black);
 
         DrawTask empty = new(
@@ -206,7 +206,7 @@ public class Entity : IUpdateEventListener
             emptyHealthBar,
             0,
             LayerDepth.HUD,
-            new List<IDrawTaskEffect> { new ColorEffect(emptyColor) },
+            new() { new ColorEffect(emptyColor) },
             Color.Red);
 
         DrawTask full = new(
@@ -215,9 +215,9 @@ public class Entity : IUpdateEventListener
             fullHealthBar,
             0,
             LayerDepth.HUD,
-            new List<IDrawTaskEffect> { new ColorEffect(fullColor) },
+            new() { new ColorEffect(fullColor) },
             Color.LimeGreen);
 
-        return new List<DrawTask> { background, empty, full };
+        return new() { background, empty, full };
     }
 }

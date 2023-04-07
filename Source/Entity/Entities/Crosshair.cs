@@ -5,20 +5,20 @@ namespace AstralAssault;
 
 public class Crosshair : Entity, IMouseEventListener
 {
-    public Crosshair(GameplayState gameState) : base(gameState, new Vector2(0, 0))
+    public Crosshair(GameplayState gameState) : base(gameState, new(0, 0))
     {
         InputEventSource.MouseButtonEvent += OnMouseButtonEvent;
         InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
 
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Crosshair");
 
-        Frame activeFrame = new(new Rectangle(0, 0, 16, 16));
-        Frame inactiveFrame = new(new Rectangle(16, 0, 16, 16));
+        Frame activeFrame = new(new(0, 0, 16, 16));
+        Frame inactiveFrame = new(new(16, 0, 16, 16));
 
         Animation activeAnimation = new(new[] { activeFrame }, false);
         Animation inactiveAnimation = new(new[] { inactiveFrame }, false);
 
-        SpriteRenderer = new SpriteRenderer(
+        SpriteRenderer = new(
             spriteSheet,
             new[] { activeAnimation, inactiveAnimation },
             LayerDepth.Crosshair);
