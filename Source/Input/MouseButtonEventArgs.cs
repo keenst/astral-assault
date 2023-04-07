@@ -1,4 +1,5 @@
 ﻿using System;
+
 using static AstralAssault.InputEventSource;
 
 namespace AstralAssault;

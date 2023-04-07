@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
 
 public static class AssetManager
 {
-    private static readonly Dictionary<string, Texture2D> Textures = new();
-    private static readonly Dictionary<string, Effect> Effects = new();
+    private static readonly Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
+    private static readonly Dictionary<string, Effect> Effects = new Dictionary<string, Effect>();
     private static Game1 _root;
 
     public static void Init(Game1 root)

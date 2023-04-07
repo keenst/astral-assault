@@ -33,7 +33,7 @@ public static class Palette
         }
     }
 
-    private static readonly List<PaletteColor> PaletteColors = new();
+    private static readonly List<PaletteColor> PaletteColors = new List<PaletteColor>();
 
     public static void Init()
     {
@@ -46,7 +46,7 @@ public static class Palette
             byte g = byte.Parse(line[2..4], System.Globalization.NumberStyles.HexNumber);
             byte b = byte.Parse(line[4..6], System.Globalization.NumberStyles.HexNumber);
 
-            Palette.PaletteColors.Add(new(r, g, b));
+            Palette.PaletteColors.Add(new PaletteColor(r, g, b));
         }
     }
 
@@ -54,13 +54,13 @@ public static class Palette
     {
         PaletteColor color = Palette.PaletteColors[(int)name];
 
-        return new(color.R, color.G, color.B, (byte)(alpha * 255));
+        return new Color(color.R, color.G, color.B, (byte)(alpha * 255));
     }
 
     public static Vector4 GetColorVector(Colors name)
     {
         PaletteColor color = Palette.PaletteColors[(int)name];
 
-        return new(color.R / 255F, color.G / 255F, color.B / 255F, 1);
+        return new Vector4(color.R / 255F, color.G / 255F, color.B / 255F, 1);
     }
 }

@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
 
 public class CollisionSystem
 {
-    public List<Collider> Colliders { get; } = new();
-    private List<Tuple<Collider, Collider>> _lastCollisions = new();
+    public List<Collider> Colliders { get; } = new List<Collider>();
+    private List<Tuple<Collider, Collider>> _lastCollisions = new List<Tuple<Collider, Collider>>();
 
     public void OnUpdate(object sender, UpdateEventArgs e)
     {
-        List<Tuple<Collider, Collider>> currentCollisions = new();
+        List<Tuple<Collider, Collider>> currentCollisions = new List<Tuple<Collider, Collider>>();
 
         for (int i = 0; i < Colliders.Count - 1; i++)
         {
@@ -44,7 +45,7 @@ public class CollisionSystem
                     other.SetPosition(other.Parent.Position.ToPoint());
                 }
 
-                Tuple<Collider, Collider> colliderPair = new(collider, other);
+                Tuple<Collider, Collider> colliderPair = new Tuple<Collider, Collider>(collider, other);
                 currentCollisions.Add(colliderPair);
 
                 if (_lastCollisions.Contains(colliderPair)) continue;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -7,8 +8,8 @@ namespace AstralAssault;
 
 public class DebrisController
 {
-    public readonly ParticleEmitter _particleEmitter;
-    private readonly Random _rnd = new();
+    public readonly ParticleEmitter ParticleEmitter;
+    private readonly Random _rnd = new Random();
     private readonly GameplayState _gameplayState;
 
     public DebrisController(GameplayState gameplayState)
@@ -19,10 +20,7 @@ public class DebrisController
 
         Rectangle[] textureSources =
         {
-            new(0, 0, 8, 8),
-            new(8, 0, 8, 8),
-            new(16, 0, 8, 8),
-            new(32, 0, 8, 8)
+            new Rectangle(0, 0, 8, 8), new Rectangle(8, 0, 8, 8), new Rectangle(16, 0, 8, 8), new Rectangle(32, 0, 8, 8)
         };
 
         IParticleProperty[] particleProperties =
@@ -32,7 +30,7 @@ public class DebrisController
             new CauseOfDeathProperty(CauseOfDeathProperty.CausesOfDeath.OutOfBounds)
         };
 
-        _particleEmitter = new(
+        ParticleEmitter = new ParticleEmitter(
             particleSpriteSheet,
             textureSources,
             0,
@@ -50,9 +48,9 @@ public class DebrisController
             position.Y - _gameplayState.Player.Position.Y,
             position.X - _gameplayState.Player.Position.X);
 
-        _particleEmitter.SetTransform(position, angleFromPlayer);
-        _particleEmitter.StartSpawning(amount);
+        ParticleEmitter.SetTransform(position, angleFromPlayer);
+        ParticleEmitter.StartSpawning(amount);
     }
 
-    public List<DrawTask> GetDrawTasks() => _particleEmitter.CreateDrawTasks();
+    public List<DrawTask> GetDrawTasks() => ParticleEmitter.CreateDrawTasks();
 }

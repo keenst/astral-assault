@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
@@ -24,7 +25,7 @@ public class WaveController
         GameState = gameState;
         _root = root;
 
-        _debrisController = new(gameState);
+        _debrisController = new DebrisController(gameState);
 
         StartNextWave();
     }
@@ -35,7 +36,7 @@ public class WaveController
 
         int enemiesToSpawn = (int)(_currentWave * 1.5F);
 
-        Random rnd = new();
+        Random rnd = new Random();
 
         for (int i = 0; i < enemiesToSpawn; i++)
         {
@@ -59,10 +60,10 @@ public class WaveController
                 _ => throw new ArgumentOutOfRangeException()
             };
 
-            Vector2 position = new(x, y);
+            Vector2 position = new Vector2(x, y);
             Asteroid.Sizes size = (Asteroid.Sizes)rnd.Next(0, 3);
 
-            Vector2 gameCenter = new(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F);
+            Vector2 gameCenter = new Vector2(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F);
             float angleToCenter = MathF.Atan2(gameCenter.Y - position.Y, gameCenter.X - position.X);
             angleToCenter += MathHelper.ToRadians(rnd.Next(-45, 45));
 
@@ -80,7 +81,7 @@ public class WaveController
         if (!_drawWaveText) return drawTasks;
 
         string text = $"Wave: {_currentWave}";
-        drawTasks.AddRange(text.CreateDrawTasks(new(10, 10), Palette.GetColor(Palette.Colors.Grey9), LayerDepth.HUD));
+        drawTasks.AddRange(text.CreateDrawTasks(new Vector2(10, 10), Palette.GetColor(Palette.Colors.Grey9), LayerDepth.HUD));
 
         return drawTasks;
     }

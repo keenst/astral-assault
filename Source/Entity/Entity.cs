@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Vector4 = Microsoft.Xna.Framework.Vector4;
 
@@ -122,7 +124,7 @@ public class Entity
 
     public virtual List<DrawTask> GetDrawTasks()
     {
-        List<DrawTask> drawTasks = new();
+        List<DrawTask> drawTasks = new List<DrawTask>();
 
         if (_isHighlighted)
         {
@@ -164,7 +166,7 @@ public class Entity
 
     private void CreateHealthBarTexture()
     {
-        _healthBarTexture = new(GameState.Root.GraphicsDevice, 1, 1);
+        _healthBarTexture = new Texture2D(GameState.Root.GraphicsDevice, 1, 1);
         Color[] data = { Palette.GetColor(Palette.Colors.Grey9) };
         _healthBarTexture.SetData(data);
     }
@@ -179,43 +181,25 @@ public class Entity
         int x = (int)Position.X - width / 2;
         int y = (int)Position.Y - 20;
 
-        Rectangle outline = new(x - 1, y - 1, width + 2, height + 2);
-        Rectangle emptyHealthBar = new(x, y, width, height);
-        Rectangle fullHealthBar = new(x, y, filled, height);
+        Rectangle outline = new Rectangle(x - 1, y - 1, width + 2, height + 2);
+        Rectangle emptyHealthBar = new Rectangle(x, y, width, height);
+        Rectangle fullHealthBar = new Rectangle(x, y, filled, height);
 
         Vector4 outlineColor = Palette.GetColorVector(Palette.Colors.Black);
         Vector4 emptyColor = Palette.GetColorVector(Palette.Colors.Red6);
         Vector4 fullColor = Palette.GetColorVector(Palette.Colors.Green7);
 
-        Rectangle source = new(0, 0, 1, 1);
+        Rectangle source = new Rectangle(0, 0, 1, 1);
 
-        DrawTask background = new(
-            _healthBarTexture,
-            source,
-            outline,
-            0,
-            LayerDepth.HUD,
-            new() { new ColorEffect(outlineColor) },
-            Palette.GetColor(Palette.Colors.Black));
+        DrawTask background = new DrawTask(_healthBarTexture, source, outline, 0, LayerDepth.HUD,
+            new List<IDrawTaskEffect> { new ColorEffect(outlineColor) }, Palette.GetColor(Palette.Colors.Black));
 
-        DrawTask empty = new(
-            _healthBarTexture,
-            source,
-            emptyHealthBar,
-            0,
-            LayerDepth.HUD,
-            new() { new ColorEffect(emptyColor) },
-            Palette.GetColor(Palette.Colors.Red9));
+        DrawTask empty = new DrawTask(_healthBarTexture, source, emptyHealthBar, 0, LayerDepth.HUD,
+            new List<IDrawTaskEffect> { new ColorEffect(emptyColor) }, Palette.GetColor(Palette.Colors.Red9));
 
-        DrawTask full = new(
-            _healthBarTexture,
-            source,
-            fullHealthBar,
-            0,
-            LayerDepth.HUD,
-            new() { new ColorEffect(fullColor) },
-            Palette.GetColor(Palette.Colors.Green9));
+        DrawTask full = new DrawTask(_healthBarTexture, source, fullHealthBar, 0, LayerDepth.HUD,
+            new List<IDrawTaskEffect> { new ColorEffect(fullColor) }, Palette.GetColor(Palette.Colors.Green9));
 
-        return new() { background, empty, full };
+        return new List<DrawTask> { background, empty, full };
     }
 }

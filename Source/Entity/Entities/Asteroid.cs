@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -30,7 +31,7 @@ public class Asteroid : Entity
 
         _size = size;
 
-        Random rnd = new();
+        Random rnd = new Random();
         _rotSpeed = rnd.Next(5, 20) / 10F;
         int speed = rnd.Next(30, 100);
 
@@ -80,21 +81,18 @@ public class Asteroid : Entity
                 throw new ArgumentOutOfRangeException();
         }
 
-        Frame frame = new(
-            new(0, 0, spriteSize, spriteSize),
-            new(spriteSize, 0, spriteSize, spriteSize),
-            new(spriteSize * 2, 0, spriteSize, spriteSize),
-            new(spriteSize * 3, 0, spriteSize, spriteSize));
+        Frame frame = new Frame(new Rectangle(0, 0, spriteSize, spriteSize), new Rectangle(spriteSize, 0, spriteSize, spriteSize),
+            new Rectangle(spriteSize * 2, 0, spriteSize, spriteSize), new Rectangle(spriteSize * 3, 0, spriteSize, spriteSize));
 
-        Animation animation = new(new[] { frame }, true);
+        Animation animation = new Animation(new[] { frame }, true);
 
-        SpriteRenderer = new(spriteSheet, new[] { animation }, LayerDepth.Foreground);
+        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
 
-        Collider = new(
+        Collider = new Collider(
             this,
-            new(
-                new((int)Position.X - colliderSize / 2, (int)Position.Y - colliderSize / 2),
-                new(colliderSize, colliderSize)),
+            new Rectangle(
+                new Point((int)Position.X - colliderSize / 2, (int)Position.Y - colliderSize / 2),
+                new Point(colliderSize, colliderSize)),
             true,
             mass);
         GameState.CollisionSystem.AddCollider(Collider);
@@ -108,7 +106,7 @@ public class Asteroid : Entity
     {
         if (!_hasExploded && _size - 1 >= 0)
         {
-            Random rnd = new();
+            Random rnd = new Random();
             int amount = rnd.Next(1, 4);
 
             Vector2 playerPosition = GameState.Player.Position;
@@ -134,7 +132,7 @@ public class Asteroid : Entity
     {
         base.OnUpdate(sender, e);
 
-        _debrisController._particleEmitter.OnUpdate(sender, e);
+        _debrisController.ParticleEmitter.OnUpdate(sender, e);
 
         Rotation += _rotSpeed * e.DeltaTime;
         if (Rotation > Math.PI) Rotation = (float)-Math.PI;

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -13,7 +14,7 @@ public static class TextRenderer
     public static void Init()
     {
         TextRenderer._font = AssetManager.Load<Texture2D>("font");
-        TextRenderer._dict = new()
+        TextRenderer._dict = new Dictionary<char, int>
         {
             { 'A', 0 },
             { 'B', 1 },
@@ -66,22 +67,22 @@ public static class TextRenderer
         LayerDepth layerDepth)
     {
         string text = input.ToUpper();
-        List<DrawTask> drawTasks = new();
+        List<DrawTask> drawTasks = new List<DrawTask>();
 
         for (int i = 0; i < text.Length; i++)
         {
             int x = TextRenderer._dict[text[i]] % 6;
             int y = TextRenderer._dict[text[i]] / 6;
 
-            Rectangle source = new(x * 10, y * 10, 10, 10);
+            Rectangle source = new Rectangle(x * 10, y * 10, 10, 10);
 
-            drawTasks.Add(new(
+            drawTasks.Add(new DrawTask(
                 TextRenderer._font,
                 source,
-                new(position.X + i * 10, position.Y),
+                new Vector2(position.X + i * 10, position.Y),
                 0,
                 layerDepth,
-                new(),
+                new List<IDrawTaskEffect>(),
                 color,
                 Vector2.Zero));
         }

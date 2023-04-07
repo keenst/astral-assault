@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 
@@ -34,7 +36,7 @@ public class Game1 : Game
     private static readonly Effect ColorEffect = AssetManager.Load<Effect>("Color");
 
     // display
-    private static readonly Color BackgroundColor = new(28, 23, 41);
+    private static readonly Color BackgroundColor = new Color(28, 23, 41);
     public const int TargetWidth = (int)Width.Quarter;
     public const int TargetHeight = (int)Height.Quarter;
     private readonly Matrix _scale;
@@ -52,7 +54,7 @@ public class Game1 : Game
     public Game1()
     {
         // set up game class
-        GraphicsDeviceManager graphics = new(this);
+        GraphicsDeviceManager graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
 
         // set up rendering
@@ -71,7 +73,7 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        _renderTarget = new(
+        _renderTarget = new RenderTarget2D(
             GraphicsDevice,
             GraphicsDevice.PresentationParameters.BackBufferWidth,
             GraphicsDevice.PresentationParameters.BackBufferHeight,
@@ -84,14 +86,14 @@ public class Game1 : Game
         InputEventSource.Init();
         Palette.Init();
 
-        GameStateMachine = new(new GameplayState(this));
+        GameStateMachine = new GameStateMachine(new GameplayState(this));
 
         base.Initialize();
     }
 
     protected override void LoadContent()
     {
-        _spriteBatch = new(GraphicsDevice);
+        _spriteBatch = new SpriteBatch(GraphicsDevice);
     }
 
     protected override void Update(GameTime gameTime)
@@ -137,7 +139,7 @@ public class Game1 : Game
             List<DrawTask> frameRateTask =
                 frameRate.CreateDrawTasks(Vector2.Zero, Palette.GetColor(Palette.Colors.Yellow9), LayerDepth.Debug);
             List<DrawTask> renderTimeTask =
-                renderTime.CreateDrawTasks(new(0, 9), Palette.GetColor(Palette.Colors.Yellow9), LayerDepth.Debug);
+                renderTime.CreateDrawTasks(new Vector2(0, 9), Palette.GetColor(Palette.Colors.Yellow9), LayerDepth.Debug);
 
             drawTasks.AddRange(frameRateTask);
             drawTasks.AddRange(renderTimeTask);

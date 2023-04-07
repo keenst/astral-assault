@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -10,23 +11,23 @@ public class Bullet : Entity
     {
         Velocity = Vector2.UnitX.RotateVector(rotation) * speed;
 
-        Texture2D spriteSheet = new(GameState.Root.GraphicsDevice, 2, 2);
+        Texture2D spriteSheet = new Texture2D(GameState.Root.GraphicsDevice, 2, 2);
 
         Color[] data = new Color[2 * 2];
         for (int i = 0; i < data.Length; ++i) data[i] = Palette.GetColor(Palette.Colors.Grey9);
         spriteSheet.SetData(data);
 
-        Frame frame = new(new(0, 0, 2, 2));
+        Frame frame = new Frame(new Rectangle(0, 0, 2, 2));
 
-        Animation animation = new(new[] { frame }, false);
+        Animation animation = new Animation(new[] { frame }, false);
 
-        SpriteRenderer = new(spriteSheet, new[] { animation }, LayerDepth.Foreground);
+        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
 
-        Collider = new(
+        Collider = new Collider(
             this,
-            new(
-                new((int)Position.X - 1, (int)Position.Y - 1),
-                new(2, 2)));
+            new Rectangle(
+                new Point((int)Position.X - 1, (int)Position.Y - 1),
+                new Point(2, 2)));
         GameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Destroy;

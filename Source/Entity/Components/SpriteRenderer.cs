@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -15,7 +16,7 @@ public class SpriteRenderer
     public int ActiveAnimationIndex => _animations.ToList().IndexOf(_activeAnimation);
     private int _activeFrame;
     private long _lastFrameUpdate;
-    public readonly EffectContainer EffectContainer = new();
+    public readonly EffectContainer EffectContainer = new EffectContainer();
 
     public const float Pi = 3.14F;
 
@@ -52,20 +53,21 @@ public class SpriteRenderer
         _lastFrameUpdate = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
     }
 
-    public DrawTask CreateDrawTask(Vector2 position, float rotation) => _activeAnimation.HasRotation ? DrawRotatable(position, rotation) : DrawStatic(position);
+    public DrawTask CreateDrawTask(Vector2 position, float rotation) =>
+        _activeAnimation.HasRotation ? DrawRotatable(position, rotation) : DrawStatic(position);
 
     private DrawTask DrawStatic(Vector2 position)
     {
         Rectangle source = _activeAnimation.Frames[_activeFrame].Source;
 
-        return new(_spriteSheet, source, position, 0, _layerDepth, EffectContainer.Effects);
+        return new DrawTask(_spriteSheet, source, position, 0, _layerDepth, EffectContainer.Effects);
     }
 
     private DrawTask DrawRotatable(Vector2 position, float rotation)
     {
         (float spriteRotation, Rectangle source) = GetRotation(rotation);
 
-        return new(_spriteSheet, source, position, spriteRotation, _layerDepth, EffectContainer.Effects);
+        return new DrawTask(_spriteSheet, source, position, spriteRotation, _layerDepth, EffectContainer.Effects);
     }
 
     private Tuple<float, Rectangle> GetRotation(float rotation)
@@ -80,7 +82,7 @@ public class SpriteRenderer
             source = _activeAnimation.Frames[_activeFrame].Rotations[0];
             spriteRotation = SpriteRenderer.Pi / 8 * rot;
 
-            return new(spriteRotation, source);
+            return new Tuple<float, Rectangle>(spriteRotation, source);
         }
 
         spriteRotation = rotation switch
@@ -94,6 +96,6 @@ public class SpriteRenderer
 
         source = _activeAnimation.Frames[_activeFrame].Rotations[rot.Mod(4)];
 
-        return new(spriteRotation, source);
+        return new Tuple<float, Rectangle>(spriteRotation, source);
     }
 }

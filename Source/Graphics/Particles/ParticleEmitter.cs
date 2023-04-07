@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -11,7 +12,7 @@ public class ParticleEmitter
     private readonly Texture2D _spriteSheet;
     private readonly Rectangle[] _textureSources;
     private readonly int _particlesPerSecond;
-    private readonly List<Particle> _particles = new();
+    private readonly List<Particle> _particles = new List<Particle>();
     private readonly IParticleProperty[] _particleProperties;
     private readonly LayerDepth _layerDepth;
     private Vector2 _position;
@@ -39,7 +40,7 @@ public class ParticleEmitter
         _particleProperties = particleProperties;
         _layerDepth = layerDepth;
 
-        List<Type> particlePropertyTypes = new();
+        List<Type> particlePropertyTypes = new List<Type>();
 
         foreach (IParticleProperty particleProperty in particleProperties)
         {
@@ -122,11 +123,11 @@ public class ParticleEmitter
 
     public List<DrawTask> CreateDrawTasks()
     {
-        List<DrawTask> drawTasks = new();
+        List<DrawTask> drawTasks = new List<DrawTask>();
 
         foreach (Particle particle in _particles.Where(p => p.IsActive))
         {
-            drawTasks.Add(new(
+            drawTasks.Add(new DrawTask(
                 _spriteSheet,
                 _textureSources[particle.TextureIndex],
                 particle.Position,
@@ -144,7 +145,7 @@ public class ParticleEmitter
 
         if (_particles.All(p => p.IsActive))
         {
-            _particles.Add(new(textureIndex, startingPosition, velocity, timeNow));
+            _particles.Add(new Particle(textureIndex, startingPosition, velocity, timeNow));
 
             return;
         }
@@ -161,17 +162,14 @@ public class ParticleEmitter
             {
                 case CauseOfDeathProperty causeOfDeathProperty:
                     ParticleEmitter.HandleCauseOfDeathProperty(particle, causeOfDeathProperty);
-
                     break;
 
                 case ColorChangeProperty colorChangeProperty:
                     ParticleEmitter.HandleColorChangeProperty(particle, colorChangeProperty);
-
                     break;
 
                 case SpriteChangeProperty spriteChangeProperty:
                     ParticleEmitter.HandleSpriteChangeProperty(particle, spriteChangeProperty);
-
                     break;
             }
         }

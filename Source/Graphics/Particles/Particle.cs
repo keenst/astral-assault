@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
@@ -9,7 +10,7 @@ public class Particle
 {
     private Vector2 _startingPosition;
     private Vector2 _velocity;
-    public EffectContainer EffectContainer = new();
+    public EffectContainer EffectContainer = new EffectContainer();
 
     public int TextureIndex { get; set; }
     public long TimeSpawned { get; private set; }

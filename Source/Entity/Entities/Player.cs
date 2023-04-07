@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace AstralAssault;
@@ -12,7 +14,7 @@ namespace AstralAssault;
 public class Player : Entity, IInputEventListener
 {
     private Vector2 _cursorPosition;
-    private Tuple<Vector2, Vector2> _muzzle = new(Vector2.Zero, Vector2.Zero);
+    private Tuple<Vector2, Vector2> _muzzle = new Tuple<Vector2, Vector2>(Vector2.Zero, Vector2.Zero);
     private bool _lastCannon;
     private bool _isCrosshairActive = true;
     private bool _thrusterIsOn;
@@ -37,11 +39,11 @@ public class Player : Entity, IInputEventListener
 
         StartListening();
 
-        Collider = new(
+        Collider = new Collider(
             this,
-            new(
-                new((int)Position.X - 12, (int)Position.Y - 12),
-                new(24, 24)),
+            new Rectangle(
+                new Point((int)Position.X - 12, (int)Position.Y - 12),
+                new Point(24, 24)),
             true,
             10);
         GameState.CollisionSystem.AddCollider(Collider);
@@ -50,10 +52,7 @@ public class Player : Entity, IInputEventListener
 
         Rectangle[] textureSources =
         {
-            new(24, 0, 8, 8),
-            new(16, 0, 8, 8),
-            new(8, 0, 8, 8),
-            new(0, 0, 8, 8)
+            new Rectangle(24, 0, 8, 8), new Rectangle(16, 0, 8, 8), new Rectangle(8, 0, 8, 8), new Rectangle(0, 0, 8, 8)
         };
 
         IParticleProperty[] particleProperties =
@@ -75,7 +74,7 @@ public class Player : Entity, IInputEventListener
             new VelocityProperty(-1F, 1F, 0.04F, 0.1F)
         };
 
-        _particleEmitter = new(
+        _particleEmitter = new ParticleEmitter(
             particleSpriteSheet,
             textureSources,
             20,
@@ -98,20 +97,16 @@ public class Player : Entity, IInputEventListener
     {
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Player");
 
-        Frame frame = new(
-            new(0, 0, 32, 32),
-            new(32, 0, 32, 32),
-            new(64, 0, 32, 32),
-            new(96, 0, 32, 32));
+        Frame frame = new Frame(new Rectangle(0, 0, 32, 32), new Rectangle(32, 0, 32, 32), new Rectangle(64, 0, 32, 32), new Rectangle(96, 0, 32, 32));
 
-        Animation animation = new(new[] { frame }, true);
+        Animation animation = new Animation(new[] { frame }, true);
 
-        SpriteRenderer = new(spriteSheet, new[] { animation }, LayerDepth.Foreground);
+        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
     }
 
     public override List<DrawTask> GetDrawTasks()
     {
-        List<DrawTask> drawTasks = new();
+        List<DrawTask> drawTasks = new List<DrawTask>();
 
         if (_thrusterIsOn)
         {
@@ -155,7 +150,7 @@ public class Player : Entity, IInputEventListener
             _delta;
 
         // apply velocity vectors
-        Velocity = new(
+        Velocity = new Vector2(
             Math.Clamp(Velocity.X + forward.X * yAxis + right.X * xAxis, -Player.MaxSpeed, Player.MaxSpeed),
             Math.Clamp(Velocity.Y + forward.Y * yAxis + right.Y * xAxis, -Player.MaxSpeed, Player.MaxSpeed));
 
@@ -237,7 +232,7 @@ public class Player : Entity, IInputEventListener
 
     public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
     {
-        Point scale = new((int)GameState.Root.ScaleX, (int)GameState.Root.ScaleY);
+        Point scale = new Point((int)GameState.Root.ScaleX, (int)GameState.Root.ScaleY);
         _cursorPosition.X = e.Position.ToVector2().X / scale.X;
         _cursorPosition.Y = e.Position.ToVector2().Y / scale.Y;
     }
@@ -285,7 +280,7 @@ public class Player : Entity, IInputEventListener
         // rotate the points for the cannon muzzles
         float rot = Player.Pi / 8 * (float)Math.Round(Rotation / (Player.Pi / 8));
 
-        _muzzle = new(
+        _muzzle = new Tuple<Vector2, Vector2>(
             Position + new Vector2(10, -8).RotateVector(rot),
             Position + new Vector2(8, 10).RotateVector(rot));
 

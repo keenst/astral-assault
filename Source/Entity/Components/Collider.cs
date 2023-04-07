@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
@@ -42,7 +43,7 @@ public class Collider
         out Vector2 totalImpulseThis,
         out Vector2 totalImpulseOther)
     {
-        List<Vector2> axes = new();
+        List<Vector2> axes = new List<Vector2>();
         axes.AddRange(_axes);
         axes.AddRange(other._axes);
 
@@ -146,22 +147,22 @@ public class Collider
     private static Vector2[] GetCorners(Rectangle rect)
     {
         Vector2[] corners = new Vector2[4];
-        corners[0] = new(rect.Left, rect.Top);
-        corners[1] = new(rect.Right, rect.Top);
-        corners[2] = new(rect.Right, rect.Bottom);
-        corners[3] = new(rect.Left, rect.Bottom);
+        corners[0] = new Vector2(rect.Left, rect.Top);
+        corners[1] = new Vector2(rect.Right, rect.Top);
+        corners[2] = new Vector2(rect.Right, rect.Bottom);
+        corners[3] = new Vector2(rect.Left, rect.Bottom);
 
         return corners;
     }
 
     private static Vector2[] GetAxes(Vector2[] corners)
     {
-        List<Vector2> axes = new();
+        List<Vector2> axes = new List<Vector2>();
 
         for (int i = 0; i < corners.Length; i++)
         {
             Vector2 edge = corners[(i + 1) % corners.Length] - corners[i];
-            Vector2 axis = new(-edge.Y, edge.X);
+            Vector2 axis = new Vector2(-edge.Y, edge.X);
             axis.Normalize();
 
             if (axes.Contains(axis)) continue;
@@ -172,8 +173,7 @@ public class Collider
         return axes.ToArray();
     }
 
-    private static Vector2 GetCenter(Vector2[] corners) =>
-        new(
-            (corners[0].X + corners[1].X + corners[2].X + corners[3].X) / 4,
-            (corners[0].Y + corners[1].Y + corners[2].Y + corners[3].Y) / 4);
+    private static Vector2 GetCenter(Vector2[] corners) => new Vector2(
+        (corners[0].X + corners[1].X + corners[2].X + corners[3].X) / 4,
+        (corners[0].Y + corners[1].Y + corners[2].Y + corners[3].Y) / 4);
 }

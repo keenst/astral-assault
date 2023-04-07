@@ -10,7 +10,7 @@ namespace AstralAssault
 
         internal EffectContainer(List<IDrawTaskEffect> effects) => Effects = effects;
 
-        internal EffectContainer() => Effects = new();
+        internal EffectContainer() => Effects = new List<IDrawTaskEffect>();
 
         internal void SetEffect<TEffect, TParameter>(TParameter parameter)
         {

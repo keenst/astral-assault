@@ -1,4 +1,5 @@
 using System;
+
 using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
@@ -47,7 +48,7 @@ public struct VelocityProperty : IParticleProperty
     {
         if (!IsRange) return Velocity;
 
-        Random rnd = new();
+        Random rnd = new Random();
         float multiplierAngle = rnd.NextSingle();
         float multiplierSpeed = rnd.NextSingle();
 

@@ -5,20 +5,20 @@ namespace AstralAssault;
 
 public class Crosshair : Entity, IMouseEventListener
 {
-    public Crosshair(GameplayState gameState) : base(gameState, new(0, 0))
+    public Crosshair(GameplayState gameState) : base(gameState, new Vector2(0, 0))
     {
         InputEventSource.MouseButtonEvent += OnMouseButtonEvent;
         InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
 
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Crosshair");
 
-        Frame activeFrame = new(new(0, 0, 16, 16));
-        Frame inactiveFrame = new(new(16, 0, 16, 16));
+        Frame activeFrame = new Frame(new Rectangle(0, 0, 16, 16));
+        Frame inactiveFrame = new Frame(new Rectangle(16, 0, 16, 16));
 
-        Animation activeAnimation = new(new[] { activeFrame }, false);
-        Animation inactiveAnimation = new(new[] { inactiveFrame }, false);
+        Animation activeAnimation = new Animation(new[] { activeFrame }, false);
+        Animation inactiveAnimation = new Animation(new[] { inactiveFrame }, false);
 
-        SpriteRenderer = new(
+        SpriteRenderer = new SpriteRenderer(
             spriteSheet,
             new[] { activeAnimation, inactiveAnimation },
             LayerDepth.Crosshair);
@@ -48,7 +48,7 @@ public class Crosshair : Entity, IMouseEventListener
 
     public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
     {
-        Point scale = new((int)GameState.Root.ScaleX, (int)GameState.Root.ScaleY);
+        Point scale = new Point((int)GameState.Root.ScaleX, (int)GameState.Root.ScaleY);
         Position = (e.Position / scale).ToVector2();
     }
 }

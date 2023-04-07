@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -12,7 +13,7 @@ public struct DrawTask
     public Rectangle Destination { get; }
     public float Rotation { get; }
     public LayerDepth LayerDepth { get; }
-    public EffectContainer EffectContainer = new();
+    public EffectContainer EffectContainer = new EffectContainer();
     public Color Color { get; }
     public Vector2 Origin { get; }
 
@@ -30,9 +31,9 @@ public struct DrawTask
         Destination = destination;
         Rotation = rotation;
         LayerDepth = layerDepth;
-        EffectContainer = new(effects);
+        EffectContainer = new EffectContainer(effects);
         Color = color;
-        Origin = new(
+        Origin = new Vector2(
             (float)Math.Round(Source.Width / 2D),
             (float)Math.Round(Source.Height / 2D));
     }
@@ -49,14 +50,14 @@ public struct DrawTask
     {
         Texture = texture;
         Source = source;
-        Destination = new(
+        Destination = new Rectangle(
             (int)position.X,
             (int)position.Y,
             source.Width,
             source.Height);
         Rotation = rotation;
         LayerDepth = layerDepth;
-        EffectContainer = new(effects);
+        EffectContainer = new EffectContainer(effects);
         Color = color;
         Origin = origin;
     }
@@ -71,19 +72,19 @@ public struct DrawTask
         Vector2 origin)
     {
         Texture = texture;
-        Source = new(
+        Source = new Rectangle(
             0,
             0,
             texture.Width,
             texture.Height);
-        Destination = new(
+        Destination = new Rectangle(
             (int)position.X,
             (int)position.Y,
             Source.Width,
             Source.Height);
         Rotation = rotation;
         LayerDepth = layerDepth;
-        EffectContainer = new(effects);
+        EffectContainer = new EffectContainer(effects);
         Color = color;
         Origin = origin;
     }
@@ -98,16 +99,16 @@ public struct DrawTask
     {
         Texture = texture;
         Source = source;
-        Destination = new(
+        Destination = new Rectangle(
             (int)position.X,
             (int)position.Y,
             source.Width,
             source.Height);
         Rotation = rotation;
         LayerDepth = layerDepth;
-        EffectContainer = new(effects);
+        EffectContainer = new EffectContainer(effects);
         Color = Palette.GetColor(Palette.Colors.Grey9);
-        Origin = new(
+        Origin = new Vector2(
             (float)Math.Round(Source.Width / 2D),
             (float)Math.Round(Source.Height / 2D));
     }
@@ -120,21 +121,21 @@ public struct DrawTask
         List<IDrawTaskEffect> effects)
     {
         Texture = texture;
-        Source = new(
+        Source = new Rectangle(
             0,
             0,
             texture.Width,
             texture.Height);
-        Destination = new(
+        Destination = new Rectangle(
             (int)position.X,
             (int)position.Y,
             Source.Width,
             Source.Height);
         Rotation = rotation;
         LayerDepth = layerDepth;
-        EffectContainer = new(effects);
+        EffectContainer = new EffectContainer(effects);
         Color = Palette.GetColor(Palette.Colors.Grey9);
-        Origin = new(
+        Origin = new Vector2(
             (float)Math.Round(Source.Width / 2D),
             (float)Math.Round(Source.Height / 2D));
     }
