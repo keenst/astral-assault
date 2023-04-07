@@ -36,10 +36,7 @@ public struct VelocityProperty : IParticleProperty
         _speedRangeStart = speed;
         _speedRangeEnd = speed;
 
-        Vector2 normal = new(
-            (float)Math.Cos(angle),
-            (float)Math.Sin(angle)
-        );
+        Vector2 normal = Vector2.UnitY.RotateVector(angle);
 
         Velocity = normal * speed;
 
@@ -57,10 +54,7 @@ public struct VelocityProperty : IParticleProperty
         float angle = _angleRangeStart + (_angleRangeEnd - _angleRangeStart) * multiplierAngle;
         float speed = _speedRangeStart + (_speedRangeEnd - _speedRangeStart) * multiplierSpeed;
 
-        Vector2 normal = new(
-            (float)Math.Cos(angle),
-            (float)Math.Sin(angle)
-        );
+        Vector2 normal = Vector2.UnitY.RotateVector(angle);
 
         return normal * speed;
     }
