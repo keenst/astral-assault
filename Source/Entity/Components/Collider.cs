@@ -45,7 +45,18 @@ public class Collider
         List<Vector2> axes = new();
         axes.AddRange(_axes);
         axes.AddRange(other._axes);
-        axes = axes.Distinct().ToList();
+
+        for (int i = 0; i < axes.Count; i++)
+        {
+            for (int j = i + 1; j < axes.Count; j++)
+            {
+                if (axes[i] == axes[j])
+                {
+                    axes.RemoveAt(j);
+                    j--;
+                }
+            }
+        }
 
         float minOverlap = float.MaxValue;
 
@@ -161,10 +172,8 @@ public class Collider
         return axes.ToArray();
     }
 
-    private static Vector2 GetCenter(Vector2[] corners)
-    {
-        return new(
+    private static Vector2 GetCenter(Vector2[] corners) =>
+        new(
             (corners[0].X + corners[1].X + corners[2].X + corners[3].X) / 4,
             (corners[0].Y + corners[1].Y + corners[2].Y + corners[3].Y) / 4);
-    }
 }

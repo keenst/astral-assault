@@ -52,10 +52,7 @@ public class SpriteRenderer
         _lastFrameUpdate = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
     }
 
-    public DrawTask CreateDrawTask(Vector2 position, float rotation)
-    {
-        return _activeAnimation.HasRotation ? DrawRotatable(position, rotation) : DrawStatic(position);
-    }
+    public DrawTask CreateDrawTask(Vector2 position, float rotation) => _activeAnimation.HasRotation ? DrawRotatable(position, rotation) : DrawStatic(position);
 
     private DrawTask DrawStatic(Vector2 position)
     {

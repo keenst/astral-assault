@@ -10,10 +10,7 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
     private Texture2D _gameOverText;
     private Texture2D _restartPrompt;
 
-    public GameOverState(Game1 root) : base(root)
-    {
-        InputEventSource.KeyboardPressedEvent += OnKeyboardPressedEvent;
-    }
+    public GameOverState(Game1 root) : base(root) => InputEventSource.KeyboardPressedEvent += OnKeyboardPressedEvent;
 
     public override List<DrawTask> GetDrawTasks()
     {

@@ -32,7 +32,7 @@ public class CollisionSystem
                         out Vector2 totalImpulseOther))
                     continue;
 
-                if (collider.IsSolid && other.IsSolid && collider.Parent.TimeSinceSpawned > 1000)
+                if (collider.IsSolid && other.IsSolid && collider.Parent.TimeSinceSpawned > 512)
                 {
                     collider.Parent.Position += initialImpulseThis * e.DeltaTime;
                     other.Parent.Position += initialImpulseOther * e.DeltaTime;

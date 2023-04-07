@@ -19,8 +19,5 @@ public class GameStateMachine
         _currentState.Enter();
     }
 
-    public List<DrawTask> GetDrawTasks()
-    {
-        return _currentState.GetDrawTasks();
-    }
+    public List<DrawTask> GetDrawTasks() => _currentState.GetDrawTasks();
 }

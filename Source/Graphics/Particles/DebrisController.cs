@@ -54,8 +54,5 @@ public class DebrisController
         _particleEmitter.StartSpawning(amount);
     }
 
-    public List<DrawTask> GetDrawTasks()
-    {
-        return _particleEmitter.CreateDrawTasks();
-    }
+    public List<DrawTask> GetDrawTasks() => _particleEmitter.CreateDrawTasks();
 }

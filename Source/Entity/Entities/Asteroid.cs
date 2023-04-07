@@ -34,7 +34,7 @@ public class Asteroid : Entity
         _rotSpeed = rnd.Next(5, 20) / 10F;
         int speed = rnd.Next(30, 100);
 
-        Velocity = Vector2.UnitY.RotateVector(direction) * speed;
+        Velocity = Vector2.UnitY.RotateVector(-direction) * speed;
 
         Texture2D spriteSheet;
         int colliderSize;

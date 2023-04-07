@@ -290,7 +290,7 @@ public class Player : Entity, IInputEventListener
             Position + new Vector2(8, 10).RotateVector(rot));
 
         float emitterRotation = (Rotation + Player.Pi) % (2 * Player.Pi);
-        Vector2 emitterPosition = this.Position + new Vector2(11, 0).RotateVector(emitterRotation);
+        Vector2 emitterPosition = Position + new Vector2(11, 0).RotateVector(emitterRotation);
 
         _particleEmitter.SetTransform(emitterPosition, emitterRotation);
     }
