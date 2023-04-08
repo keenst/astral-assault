@@ -119,7 +119,7 @@ public class SpriteRenderer : IUpdateEventListener
     
     private DrawTask DrawStatic(Vector2 position)
     {
-        Rectangle source = _activeAnimation.Frames[_activeFrame].Source;
+        Rectangle source = CurrentAnimation.Frames[_currentFrameIndex].Source;
         return new DrawTask(_spriteSheet, source, position, 0, _layerDepth, EffectContainer.Effects);
     }
 
