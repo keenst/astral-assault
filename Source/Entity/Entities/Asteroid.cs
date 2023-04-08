@@ -80,9 +80,7 @@ public class Asteroid : Entity
              se:new Rectangle(spriteSize * 2, 0, spriteSize, spriteSize),
             sse:new Rectangle(spriteSize * 3, 0, spriteSize, spriteSize));
 
-        Animation animation = new(new[] { frame }, true);
-
-        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
+        SpriteRenderer = new SpriteRenderer(spriteSheet, frame, LayerDepth.Foreground);
         
         Collider = new Collider(
             this, 

@@ -57,7 +57,6 @@ public static class InputEventSource
         if (_keysDown.Count == 0)
         {
             _prevKeysDown.Clear();
-            return;
         }
 
         List<Keys> keysDown = new();

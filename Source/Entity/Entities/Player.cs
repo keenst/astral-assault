@@ -98,15 +98,56 @@ public class Player : Entity, IInputEventListener
     {
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Player");
         
-        Frame frame = new(
-            new Rectangle(0, 0, 32, 32),
-            new Rectangle(32, 0, 32, 32),
-            new Rectangle(64, 0, 32, 32),
-            new Rectangle(96, 0, 32, 32));
+        Animation idleAnimation = new(
+            new[]
+            {
+                new Frame(
+                    new Rectangle(0, 0,  32, 32),
+                    new Rectangle(0, 32, 32, 32),
+                    new Rectangle(0, 64, 32, 32),
+                    new Rectangle(0, 96, 32, 32), 
+                    120)
+            }, 
+            true);
 
-        Animation animation = new(new[] { frame }, true);
+        Animation tiltRightAnimation = new(
+            new[]
+            {
+                new Frame(
+                    new Rectangle(352, 0,  32, 32),
+                    new Rectangle(352, 32, 32, 32),
+                    new Rectangle(352, 64, 32, 32),
+                    new Rectangle(352, 96, 32, 32))
+            },
+            true);
 
-        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
+        Animation tiltLeftAnimation = new(
+            new[]
+            {
+                new Frame(
+                    new Rectangle(32, 0,  32, 32),
+                    new Rectangle(32, 32, 32, 32),
+                    new Rectangle(32, 64, 32, 32),
+                    new Rectangle(32, 96, 32, 32))
+            },
+            true);
+
+        Transition[] transitions =
+        {
+            new(1, 0, new[] { 0 },    "Tilt",  0),
+            new(0, 1, new[] { 1 },    "Tilt",  1),
+            new(0, 2, new[] { 2 },    "Tilt", -1),
+            new(2, 0, new[] { 0 },    "Tilt",  0),
+            new(2, 1, new[] { 0, 1 }, "Tilt",  1),
+            new(1, 2, new[] { 0, 2 }, "Tilt", -1)
+        };
+        
+        SpriteRenderer = new SpriteRenderer(
+            spriteSheet, 
+            new[] { idleAnimation, tiltRightAnimation, tiltLeftAnimation }, 
+            LayerDepth.Foreground,
+            transitions,
+            new[] { "Tilt" });
     }
     
     public override List<DrawTask> GetDrawTasks()
@@ -226,18 +267,28 @@ public class Player : Entity, IInputEventListener
         int yAxis = 0;
 
         if (e.Keys.Contains(Keys.D))
+        {
             xAxis = 1;
+            SpriteRenderer.SetAnimationCondition("Tilt", 1);
+        }
         else if (e.Keys.Contains(Keys.A))
+        {
             xAxis = -1;
+            SpriteRenderer.SetAnimationCondition("Tilt", -1);
+        }
+        else
+        {
+            SpriteRenderer.SetAnimationCondition("Tilt", 0);
+        }
 
         if (e.Keys.Contains(Keys.W))
-            yAxis = 1;
-        else if (e.Keys.Contains(Keys.S))
-            yAxis = -1;
-
-        if (yAxis == 1)
         {
+            yAxis = 1;
             _thrusterIsOn = true;
+        }
+        else if (e.Keys.Contains(Keys.S))
+        {
+            yAxis = -1;
         }
 
         HandleMovement(xAxis, yAxis);
