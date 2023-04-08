@@ -147,7 +147,7 @@ public class Game1 : Game
         
         foreach (DrawTask drawTask in drawTasks)
         {
-            foreach (IDrawTaskEffect effect in drawTask.Effects)
+            foreach (IDrawTaskEffect effect in drawTask.EffectContainer.Effects)
             {
                 switch (effect)
                 {

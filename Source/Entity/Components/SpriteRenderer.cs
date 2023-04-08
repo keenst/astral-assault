@@ -8,6 +8,8 @@ namespace AstralAssault;
 
 public class SpriteRenderer : IUpdateEventListener
 {
+    public readonly EffectContainer EffectContainer = new();
+
     private int CurrentAnimationIndex { get; set; }
     private readonly LayerDepth _layerDepth;
     private readonly Animation[] _animations;
@@ -18,7 +20,6 @@ public class SpriteRenderer : IUpdateEventListener
     private int _startAnimationIndex;
     private bool _isTransitioning;
     private long _lastFrameUpdate;
-    private readonly List<IDrawTaskEffect> _drawTaskEffects = new();
     private readonly Dictionary<Tuple<int, int>, Transition> _animationPaths = new();
     private int[] _animationQueue;
     private int _indexInQueue;
@@ -115,38 +116,17 @@ public class SpriteRenderer : IUpdateEventListener
     {
         return CurrentAnimation.HasRotation ? DrawRotatable(position, rotation) : DrawStatic(position);
     }
-
-    public void SetEffect<TEffect, TParameter>(TParameter parameter)
-    {
-        if (!_drawTaskEffects.OfType<TEffect>().Any())
-        {
-            _drawTaskEffects.Add((IDrawTaskEffect)Activator.CreateInstance(typeof(TEffect), parameter));
-        }
-        else
-        {
-            int index = _drawTaskEffects.IndexOf((IDrawTaskEffect)_drawTaskEffects.OfType<TEffect>().First());
-            _drawTaskEffects[index] = (IDrawTaskEffect)Activator.CreateInstance(typeof(TEffect), parameter);
-        }
-    }
-
-    public void RemoveEffect<TEffect>()
-    {
-        if (!_drawTaskEffects.OfType<TEffect>().Any()) return;
-
-        int index = _drawTaskEffects.IndexOf((IDrawTaskEffect)_drawTaskEffects.OfType<TEffect>().First());
-        _drawTaskEffects.RemoveAt(index);
-    }
-
+    
     private DrawTask DrawStatic(Vector2 position)
     {
-        Rectangle source = CurrentAnimation.Frames[_currentFrameIndex].Source;
-        return new DrawTask(_spriteSheet, source, position, 0, _layerDepth, _drawTaskEffects);
+        Rectangle source = _activeAnimation.Frames[_activeFrame].Source;
+        return new DrawTask(_spriteSheet, source, position, 0, _layerDepth, EffectContainer.Effects);
     }
 
     private DrawTask DrawRotatable(Vector2 position, float rotation)
     {
         (float spriteRotation, Rectangle source) = GetRotation(rotation);
-        return new DrawTask(_spriteSheet, source, position, spriteRotation, _layerDepth, _drawTaskEffects);
+        return new DrawTask(_spriteSheet, source, position, spriteRotation, _layerDepth, EffectContainer.Effects);
     }
 
     private Tuple<float, Rectangle> GetRotation(float rotation)
