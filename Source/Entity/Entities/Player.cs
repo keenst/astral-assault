@@ -105,7 +105,8 @@ public class Player : Entity, IInputEventListener
                     new Rectangle(0, 0,  32, 32),
                     new Rectangle(0, 32, 32, 32),
                     new Rectangle(0, 64, 32, 32),
-                    new Rectangle(0, 96, 32, 32))
+                    new Rectangle(0, 96, 32, 32), 
+                    120)
             }, 
             true);
 
@@ -113,10 +114,10 @@ public class Player : Entity, IInputEventListener
             new[]
             {
                 new Frame(
-                    new Rectangle(32, 0,  32, 32),
-                    new Rectangle(32, 32, 32, 32),
-                    new Rectangle(32, 64, 32, 32),
-                    new Rectangle(32, 96, 32, 32))
+                    new Rectangle(352, 0,  32, 32),
+                    new Rectangle(352, 32, 32, 32),
+                    new Rectangle(352, 64, 32, 32),
+                    new Rectangle(352, 96, 32, 32))
             },
             true);
 
@@ -124,10 +125,10 @@ public class Player : Entity, IInputEventListener
             new[]
             {
                 new Frame(
-                    new Rectangle(384, 0,  32, 32),
-                    new Rectangle(384, 32, 32, 32),
-                    new Rectangle(384, 64, 32, 32),
-                    new Rectangle(384, 96, 32, 32))
+                    new Rectangle(32, 0,  32, 32),
+                    new Rectangle(32, 32, 32, 32),
+                    new Rectangle(32, 64, 32, 32),
+                    new Rectangle(32, 96, 32, 32))
             },
             true);
 
@@ -265,18 +266,28 @@ public class Player : Entity, IInputEventListener
         int yAxis = 0;
 
         if (e.Keys.Contains(Keys.D))
+        {
             xAxis = 1;
+            SpriteRenderer.SetAnimationCondition("Tilt", 1);
+        }
         else if (e.Keys.Contains(Keys.A))
+        {
             xAxis = -1;
+            SpriteRenderer.SetAnimationCondition("Tilt", -1);
+        }
+        else
+        {
+            SpriteRenderer.SetAnimationCondition("Tilt", 0);
+        }
 
         if (e.Keys.Contains(Keys.W))
-            yAxis = 1;
-        else if (e.Keys.Contains(Keys.S))
-            yAxis = -1;
-
-        if (yAxis == 1)
         {
+            yAxis = 1;
             _thrusterIsOn = true;
+        }
+        else if (e.Keys.Contains(Keys.S))
+        {
+            yAxis = -1;
         }
 
         HandleMovement(xAxis, yAxis);
