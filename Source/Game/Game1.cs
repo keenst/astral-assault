@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 
@@ -13,25 +11,15 @@ namespace AstralAssault;
 
 public class Game1 : Game
 {
-    private enum Height
-    {
-        Full = 1080,
-        Half = 540,
-        Quarter = 270
-    }
+    private enum Height { Full = 1080, Half = 540, Quarter = 270 }
 
-    private enum Width
-    {
-        Full = 1920,
-        Half = 960,
-        Quarter = 480
-    }
+    private enum Width { Full = 1920, Half = 960, Quarter = 480 }
 
     public GameStateMachine GameStateMachine;
 
     // render
-    private SpriteBatch _spriteBatch;
-    private RenderTarget2D _renderTarget;
+    private SpriteBatch m_spriteBatch;
+    private RenderTarget2D m_renderTarget;
     private static readonly Effect HighlightEffect = AssetManager.Load<Effect>("Highlight");
     private static readonly Effect ColorEffect = AssetManager.Load<Effect>("Color");
 
@@ -39,17 +27,17 @@ public class Game1 : Game
     private static readonly Color BackgroundColor = new Color(28, 23, 41);
     public const int TargetWidth = (int)Width.Quarter;
     public const int TargetHeight = (int)Height.Quarter;
-    private readonly Matrix _scale;
+    private readonly Matrix m_scale;
     public readonly float ScaleX;
     public readonly float ScaleY;
 
     // debug tools
     public bool ShowDebug;
-    private float _frameRate;
-    private float _renderTime;
-    private long _lastStatUpdate;
+    private float m_frameRate;
+    private float m_renderTime;
+    private long m_lastStatUpdate;
     private const int StatUpdateInterval = 300;
-    private KeyboardState _prevKeyState = Keyboard.GetState();
+    private KeyboardState m_prevKeyState = Keyboard.GetState();
 
     public Game1()
     {
@@ -61,9 +49,9 @@ public class Game1 : Game
         graphics.PreferredBackBufferWidth = (int)Width.Half;
         graphics.PreferredBackBufferHeight = (int)Height.Half;
 
-        ScaleX = graphics.PreferredBackBufferWidth / (float)Game1.TargetWidth;
-        ScaleY = graphics.PreferredBackBufferHeight / (float)Game1.TargetHeight;
-        _scale = Matrix.CreateScale(new Vector3(ScaleX, ScaleY, 1));
+        ScaleX = graphics.PreferredBackBufferWidth / (float)TargetWidth;
+        ScaleY = graphics.PreferredBackBufferHeight / (float)TargetHeight;
+        m_scale = Matrix.CreateScale(new Vector3(ScaleX, ScaleY, 1));
 
         graphics.SynchronizeWithVerticalRetrace = false;
         IsFixedTimeStep = false;
@@ -73,13 +61,15 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        _renderTarget = new RenderTarget2D(
+        m_renderTarget = new RenderTarget2D
+        (
             GraphicsDevice,
             GraphicsDevice.PresentationParameters.BackBufferWidth,
             GraphicsDevice.PresentationParameters.BackBufferHeight,
             false,
             GraphicsDevice.PresentationParameters.BackBufferFormat,
-            DepthFormat.Depth24);
+            DepthFormat.Depth24
+        );
 
         AssetManager.Init(this);
         TextRenderer.Init();
@@ -93,19 +83,19 @@ public class Game1 : Game
 
     protected override void LoadContent()
     {
-        _spriteBatch = new SpriteBatch(GraphicsDevice);
+        m_spriteBatch = new SpriteBatch(GraphicsDevice);
     }
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
+        if ((GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed) ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        if (Keyboard.GetState().IsKeyDown(Keys.F3) && !_prevKeyState.IsKeyDown(Keys.F3))
+        if (Keyboard.GetState().IsKeyDown(Keys.F3) && !m_prevKeyState.IsKeyDown(Keys.F3))
             ShowDebug = !ShowDebug;
 
-        _prevKeyState = Keyboard.GetState();
+        m_prevKeyState = Keyboard.GetState();
 
         UpdateEventSource.Update(gameTime);
 
@@ -115,37 +105,38 @@ public class Game1 : Game
     protected override void Draw(GameTime gameTime)
     {
         // draw sprites to render target
-        GraphicsDevice.SetRenderTarget(_renderTarget);
+        GraphicsDevice.SetRenderTarget(m_renderTarget);
 
-        GraphicsDevice.Clear(Game1.BackgroundColor);
+        GraphicsDevice.Clear(BackgroundColor);
 
-        List<DrawTask> drawTasks = GameStateMachine.GetDrawTasks().OrderBy(dt => (int)dt.LayerDepth).ToList();
+        List<DrawTask> drawTasks = GameStateMachine.GetDrawTasks().OrderBy(static dt => (int)dt.LayerDepth).ToList();
 
         if (ShowDebug)
         {
             long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-            if (_lastStatUpdate + Game1.StatUpdateInterval < timeNow)
+            if ((m_lastStatUpdate + StatUpdateInterval) < timeNow)
             {
-                _frameRate = 1 / (float)gameTime.ElapsedGameTime.TotalSeconds;
-                _renderTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                m_frameRate = 1 / (float)gameTime.ElapsedGameTime.TotalSeconds;
+                m_renderTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
 
-                _lastStatUpdate = timeNow;
+                m_lastStatUpdate = timeNow;
             }
 
-            string frameRate = Math.Round(_frameRate).ToString();
-            string renderTime = _renderTime.ToString();
+            string frameRate = Math.Round(m_frameRate).ToString();
+            string renderTime = m_renderTime.ToString();
 
             List<DrawTask> frameRateTask =
                 frameRate.CreateDrawTasks(Vector2.Zero, Palette.GetColor(Palette.Colors.Yellow9), LayerDepth.Debug);
             List<DrawTask> renderTimeTask =
-                renderTime.CreateDrawTasks(new Vector2(0, 9), Palette.GetColor(Palette.Colors.Yellow9), LayerDepth.Debug);
+                renderTime.CreateDrawTasks
+                    (new Vector2(0, 9), Palette.GetColor(Palette.Colors.Yellow9), LayerDepth.Debug);
 
             drawTasks.AddRange(frameRateTask);
             drawTasks.AddRange(renderTimeTask);
         }
 
-        _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointWrap);
+        m_spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointWrap);
 
         foreach (DrawTask drawTask in drawTasks)
         {
@@ -153,23 +144,24 @@ public class Game1 : Game
             {
                 switch (effect)
                 {
-                    case HighlightEffect highlightEffect:
-                        Game1.HighlightEffect.CurrentTechnique.Passes[1].Apply();
-                        Game1.HighlightEffect.Parameters["blendAlpha"].SetValue(highlightEffect.Alpha);
-                        Game1.HighlightEffect.CurrentTechnique.Passes[0].Apply();
+                case HighlightEffect highlightEffect:
+                    HighlightEffect.CurrentTechnique.Passes[1].Apply();
+                    HighlightEffect.Parameters["blendAlpha"].SetValue(highlightEffect.Alpha);
+                    HighlightEffect.CurrentTechnique.Passes[0].Apply();
 
-                        break;
+                    break;
 
-                    case ColorEffect colorEffect:
-                        Game1.ColorEffect.CurrentTechnique.Passes[1].Apply();
-                        Game1.ColorEffect.Parameters["newColor"].SetValue(colorEffect.Color);
-                        Game1.ColorEffect.CurrentTechnique.Passes[0].Apply();
+                case ColorEffect colorEffect:
+                    ColorEffect.CurrentTechnique.Passes[1].Apply();
+                    ColorEffect.Parameters["newColor"].SetValue(colorEffect.Color);
+                    ColorEffect.CurrentTechnique.Passes[0].Apply();
 
-                        break;
+                    break;
                 }
             }
 
-            _spriteBatch.Draw(
+            m_spriteBatch.Draw
+            (
                 drawTask.Texture,
                 drawTask.Destination,
                 drawTask.Source,
@@ -177,24 +169,30 @@ public class Game1 : Game
                 drawTask.Rotation,
                 drawTask.Origin,
                 SpriteEffects.None,
-                0);
+                0
+            );
 
-            Game1.HighlightEffect.CurrentTechnique.Passes[1].Apply();
-            Game1.ColorEffect.CurrentTechnique.Passes[1].Apply();
+            HighlightEffect.CurrentTechnique.Passes[1].Apply();
+            ColorEffect.CurrentTechnique.Passes[1].Apply();
         }
 
-        _spriteBatch.End();
+        m_spriteBatch.End();
 
         // draw render target to screen
         GraphicsDevice.SetRenderTarget(null);
 
-        _spriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointWrap,
-            null, null, null, _scale);
-        _spriteBatch.Draw(
-            _renderTarget,
+        m_spriteBatch.Begin
+        (
+            SpriteSortMode.Immediate, null, SamplerState.PointWrap,
+            null, null, null, m_scale
+        );
+        m_spriteBatch.Draw
+        (
+            m_renderTarget,
             new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height),
-            Color.White);
-        _spriteBatch.End();
+            Color.White
+        );
+        m_spriteBatch.End();
 
         base.Draw(gameTime);
     }

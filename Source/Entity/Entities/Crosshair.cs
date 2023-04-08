@@ -18,10 +18,12 @@ public class Crosshair : Entity, IMouseEventListener
         Animation activeAnimation = new Animation(new[] { activeFrame }, false);
         Animation inactiveAnimation = new Animation(new[] { inactiveFrame }, false);
 
-        SpriteRenderer = new SpriteRenderer(
+        SpriteRenderer = new SpriteRenderer
+        (
             spriteSheet,
             new[] { activeAnimation, inactiveAnimation },
-            LayerDepth.Crosshair);
+            LayerDepth.Crosshair
+        );
 
         OutOfBoundsBehavior = OutOfBounds.DoNothing;
     }

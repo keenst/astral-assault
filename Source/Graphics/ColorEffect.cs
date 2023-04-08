@@ -6,5 +6,8 @@ public struct ColorEffect : IDrawTaskEffect
 {
     public Vector4 Color { get; }
 
-    public ColorEffect(Vector4 color) => Color = color;
+    public ColorEffect(Vector4 color)
+    {
+        Color = color;
+    }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
@@ -8,13 +7,13 @@ namespace AstralAssault;
 public class CollisionSystem
 {
     public List<Collider> Colliders { get; } = new List<Collider>();
-    private List<Tuple<Collider, Collider>> _lastCollisions = new List<Tuple<Collider, Collider>>();
+    private List<Tuple<Collider, Collider>> m_lastCollisions = new List<Tuple<Collider, Collider>>();
 
     public void OnUpdate(object sender, UpdateEventArgs e)
     {
         List<Tuple<Collider, Collider>> currentCollisions = new List<Tuple<Collider, Collider>>();
 
-        for (int i = 0; i < Colliders.Count - 1; i++)
+        for (int i = 0; i < (Colliders.Count - 1); i++)
         {
             Collider collider = Colliders[i];
 
@@ -24,16 +23,18 @@ public class CollisionSystem
 
                 if (collider == other) continue;
 
-                if (!collider.CollidesWith(
+                if (!collider.CollidesWith
+                    (
                         other,
                         e.DeltaTime,
                         out Vector2 initialImpulseThis,
                         out Vector2 initialImpulseOther,
                         out Vector2 totalImpulseThis,
-                        out Vector2 totalImpulseOther))
+                        out Vector2 totalImpulseOther
+                    ))
                     continue;
 
-                if (collider.IsSolid && other.IsSolid && collider.Parent.TimeSinceSpawned > 512)
+                if (collider.IsSolid && other.IsSolid && (collider.Parent.TimeSinceSpawned > 512))
                 {
                     collider.Parent.Position += initialImpulseThis * e.DeltaTime;
                     other.Parent.Position += initialImpulseOther * e.DeltaTime;
@@ -48,14 +49,14 @@ public class CollisionSystem
                 Tuple<Collider, Collider> colliderPair = new Tuple<Collider, Collider>(collider, other);
                 currentCollisions.Add(colliderPair);
 
-                if (_lastCollisions.Contains(colliderPair)) continue;
+                if (m_lastCollisions.Contains(colliderPair)) continue;
 
                 collider.Parent.OnCollision(other);
                 other.Parent.OnCollision(collider);
             }
         }
 
-        _lastCollisions = currentCollisions;
+        m_lastCollisions = currentCollisions;
     }
 
     public void AddCollider(Collider collider)

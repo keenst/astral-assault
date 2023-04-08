@@ -4,14 +4,18 @@ namespace AstralAssault;
 
 public struct RandomSpriteProperty : IParticleProperty
 {
-    private readonly Random _rnd = new Random();
-    private readonly int _rangeStart;
-    private readonly int _rangeEnd;
-    public int SpriteIndex => _rnd.Next(_rangeStart, _rangeEnd + 1);
+    private readonly Random m_rnd = new Random();
+    private readonly int m_rangeStart;
+    private readonly int m_rangeEnd;
+
+    public int SpriteIndex
+    {
+        get => m_rnd.Next(m_rangeStart, m_rangeEnd + 1);
+    }
 
     public RandomSpriteProperty(int rangeStart, int rangeEnd)
     {
-        _rangeStart = rangeStart;
-        _rangeEnd = rangeEnd;
+        m_rangeStart = rangeStart;
+        m_rangeEnd = rangeEnd;
     }
 }

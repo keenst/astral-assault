@@ -1,16 +1,15 @@
 using System;
-
 using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
 
 public struct VelocityProperty : IParticleProperty
 {
-    private readonly float _angleRangeStart;
-    private readonly float _angleRangeEnd;
+    private readonly float m_angleRangeStart;
+    private readonly float m_angleRangeEnd;
 
-    private readonly float _speedRangeStart;
-    private readonly float _speedRangeEnd;
+    private readonly float m_speedRangeStart;
+    private readonly float m_speedRangeEnd;
 
     public Vector2 Velocity { get; }
 
@@ -18,11 +17,11 @@ public struct VelocityProperty : IParticleProperty
 
     public VelocityProperty(float angleRangeStart, float angleRangeEnd, float speedRangeStart, float speedRangeEnd)
     {
-        _angleRangeStart = angleRangeStart;
-        _angleRangeEnd = angleRangeEnd;
+        m_angleRangeStart = angleRangeStart;
+        m_angleRangeEnd = angleRangeEnd;
 
-        _speedRangeStart = speedRangeStart;
-        _speedRangeEnd = speedRangeEnd;
+        m_speedRangeStart = speedRangeStart;
+        m_speedRangeEnd = speedRangeEnd;
 
         Velocity = Vector2.Zero;
 
@@ -31,11 +30,11 @@ public struct VelocityProperty : IParticleProperty
 
     public VelocityProperty(float angle, float speed)
     {
-        _angleRangeStart = angle;
-        _angleRangeEnd = angle;
+        m_angleRangeStart = angle;
+        m_angleRangeEnd = angle;
 
-        _speedRangeStart = speed;
-        _speedRangeEnd = speed;
+        m_speedRangeStart = speed;
+        m_speedRangeEnd = speed;
 
         Vector2 normal = Vector2.UnitY.RotateVector(angle);
 
@@ -52,8 +51,8 @@ public struct VelocityProperty : IParticleProperty
         float multiplierAngle = rnd.NextSingle();
         float multiplierSpeed = rnd.NextSingle();
 
-        float angle = _angleRangeStart + (_angleRangeEnd - _angleRangeStart) * multiplierAngle;
-        float speed = _speedRangeStart + (_speedRangeEnd - _speedRangeStart) * multiplierSpeed;
+        float angle = m_angleRangeStart + (m_angleRangeEnd - m_angleRangeStart) * multiplierAngle;
+        float speed = m_speedRangeStart + (m_speedRangeEnd - m_speedRangeStart) * multiplierSpeed;
 
         Vector2 normal = Vector2.UnitY.RotateVector(angle);
 

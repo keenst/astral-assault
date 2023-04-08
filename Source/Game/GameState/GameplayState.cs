@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -12,7 +11,10 @@ public class GameplayState : GameState
     public readonly CollisionSystem CollisionSystem = new CollisionSystem();
     public WaveController WaveController;
 
-    public Player Player => (Player)Entities.Find(entity => entity is Player);
+    public Player Player
+    {
+        get => (Player)Entities.Find(static entity => entity is Player);
+    }
 
     public GameplayState(Game1 root) : base(root)
     {
@@ -24,10 +26,7 @@ public class GameplayState : GameState
     {
         List<DrawTask> drawTasks = new List<DrawTask>();
 
-        foreach (Entity entity in Entities)
-        {
-            drawTasks.AddRange(entity.GetDrawTasks());
-        }
+        foreach (Entity entity in Entities) drawTasks.AddRange(entity.GetDrawTasks());
 
         drawTasks.AddRange(WaveController.GetDrawTasks());
 
@@ -45,14 +44,19 @@ public class GameplayState : GameState
             Array.Fill(data, new Color(Palette.GetColor(Palette.Colors.Grey9), 0.15F));
             rect.SetData(data);
 
-            drawTasks.Add(new DrawTask(
-                rect,
-                collider.Rectangle.Location.ToVector2(),
-                0,
-                LayerDepth.Debug,
-                new List<IDrawTaskEffect>(),
-                Palette.GetColor(Palette.Colors.Blue9),
-                Vector2.Zero));
+            drawTasks.Add
+            (
+                new DrawTask
+                (
+                    rect,
+                    collider.Rectangle.Location.ToVector2(),
+                    0,
+                    LayerDepth.Debug,
+                    new List<IDrawTaskEffect>(),
+                    Palette.GetColor(Palette.Colors.Blue9),
+                    Vector2.Zero
+                )
+            );
         }
 
         return drawTasks;
@@ -76,9 +80,6 @@ public class GameplayState : GameState
         CollisionSystem.OnUpdate(sender, e);
         WaveController.OnUpdate(sender, e);
 
-        for (int i = 0; i < Entities.Count; i++)
-        {
-            Entities[i].OnUpdate(sender, e);
-        }
+        for (int i = 0; i < Entities.Count; i++) Entities[i].OnUpdate(sender, e);
     }
 }

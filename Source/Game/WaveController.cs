@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
@@ -9,32 +8,32 @@ namespace AstralAssault;
 public class WaveController
 {
     public readonly GameplayState GameState;
-    private readonly Game1 _root;
-    private readonly DebrisController _debrisController;
-    private int _currentWave;
+    private readonly Game1 m_root;
+    private readonly DebrisController m_debrisController;
+    private int m_currentWave;
 
-    private bool _drawWaveText;
-    private long _waveTextTimer;
+    private bool m_drawWaveText;
+    private long m_waveTextTimer;
     private const long WaveTextDuration = 2000;
 
-    private long _waveTimer;
+    private long m_waveTimer;
     private const long WaveDelay = 5000;
 
     public WaveController(GameplayState gameState, Game1 root)
     {
         GameState = gameState;
-        _root = root;
+        m_root = root;
 
-        _debrisController = new DebrisController(gameState);
+        m_debrisController = new DebrisController(gameState);
 
         StartNextWave();
     }
 
     private void StartNextWave()
     {
-        _currentWave++;
+        m_currentWave++;
 
-        int enemiesToSpawn = (int)(_currentWave * 1.5F);
+        int enemiesToSpawn = (int)(m_currentWave * 1.5F);
 
         Random rnd = new Random();
 
@@ -48,7 +47,7 @@ public class WaveController
                 1 => Game1.TargetWidth,
                 2 => rnd.Next(0, Game1.TargetWidth),
                 3 => rnd.Next(0, Game1.TargetWidth),
-                _ => throw new ArgumentOutOfRangeException()
+                var _ => throw new ArgumentOutOfRangeException()
             };
 
             int y = side switch
@@ -57,7 +56,7 @@ public class WaveController
                 1 => rnd.Next(0, Game1.TargetHeight),
                 2 => 0,
                 3 => Game1.TargetHeight,
-                _ => throw new ArgumentOutOfRangeException()
+                var _ => throw new ArgumentOutOfRangeException()
             };
 
             Vector2 position = new Vector2(x, y);
@@ -67,21 +66,22 @@ public class WaveController
             float angleToCenter = MathF.Atan2(gameCenter.Y - position.Y, gameCenter.X - position.X);
             angleToCenter += MathHelper.ToRadians(rnd.Next(-45, 45));
 
-            GameState.Entities.Add(new Asteroid(GameState, position, angleToCenter, size, _debrisController));
+            GameState.Entities.Add(new Asteroid(GameState, position, angleToCenter, size, m_debrisController));
         }
 
-        _drawWaveText = true;
-        _waveTextTimer = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        m_drawWaveText = true;
+        m_waveTextTimer = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
     }
 
     public List<DrawTask> GetDrawTasks()
     {
-        List<DrawTask> drawTasks = _debrisController.GetDrawTasks();
+        List<DrawTask> drawTasks = m_debrisController.GetDrawTasks();
 
-        if (!_drawWaveText) return drawTasks;
+        if (!m_drawWaveText) return drawTasks;
 
-        string text = $"Wave: {_currentWave}";
-        drawTasks.AddRange(text.CreateDrawTasks(new Vector2(10, 10), Palette.GetColor(Palette.Colors.Grey9), LayerDepth.HUD));
+        string text = $"Wave: {m_currentWave}";
+        drawTasks.AddRange
+            (text.CreateDrawTasks(new Vector2(10, 10), Palette.GetColor(Palette.Colors.Grey9), LayerDepth.HUD));
 
         return drawTasks;
     }
@@ -90,19 +90,16 @@ public class WaveController
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-        if (_drawWaveText && timeNow - _waveTextTimer > WaveController.WaveTextDuration)
-        {
-            _drawWaveText = false;
-        }
+        if (m_drawWaveText && ((timeNow - m_waveTextTimer) > WaveTextDuration)) m_drawWaveText = false;
 
-        int enemiesAlive = GameState.Entities.Count(x => x is Asteroid);
+        int enemiesAlive = GameState.Entities.Count(static x => x is Asteroid);
 
         if (enemiesAlive == 0)
         {
-            if (timeNow - _waveTimer < WaveController.WaveDelay) return;
+            if ((timeNow - m_waveTimer) < WaveDelay) return;
 
             StartNextWave();
-            _waveTimer = timeNow;
+            m_waveTimer = timeNow;
         }
     }
 }

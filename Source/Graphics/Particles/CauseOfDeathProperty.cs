@@ -2,11 +2,7 @@ namespace AstralAssault;
 
 public struct CauseOfDeathProperty : IParticleProperty
 {
-    public enum CausesOfDeath
-    {
-        OutOfBounds,
-        LifeSpan
-    }
+    public enum CausesOfDeath { OutOfBounds, LifeSpan }
 
     public CausesOfDeath CauseOfDeath { get; }
     public int LifeSpan { get; }

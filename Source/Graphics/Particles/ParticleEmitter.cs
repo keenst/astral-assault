@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -9,19 +8,24 @@ namespace AstralAssault;
 
 public class ParticleEmitter
 {
-    private readonly Texture2D _spriteSheet;
-    private readonly Rectangle[] _textureSources;
-    private readonly int _particlesPerSecond;
-    private readonly List<Particle> _particles = new List<Particle>();
-    private readonly IParticleProperty[] _particleProperties;
-    private readonly LayerDepth _layerDepth;
-    private Vector2 _position;
-    private float _rotation;
-    private float TimeBetweenParticles => 1000F / _particlesPerSecond;
-    private int _particlesSpawned;
-    private int _particlesToSpawn;
-    private long _lastTimeSpawned;
-    private bool _isSpawning;
+    private readonly Texture2D m_spriteSheet;
+    private readonly Rectangle[] m_textureSources;
+    private readonly int m_particlesPerSecond;
+    private readonly List<Particle> m_particles = new List<Particle>();
+    private readonly IParticleProperty[] m_particleProperties;
+    private readonly LayerDepth m_layerDepth;
+    private Vector2 m_position;
+    private float m_rotation;
+
+    private float TimeBetweenParticles
+    {
+        get => 1000F / m_particlesPerSecond;
+    }
+
+    private int m_particlesSpawned;
+    private int m_particlesToSpawn;
+    private long m_lastTimeSpawned;
+    private bool m_isSpawning;
 
     public ParticleEmitter(
         Texture2D spriteSheet,
@@ -32,13 +36,13 @@ public class ParticleEmitter
         IParticleProperty[] particleProperties,
         LayerDepth layerDepth)
     {
-        _spriteSheet = spriteSheet;
-        _textureSources = textureSources;
-        _particlesPerSecond = particlesPerSecond;
-        _position = position;
-        _rotation = rotation;
-        _particleProperties = particleProperties;
-        _layerDepth = layerDepth;
+        m_spriteSheet = spriteSheet;
+        m_textureSources = textureSources;
+        m_particlesPerSecond = particlesPerSecond;
+        m_position = position;
+        m_rotation = rotation;
+        m_particleProperties = particleProperties;
+        m_layerDepth = layerDepth;
 
         List<Type> particlePropertyTypes = new List<Type>();
 
@@ -46,94 +50,89 @@ public class ParticleEmitter
         {
             Type particlePropertyType = particleProperty.GetType();
 
-            if (particlePropertyTypes.Contains(particlePropertyType))
-            {
-                throw new ArgumentException();
-            }
+            if (particlePropertyTypes.Contains(particlePropertyType)) throw new ArgumentException();
         }
 
         Type causeOfDeathPropertyType = typeof(CauseOfDeathProperty);
 
-        if (!particleProperties.Any(p => causeOfDeathPropertyType.IsInstanceOfType(p)))
-        {
-            throw new ArgumentException();
-        }
+        if (!particleProperties.Any(p => causeOfDeathPropertyType.IsInstanceOfType(p))) throw new ArgumentException();
     }
 
     public void OnUpdate(object sender, UpdateEventArgs e)
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-        if ((timeNow - _lastTimeSpawned > TimeBetweenParticles || _particlesPerSecond == 0) &&
-            _isSpawning &&
-            (_particlesSpawned < _particlesToSpawn || _particlesToSpawn == 0))
+        if ((((timeNow - m_lastTimeSpawned) > TimeBetweenParticles) || (m_particlesPerSecond == 0)) &&
+            m_isSpawning &&
+            ((m_particlesSpawned < m_particlesToSpawn) || (m_particlesToSpawn == 0)))
         {
             Vector2 velocity = Vector2.Zero;
 
-            if (_particleProperties.OfType<VelocityProperty>().Any())
+            if (m_particleProperties.OfType<VelocityProperty>().Any())
             {
-                velocity = _particleProperties.OfType<VelocityProperty>().First().GetVelocity();
-                velocity = Vector2.Transform(velocity, Matrix.CreateRotationZ(_rotation));
+                velocity = m_particleProperties.OfType<VelocityProperty>().First().GetVelocity();
+                velocity = Vector2.Transform(velocity, Matrix.CreateRotationZ(m_rotation));
             }
 
-            int textureIndex = _textureSources.Length - 1;
+            int textureIndex = m_textureSources.Length - 1;
 
-            if (_particleProperties.OfType<RandomSpriteProperty>().Any())
-            {
-                textureIndex = _particleProperties.OfType<RandomSpriteProperty>().First().SpriteIndex;
-            }
+            if (m_particleProperties.OfType<RandomSpriteProperty>().Any()) textureIndex = m_particleProperties.OfType<RandomSpriteProperty>().First().SpriteIndex;
 
-            ActivateParticle(
+            ActivateParticle
+            (
                 textureIndex,
-                _position,
-                velocity);
+                m_position,
+                velocity
+            );
 
-            _lastTimeSpawned = timeNow;
-            _particlesSpawned++;
+            m_lastTimeSpawned = timeNow;
+            m_particlesSpawned++;
         }
 
-        foreach (Particle particle in _particles.Where(particle => particle.IsActive))
-        {
-            HandleParticleProperties(particle);
-        }
+        foreach (Particle particle in m_particles.Where(static particle => particle.IsActive)) HandleParticleProperties(particle);
     }
 
     public void StartSpawning(int particlesToSpawn = 0)
     {
-        _particlesToSpawn = particlesToSpawn;
-        _particlesSpawned = 0;
-        _isSpawning = true;
+        m_particlesToSpawn = particlesToSpawn;
+        m_particlesSpawned = 0;
+        m_isSpawning = true;
     }
 
     public void StopSpawning()
     {
-        _isSpawning = false;
+        m_isSpawning = false;
     }
 
     public void SetTransform(Vector2 position, float rotation)
     {
-        _position = position;
-        _rotation = rotation;
+        m_position = position;
+        m_rotation = rotation;
     }
 
     public void SetPosition(Vector2 position)
     {
-        _position = position;
+        m_position = position;
     }
 
     public List<DrawTask> CreateDrawTasks()
     {
         List<DrawTask> drawTasks = new List<DrawTask>();
 
-        foreach (Particle particle in _particles.Where(p => p.IsActive))
+        foreach (Particle particle in m_particles.Where(static p => p.IsActive))
         {
-            drawTasks.Add(new DrawTask(
-                _spriteSheet,
-                _textureSources[particle.TextureIndex],
-                particle.Position,
-                0,
-                _layerDepth,
-                particle.EffectContainer.Effects));
+            drawTasks.Add
+            (
+                new DrawTask
+                (
+                    m_spriteSheet,
+                    m_textureSources[particle.TextureIndex],
+                    particle.Position,
+                    0,
+                    m_layerDepth,
+                    particle.EffectContainer.Effects
+                )
+            );
         }
 
         return drawTasks;
@@ -143,34 +142,37 @@ public class ParticleEmitter
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-        if (_particles.All(p => p.IsActive))
+        if (m_particles.All(static p => p.IsActive))
         {
-            _particles.Add(new Particle(textureIndex, startingPosition, velocity, timeNow));
+            m_particles.Add(new Particle(textureIndex, startingPosition, velocity, timeNow));
 
             return;
         }
 
-        int inactiveParticleIndex = _particles.FindIndex(p => !p.IsActive);
-        _particles[inactiveParticleIndex].Set(textureIndex, startingPosition, velocity, timeNow);
+        int inactiveParticleIndex = m_particles.FindIndex(static p => !p.IsActive);
+        m_particles[inactiveParticleIndex].Set(textureIndex, startingPosition, velocity, timeNow);
     }
 
     private void HandleParticleProperties(Particle particle)
     {
-        foreach (IParticleProperty particleProperty in _particleProperties)
+        foreach (IParticleProperty particleProperty in m_particleProperties)
         {
             switch (particleProperty)
             {
-                case CauseOfDeathProperty causeOfDeathProperty:
-                    ParticleEmitter.HandleCauseOfDeathProperty(particle, causeOfDeathProperty);
-                    break;
+            case CauseOfDeathProperty causeOfDeathProperty:
+                HandleCauseOfDeathProperty(particle, causeOfDeathProperty);
 
-                case ColorChangeProperty colorChangeProperty:
-                    ParticleEmitter.HandleColorChangeProperty(particle, colorChangeProperty);
-                    break;
+                break;
 
-                case SpriteChangeProperty spriteChangeProperty:
-                    ParticleEmitter.HandleSpriteChangeProperty(particle, spriteChangeProperty);
-                    break;
+            case ColorChangeProperty colorChangeProperty:
+                HandleColorChangeProperty(particle, colorChangeProperty);
+
+                break;
+
+            case SpriteChangeProperty spriteChangeProperty:
+                HandleSpriteChangeProperty(particle, spriteChangeProperty);
+
+                break;
             }
         }
     }
@@ -179,31 +181,25 @@ public class ParticleEmitter
     {
         switch (property.CauseOfDeath)
         {
-            case CauseOfDeathProperty.CausesOfDeath.LifeSpan:
-            {
-                long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        case CauseOfDeathProperty.CausesOfDeath.LifeSpan:
+        {
+            long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-                if (timeNow - particle.TimeSpawned > property.LifeSpan)
-                {
-                    particle.Deactivate();
-                }
+            if ((timeNow - particle.TimeSpawned) > property.LifeSpan) particle.Deactivate();
 
-                break;
-            }
+            break;
+        }
 
-            case CauseOfDeathProperty.CausesOfDeath.OutOfBounds:
-            {
-                if (particle.Position.X is < 0 or > Game1.TargetWidth ||
-                    particle.Position.Y is < 0 or > Game1.TargetHeight)
-                {
-                    particle.Deactivate();
-                }
+        case CauseOfDeathProperty.CausesOfDeath.OutOfBounds:
+        {
+            if (particle.Position.X is < 0 or > Game1.TargetWidth ||
+                particle.Position.Y is < 0 or > Game1.TargetHeight) particle.Deactivate();
 
-                break;
-            }
+            break;
+        }
 
-            default:
-                throw new ArgumentOutOfRangeException();
+        default:
+            throw new ArgumentOutOfRangeException();
         }
     }
 

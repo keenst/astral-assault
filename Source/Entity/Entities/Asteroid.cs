@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -7,17 +6,12 @@ namespace AstralAssault;
 
 public class Asteroid : Entity
 {
-    private readonly DebrisController _debrisController;
-    private readonly float _rotSpeed;
-    private readonly Sizes _size;
-    private bool _hasExploded;
+    private readonly DebrisController m_debrisController;
+    private readonly float m_rotSpeed;
+    private readonly Sizes m_size;
+    private bool m_hasExploded;
 
-    public enum Sizes
-    {
-        Smallest,
-        Small,
-        Medium
-    }
+    public enum Sizes { Smallest, Small, Medium }
 
     public Asteroid(
         GameplayState gameState,
@@ -27,12 +21,12 @@ public class Asteroid : Entity
         DebrisController debrisController)
         : base(gameState, position)
     {
-        _debrisController = debrisController;
+        m_debrisController = debrisController;
 
-        _size = size;
+        m_size = size;
 
         Random rnd = new Random();
-        _rotSpeed = rnd.Next(5, 20) / 10F;
+        m_rotSpeed = rnd.Next(5, 20) / 10F;
         int speed = rnd.Next(30, 100);
 
         Velocity = Vector2.UnitX.RotateVector(direction) * speed;
@@ -44,57 +38,65 @@ public class Asteroid : Entity
 
         switch (size)
         {
-            case Sizes.Smallest:
-                spriteSheet = AssetManager.Load<Texture2D>("Asteroid1");
-                spriteSize = 16;
-                colliderSize = 10;
-                MaxHP = 12;
-                HP = MaxHP;
-                ContactDamage = 5;
-                mass = 6;
+        case Sizes.Smallest:
+            spriteSheet = AssetManager.Load<Texture2D>("Asteroid1");
+            spriteSize = 16;
+            colliderSize = 10;
+            MaxHP = 12;
+            HP = MaxHP;
+            ContactDamage = 5;
+            mass = 6;
 
-                break;
+            break;
 
-            case Sizes.Small:
-                spriteSheet = AssetManager.Load<Texture2D>("Asteroid2");
-                spriteSize = 24;
-                colliderSize = 16;
-                MaxHP = 24;
-                HP = MaxHP;
-                ContactDamage = 7;
-                mass = 12;
+        case Sizes.Small:
+            spriteSheet = AssetManager.Load<Texture2D>("Asteroid2");
+            spriteSize = 24;
+            colliderSize = 16;
+            MaxHP = 24;
+            HP = MaxHP;
+            ContactDamage = 7;
+            mass = 12;
 
-                break;
+            break;
 
-            case Sizes.Medium:
-                spriteSheet = AssetManager.Load<Texture2D>("Asteroid3");
-                spriteSize = 32;
-                colliderSize = 24;
-                MaxHP = 36;
-                HP = MaxHP;
-                ContactDamage = 12;
-                mass = 18;
+        case Sizes.Medium:
+            spriteSheet = AssetManager.Load<Texture2D>("Asteroid3");
+            spriteSize = 32;
+            colliderSize = 24;
+            MaxHP = 36;
+            HP = MaxHP;
+            ContactDamage = 12;
+            mass = 18;
 
-                break;
+            break;
 
-            default:
-                throw new ArgumentOutOfRangeException();
+        default:
+            throw new ArgumentOutOfRangeException();
         }
 
-        Frame frame = new Frame(new Rectangle(0, 0, spriteSize, spriteSize), new Rectangle(spriteSize, 0, spriteSize, spriteSize),
-            new Rectangle(spriteSize * 2, 0, spriteSize, spriteSize), new Rectangle(spriteSize * 3, 0, spriteSize, spriteSize));
+        Frame frame = new Frame
+        (
+            new Rectangle(0, 0, spriteSize, spriteSize), new Rectangle(spriteSize, 0, spriteSize, spriteSize),
+            new Rectangle(spriteSize * 2, 0, spriteSize, spriteSize),
+            new Rectangle(spriteSize * 3, 0, spriteSize, spriteSize)
+        );
 
         Animation animation = new Animation(new[] { frame }, true);
 
         SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
 
-        Collider = new Collider(
+        Collider = new Collider
+        (
             this,
-            new Rectangle(
+            new Rectangle
+            (
                 new Point((int)Position.X - colliderSize / 2, (int)Position.Y - colliderSize / 2),
-                new Point(colliderSize, colliderSize)),
+                new Point(colliderSize, colliderSize)
+            ),
             true,
-            mass);
+            mass
+        );
         GameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Wrap;
@@ -104,7 +106,7 @@ public class Asteroid : Entity
 
     protected override void OnDeath()
     {
-        if (!_hasExploded && _size - 1 >= 0)
+        if (!m_hasExploded && ((m_size - 1) >= 0))
         {
             Random rnd = new Random();
             int amount = rnd.Next(1, 4);
@@ -116,14 +118,16 @@ public class Asteroid : Entity
             {
                 angleToPlayer += (float)rnd.NextDouble() * MathF.PI / 1 - MathF.PI / 2;
 
-                GameState.Entities.Add(
-                    new Asteroid(GameState, Position, angleToPlayer, _size - 1, _debrisController));
+                GameState.Entities.Add
+                (
+                    new Asteroid(GameState, Position, angleToPlayer, m_size - 1, m_debrisController)
+                );
             }
         }
 
-        _hasExploded = true;
+        m_hasExploded = true;
 
-        _debrisController.SpawnDebris(Position, (int)_size);
+        m_debrisController.SpawnDebris(Position, (int)m_size);
 
         base.OnDeath();
     }
@@ -132,9 +136,9 @@ public class Asteroid : Entity
     {
         base.OnUpdate(sender, e);
 
-        _debrisController.ParticleEmitter.OnUpdate(sender, e);
+        m_debrisController.ParticleEmitter.OnUpdate(sender, e);
 
-        Rotation += _rotSpeed * e.DeltaTime;
+        Rotation += m_rotSpeed * e.DeltaTime;
         if (Rotation > Math.PI) Rotation = (float)-Math.PI;
     }
 }

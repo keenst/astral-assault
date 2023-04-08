@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-
 using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
@@ -11,18 +9,18 @@ public class Collider
     public readonly Entity Parent;
     public Rectangle Rectangle;
     public bool IsSolid;
-    private Vector2[] _corners;
-    private Vector2[] _axes;
-    private readonly float _mass;
+    private Vector2[] m_corners;
+    private Vector2[] m_axes;
+    private readonly float m_mass;
 
     public Collider(Entity parent, Rectangle rectangle, bool isSolid, float mass)
     {
         Parent = parent;
         Rectangle = rectangle;
         IsSolid = isSolid;
-        _corners = Collider.GetCorners(Rectangle);
-        _axes = Collider.GetAxes(_corners);
-        _mass = mass;
+        m_corners = GetCorners(Rectangle);
+        m_axes = GetAxes(m_corners);
+        m_mass = mass;
     }
 
     public Collider(Entity parent, Rectangle rectangle)
@@ -30,9 +28,9 @@ public class Collider
         Parent = parent;
         Rectangle = rectangle;
         IsSolid = false;
-        _corners = Collider.GetCorners(Rectangle);
-        _axes = Collider.GetAxes(_corners);
-        _mass = 0;
+        m_corners = GetCorners(Rectangle);
+        m_axes = GetAxes(m_corners);
+        m_mass = 0;
     }
 
     public bool CollidesWith(
@@ -44,8 +42,8 @@ public class Collider
         out Vector2 totalImpulseOther)
     {
         List<Vector2> axes = new List<Vector2>();
-        axes.AddRange(_axes);
-        axes.AddRange(other._axes);
+        axes.AddRange(m_axes);
+        axes.AddRange(other.m_axes);
 
         for (int i = 0; i < axes.Count; i++)
         {
@@ -61,8 +59,8 @@ public class Collider
 
         float minOverlap = float.MaxValue;
 
-        Vector2 centerThis = Collider.GetCenter(_corners);
-        Vector2 centerOther = Collider.GetCenter(other._corners);
+        Vector2 centerThis = GetCenter(m_corners);
+        Vector2 centerOther = GetCenter(other.m_corners);
 
         Vector2 relativeVelocity = centerOther - centerThis;
 
@@ -78,7 +76,7 @@ public class Collider
             float minOther = float.MaxValue;
             float maxOther = float.MinValue;
 
-            foreach (Vector2 corner in _corners)
+            foreach (Vector2 corner in m_corners)
             {
                 float projection = Vector2.Dot(corner, axis);
 
@@ -89,7 +87,7 @@ public class Collider
                     maxThis = projection;
             }
 
-            foreach (Vector2 corner in other._corners)
+            foreach (Vector2 corner in other.m_corners)
             {
                 float projection = Vector2.Dot(corner, axis);
 
@@ -102,10 +100,7 @@ public class Collider
 
             float overlap = Math.Min(maxThis, maxOther) - Math.Max(minThis, minOther);
 
-            if (overlap < 0)
-            {
-                return false;
-            }
+            if (overlap < 0) return false;
 
             if (overlap >= minOverlap) continue;
 
@@ -116,18 +111,18 @@ public class Collider
             if (Vector2.Dot(centerOther - centerThis, direction) < 0)
                 direction = -direction;
 
-            initialImpulseThis = -direction * (other._mass / (other._mass + _mass)) * overlap;
-            initialImpulseOther = direction * (_mass / (other._mass + _mass)) * overlap;
+            initialImpulseThis = -direction * (other.m_mass / (other.m_mass + m_mass)) * overlap;
+            initialImpulseOther = direction * (m_mass / (other.m_mass + m_mass)) * overlap;
         }
 
         totalImpulseThis = initialImpulseThis;
         totalImpulseOther = initialImpulseOther;
 
         Vector2 newRelativeVelocity = centerOther - centerThis;
-        Vector2 impulse = (newRelativeVelocity - relativeVelocity) * (_mass * other._mass) / (_mass + other._mass);
+        Vector2 impulse = (newRelativeVelocity - relativeVelocity) * (m_mass * other.m_mass) / (m_mass + other.m_mass);
 
-        Vector2 impulseThis = -impulse * (other._mass / (_mass + other._mass));
-        Vector2 impulseOther = impulse * (_mass / (_mass + other._mass));
+        Vector2 impulseThis = -impulse * (other.m_mass / (m_mass + other.m_mass));
+        Vector2 impulseOther = impulse * (m_mass / (m_mass + other.m_mass));
 
         totalImpulseThis += impulseThis;
         totalImpulseOther += impulseOther;
@@ -140,8 +135,8 @@ public class Collider
         Rectangle.X = position.X - Rectangle.Width / 2;
         Rectangle.Y = position.Y - Rectangle.Height / 2;
 
-        _corners = Collider.GetCorners(Rectangle);
-        _axes = Collider.GetAxes(_corners);
+        m_corners = GetCorners(Rectangle);
+        m_axes = GetAxes(m_corners);
     }
 
     private static Vector2[] GetCorners(Rectangle rect)
@@ -173,7 +168,9 @@ public class Collider
         return axes.ToArray();
     }
 
-    private static Vector2 GetCenter(Vector2[] corners) => new Vector2(
+    private static Vector2 GetCenter(Vector2[] corners) => new Vector2
+    (
         (corners[0].X + corners[1].X + corners[2].X + corners[3].X) / 4,
-        (corners[0].Y + corners[1].Y + corners[2].Y + corners[3].Y) / 4);
+        (corners[0].Y + corners[1].Y + corners[2].Y + corners[3].Y) / 4
+    );
 }

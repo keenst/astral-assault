@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Vector4 = Microsoft.Xna.Framework.Vector4;
 
@@ -24,29 +21,28 @@ public class Entity
     protected float HP;
     protected float ContactDamage;
 
-    private bool _isHighlighted;
-    private long _timeStartedHighlightingMS;
-    private float _highlightAlpha;
+    private bool m_isHighlighted;
+    private long m_timeStartedHighlightingMS;
+    private float m_highlightAlpha;
 
     public bool IsFriendly;
 
-    private readonly long _timeSpawned;
-    public long TimeSinceSpawned => DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - _timeSpawned;
+    private readonly long m_timeSpawned;
 
-    private Texture2D _healthBarTexture;
-
-    protected enum OutOfBounds
+    public long TimeSinceSpawned
     {
-        DoNothing,
-        Wrap,
-        Destroy
+        get => DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - m_timeSpawned;
     }
+
+    private Texture2D m_healthBarTexture;
+
+    protected enum OutOfBounds { DoNothing, Wrap, Destroy }
 
     protected Entity(GameplayState gameState, Vector2 position)
     {
         GameState = gameState;
         Position = position;
-        _timeSpawned = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        m_timeSpawned = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
         CreateHealthBarTexture();
     }
@@ -55,7 +51,7 @@ public class Entity
     {
         SpriteRenderer.OnUpdate(sender, e);
 
-        if (IsActor && HP <= 0)
+        if (IsActor && (HP <= 0))
         {
             OnDeath();
 
@@ -67,84 +63,78 @@ public class Entity
 
         switch (OutOfBoundsBehavior)
         {
-            case OutOfBounds.DoNothing:
+        case OutOfBounds.DoNothing:
+        {
+            break;
+        }
+
+        case OutOfBounds.Destroy:
+        {
+            if (Position.X is < 0 or > Game1.TargetWidth ||
+                Position.Y is < 0 or > Game1.TargetHeight) Destroy();
+
+            break;
+        }
+
+        case OutOfBounds.Wrap:
+        {
+            Position.X = Position.X switch
             {
-                break;
-            }
+                < 0 => Game1.TargetWidth,
+                > Game1.TargetWidth => 0,
+                var _ => Position.X
+            };
 
-            case OutOfBounds.Destroy:
+            Position.Y = Position.Y switch
             {
-                if (Position.X is < 0 or > Game1.TargetWidth ||
-                    Position.Y is < 0 or > Game1.TargetHeight)
-                {
-                    Destroy();
-                }
+                < 0 => Game1.TargetHeight,
+                > Game1.TargetHeight => 0,
+                var _ => Position.Y
+            };
 
-                break;
-            }
+            break;
+        }
 
-            case OutOfBounds.Wrap:
-            {
-                Position.X = Position.X switch
-                {
-                    < 0 => Game1.TargetWidth,
-                    > Game1.TargetWidth => 0,
-                    _ => Position.X
-                };
-
-                Position.Y = Position.Y switch
-                {
-                    < 0 => Game1.TargetHeight,
-                    > Game1.TargetHeight => 0,
-                    _ => Position.Y
-                };
-
-                break;
-            }
-
-            default:
-            {
-                throw new ArgumentOutOfRangeException();
-            }
+        default:
+        {
+            throw new ArgumentOutOfRangeException();
+        }
         }
     }
 
     public virtual void OnCollision(Collider other)
     {
-        if (!IsActor || other.Parent.IsFriendly == IsFriendly) return;
+        if (!IsActor || (other.Parent.IsFriendly == IsFriendly)) return;
 
         HP = Math.Max(0, HP - other.Parent.ContactDamage);
 
-        _isHighlighted = true;
-        _timeStartedHighlightingMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        _highlightAlpha = 0.7F;
+        m_isHighlighted = true;
+        m_timeStartedHighlightingMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        m_highlightAlpha = 0.7F;
 
-        SpriteRenderer.EffectContainer.SetEffect<HighlightEffect, float>(_highlightAlpha);
+        SpriteRenderer.EffectContainer.SetEffect<HighlightEffect, float>(m_highlightAlpha);
     }
 
     public virtual List<DrawTask> GetDrawTasks()
     {
         List<DrawTask> drawTasks = new List<DrawTask>();
 
-        if (_isHighlighted)
+        if (m_isHighlighted)
         {
             const float decayRate = 0.005F;
 
             long timeNowMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-            float timeSinceStartedS = (timeNowMS - _timeStartedHighlightingMS) / 1000F;
+            float timeSinceStartedS = (timeNowMS - m_timeStartedHighlightingMS) / 1000F;
 
-            _highlightAlpha = 0.7F * MathF.Pow(decayRate, timeSinceStartedS);
+            m_highlightAlpha = 0.7F * MathF.Pow(decayRate, timeSinceStartedS);
 
-            if (_highlightAlpha <= 0.01)
+            if (m_highlightAlpha <= 0.01)
             {
-                _isHighlighted = false;
-                _highlightAlpha = 0;
+                m_isHighlighted = false;
+                m_highlightAlpha = 0;
                 SpriteRenderer.EffectContainer.RemoveEffect<HighlightEffect>();
             }
-            else
-            {
-                SpriteRenderer.EffectContainer.SetEffect<HighlightEffect, float>(_highlightAlpha);
-            }
+            else SpriteRenderer.EffectContainer.SetEffect<HighlightEffect, float>(m_highlightAlpha);
         }
 
         if (IsActor) drawTasks.AddRange(CreateHealthBarDrawTasks());
@@ -166,9 +156,9 @@ public class Entity
 
     private void CreateHealthBarTexture()
     {
-        _healthBarTexture = new Texture2D(GameState.Root.GraphicsDevice, 1, 1);
+        m_healthBarTexture = new Texture2D(GameState.Root.GraphicsDevice, 1, 1);
         Color[] data = { Palette.GetColor(Palette.Colors.Grey9) };
-        _healthBarTexture.SetData(data);
+        m_healthBarTexture.SetData(data);
     }
 
     private List<DrawTask> CreateHealthBarDrawTasks()
@@ -191,14 +181,23 @@ public class Entity
 
         Rectangle source = new Rectangle(0, 0, 1, 1);
 
-        DrawTask background = new DrawTask(_healthBarTexture, source, outline, 0, LayerDepth.HUD,
-            new List<IDrawTaskEffect> { new ColorEffect(outlineColor) }, Palette.GetColor(Palette.Colors.Black));
+        DrawTask background = new DrawTask
+        (
+            m_healthBarTexture, source, outline, 0, LayerDepth.HUD,
+            new List<IDrawTaskEffect> { new ColorEffect(outlineColor) }, Palette.GetColor(Palette.Colors.Black)
+        );
 
-        DrawTask empty = new DrawTask(_healthBarTexture, source, emptyHealthBar, 0, LayerDepth.HUD,
-            new List<IDrawTaskEffect> { new ColorEffect(emptyColor) }, Palette.GetColor(Palette.Colors.Red9));
+        DrawTask empty = new DrawTask
+        (
+            m_healthBarTexture, source, emptyHealthBar, 0, LayerDepth.HUD,
+            new List<IDrawTaskEffect> { new ColorEffect(emptyColor) }, Palette.GetColor(Palette.Colors.Red9)
+        );
 
-        DrawTask full = new DrawTask(_healthBarTexture, source, fullHealthBar, 0, LayerDepth.HUD,
-            new List<IDrawTaskEffect> { new ColorEffect(fullColor) }, Palette.GetColor(Palette.Colors.Green9));
+        DrawTask full = new DrawTask
+        (
+            m_healthBarTexture, source, fullHealthBar, 0, LayerDepth.HUD,
+            new List<IDrawTaskEffect> { new ColorEffect(fullColor) }, Palette.GetColor(Palette.Colors.Green9)
+        );
 
         return new List<DrawTask> { background, empty, full };
     }

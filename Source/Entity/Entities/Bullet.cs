@@ -1,6 +1,4 @@
-﻿using System;
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
@@ -23,11 +21,15 @@ public class Bullet : Entity
 
         SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
 
-        Collider = new Collider(
+        Collider = new Collider
+        (
             this,
-            new Rectangle(
+            new Rectangle
+            (
                 new Point((int)Position.X - 1, (int)Position.Y - 1),
-                new Point(2, 2)));
+                new Point(2, 2)
+            )
+        );
         GameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Destroy;
@@ -48,9 +50,6 @@ public class Bullet : Entity
         base.OnUpdate(sender, e);
 
         if (Position.X is > Game1.TargetWidth or < 0 ||
-            Position.Y is > Game1.TargetHeight or < 0)
-        {
-            Destroy();
-        }
+            Position.Y is > Game1.TargetHeight or < 0) Destroy();
     }
 }

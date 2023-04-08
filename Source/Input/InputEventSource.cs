@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -20,44 +19,37 @@ public static class InputEventSource
     public static event EventHandler<MouseMoveEventArgs>
         MouseMoveEvent;
 
-    private static List<Keys> _keysDown = new List<Keys>();
-    private static List<Keys> _prevKeysDown = new List<Keys>();
+    private static List<Keys> m_keysDown = new List<Keys>();
+    private static List<Keys> m_prevKeysDown = new List<Keys>();
 
     private static readonly List<MouseButtons> MouseDown = new List<MouseButtons>();
-    private static List<MouseButtons> _prevMouseDown = new List<MouseButtons>();
+    private static List<MouseButtons> m_prevMouseDown = new List<MouseButtons>();
 
-    private static Point _mousePos;
-    private static Point _prevMousePos;
+    private static Point m_mousePos;
+    private static Point m_prevMousePos;
 
-    public enum MouseButtons
-    {
-        Left,
-        Right,
-        Middle,
-        Side1,
-        Side2
-    }
+    public enum MouseButtons { Left, Right, Middle, Side1, Side2 }
 
     public static void Init()
     {
-        UpdateEventSource.UpdateEvent += InputEventSource.OnUpdate;
+        UpdateEventSource.UpdateEvent += OnUpdate;
     }
 
     private static void OnUpdate(object sender, UpdateEventArgs e)
     {
-        InputEventSource.HandleKeyboard();
-        InputEventSource.HandleMouseButtons();
-        InputEventSource.HandleMouseMovement();
+        HandleKeyboard();
+        HandleMouseButtons();
+        HandleMouseMovement();
     }
 
     private static void HandleKeyboard()
     {
-        InputEventSource._prevKeysDown = InputEventSource._keysDown;
-        InputEventSource._keysDown = Keyboard.GetState().GetPressedKeys().ToList();
+        m_prevKeysDown = m_keysDown;
+        m_keysDown = Keyboard.GetState().GetPressedKeys().ToList();
 
-        if (InputEventSource._keysDown.Count == 0)
+        if (m_keysDown.Count == 0)
         {
-            InputEventSource._prevKeysDown.Clear();
+            m_prevKeysDown.Clear();
 
             return;
         }
@@ -65,28 +57,26 @@ public static class InputEventSource
         List<Keys> keysDown = new List<Keys>();
         List<Keys> keysPressed = new List<Keys>();
 
-        foreach (Keys key in InputEventSource._keysDown)
+        foreach (Keys key in m_keysDown)
         {
             keysDown.Add(key);
 
-            if (!InputEventSource._prevKeysDown.Contains(key))
-            {
-                keysPressed.Add(key);
-            }
+            if (!m_prevKeysDown.Contains(key)) keysPressed.Add(key);
         }
 
-        InputEventSource.KeyboardEvent?.Invoke(null, new KeyboardEventArgs(keysDown.ToArray()));
+        KeyboardEvent?.Invoke(null, new KeyboardEventArgs(keysDown.ToArray()));
 
         if (keysPressed.Count == 0) return;
-        InputEventSource.KeyboardPressedEvent?.Invoke(null, new KeyboardEventArgs(keysPressed.ToArray()));
+
+        KeyboardPressedEvent?.Invoke(null, new KeyboardEventArgs(keysPressed.ToArray()));
     }
 
     private static void HandleMouseButtons()
     {
         MouseState mouseState = Mouse.GetState();
 
-        InputEventSource._prevMouseDown = InputEventSource.MouseDown;
-        InputEventSource.MouseDown.Clear();
+        m_prevMouseDown = MouseDown;
+        MouseDown.Clear();
 
         ButtonState[] buttonStates = new ButtonState[5];
         buttonStates[0] = mouseState.LeftButton;
@@ -101,24 +91,19 @@ public static class InputEventSource
 
             MouseButtons button = (MouseButtons)i;
 
-            InputEventSource.MouseDown.Add(button);
-            InputEventSource.MouseButtonEvent?.Invoke(null, new MouseButtonEventArgs(button));
+            MouseDown.Add(button);
+            MouseButtonEvent?.Invoke(null, new MouseButtonEventArgs(button));
 
-            if (!InputEventSource._prevMouseDown.Contains(button))
-            {
-                InputEventSource.MouseButtonPressedEvent?.Invoke(null, new MouseButtonEventArgs(button));
-            }
+            if (!m_prevMouseDown.Contains(button))
+                MouseButtonPressedEvent?.Invoke(null, new MouseButtonEventArgs(button));
         }
     }
 
     private static void HandleMouseMovement()
     {
-        InputEventSource._prevMousePos = InputEventSource._mousePos;
-        InputEventSource._mousePos = Mouse.GetState().Position;
+        m_prevMousePos = m_mousePos;
+        m_mousePos = Mouse.GetState().Position;
 
-        if (InputEventSource._mousePos != InputEventSource._prevMousePos)
-        {
-            InputEventSource.MouseMoveEvent?.Invoke(null, new MouseMoveEventArgs(InputEventSource._mousePos));
-        }
+        if (m_mousePos != m_prevMousePos) MouseMoveEvent?.Invoke(null, new MouseMoveEventArgs(m_mousePos));
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -9,12 +8,12 @@ namespace AstralAssault;
 public class DebrisController
 {
     public readonly ParticleEmitter ParticleEmitter;
-    private readonly Random _rnd = new Random();
-    private readonly GameplayState _gameplayState;
+    private readonly Random m_rnd = new Random();
+    private readonly GameplayState m_gameplayState;
 
     public DebrisController(GameplayState gameplayState)
     {
-        _gameplayState = gameplayState;
+        m_gameplayState = gameplayState;
 
         Texture2D particleSpriteSheet = AssetManager.Load<Texture2D>("AsteroidDebris");
 
@@ -30,23 +29,27 @@ public class DebrisController
             new CauseOfDeathProperty(CauseOfDeathProperty.CausesOfDeath.OutOfBounds)
         };
 
-        ParticleEmitter = new ParticleEmitter(
+        ParticleEmitter = new ParticleEmitter
+        (
             particleSpriteSheet,
             textureSources,
             0,
             Vector2.Zero,
             0,
             particleProperties,
-            LayerDepth.Debris);
+            LayerDepth.Debris
+        );
     }
 
     public void SpawnDebris(Vector2 position, int asteroidSize)
     {
-        int amount = _rnd.Next(4, (1 + asteroidSize) * 4);
+        int amount = m_rnd.Next(4, (1 + asteroidSize) * 4);
 
-        float angleFromPlayer = MathF.Atan2(
-            position.Y - _gameplayState.Player.Position.Y,
-            position.X - _gameplayState.Player.Position.X);
+        float angleFromPlayer = MathF.Atan2
+        (
+            position.Y - m_gameplayState.Player.Position.Y,
+            position.X - m_gameplayState.Player.Position.X
+        );
 
         ParticleEmitter.SetTransform(position, angleFromPlayer);
         ParticleEmitter.StartSpawning(amount);

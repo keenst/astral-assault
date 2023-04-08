@@ -6,5 +6,8 @@ public class UpdateEventArgs : EventArgs
 {
     public float DeltaTime { get; }
 
-    public UpdateEventArgs(float deltaTime) => DeltaTime = deltaTime;
+    public UpdateEventArgs(float deltaTime)
+    {
+        DeltaTime = deltaTime;
+    }
 }

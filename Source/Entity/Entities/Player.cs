@@ -1,26 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace AstralAssault;
 
 public class Player : Entity, IInputEventListener
 {
-    private Vector2 _cursorPosition;
-    private Tuple<Vector2, Vector2> _muzzle = new Tuple<Vector2, Vector2>(Vector2.Zero, Vector2.Zero);
-    private bool _lastCannon;
-    private bool _isCrosshairActive = true;
-    private bool _thrusterIsOn;
-    private long _lastTimeFired;
-    private float _delta;
-    private readonly ParticleEmitter _particleEmitter;
+    private Vector2 m_cursorPosition;
+    private Tuple<Vector2, Vector2> m_muzzle = new Tuple<Vector2, Vector2>(Vector2.Zero, Vector2.Zero);
+    private bool m_lastCannon;
+    private bool m_isCrosshairActive = true;
+    private bool m_thrusterIsOn;
+    private long m_lastTimeFired;
+    private float m_delta;
+    private readonly ParticleEmitter m_particleEmitter;
 
     private const float MoveSpeed = 200;
     private const float MaxSpeed = 100;
@@ -33,19 +30,23 @@ public class Player : Entity, IInputEventListener
     public Player(GameplayState gameState, Vector2 position) : base(gameState, position)
     {
         Position = position;
-        Rotation = Player.Pi / 2;
+        Rotation = Pi / 2;
 
         InitSpriteRenderer();
 
         StartListening();
 
-        Collider = new Collider(
+        Collider = new Collider
+        (
             this,
-            new Rectangle(
+            new Rectangle
+            (
                 new Point((int)Position.X - 12, (int)Position.Y - 12),
-                new Point(24, 24)),
+                new Point(24, 24)
+            ),
             true,
-            10);
+            10
+        );
         GameState.CollisionSystem.AddCollider(Collider);
 
         Texture2D particleSpriteSheet = AssetManager.Load<Texture2D>("Particle");
@@ -58,7 +59,8 @@ public class Player : Entity, IInputEventListener
         IParticleProperty[] particleProperties =
         {
             new CauseOfDeathProperty(CauseOfDeathProperty.CausesOfDeath.LifeSpan, 210),
-            new ColorChangeProperty(
+            new ColorChangeProperty
+            (
                 new[]
                 {
                     Palette.Colors.Blue9,
@@ -69,21 +71,24 @@ public class Player : Entity, IInputEventListener
                     Palette.Colors.Blue4,
                     Palette.Colors.Blue3
                 },
-                30),
+                30
+            ),
             new SpriteChangeProperty(0, textureSources.Length, 40),
             new VelocityProperty(-1F, 1F, 0.04F, 0.1F)
         };
 
-        _particleEmitter = new ParticleEmitter(
+        m_particleEmitter = new ParticleEmitter
+        (
             particleSpriteSheet,
             textureSources,
             20,
             Position,
             Rotation,
             particleProperties,
-            LayerDepth.ThrusterFlame);
+            LayerDepth.ThrusterFlame
+        );
 
-        _particleEmitter.StartSpawning();
+        m_particleEmitter.StartSpawning();
 
         OutOfBoundsBehavior = OutOfBounds.Wrap;
 
@@ -97,7 +102,11 @@ public class Player : Entity, IInputEventListener
     {
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Player");
 
-        Frame frame = new Frame(new Rectangle(0, 0, 32, 32), new Rectangle(32, 0, 32, 32), new Rectangle(64, 0, 32, 32), new Rectangle(96, 0, 32, 32));
+        Frame frame = new Frame
+        (
+            new Rectangle(0, 0, 32, 32), new Rectangle(32, 0, 32, 32), new Rectangle(64, 0, 32, 32),
+            new Rectangle(96, 0, 32, 32)
+        );
 
         Animation animation = new Animation(new[] { frame }, true);
 
@@ -108,19 +117,13 @@ public class Player : Entity, IInputEventListener
     {
         List<DrawTask> drawTasks = new List<DrawTask>();
 
-        if (_thrusterIsOn)
-        {
-            _particleEmitter.StartSpawning();
-        }
-        else
-        {
-            _particleEmitter.StopSpawning();
-        }
+        if (m_thrusterIsOn) m_particleEmitter.StartSpawning();
+        else m_particleEmitter.StopSpawning();
 
-        drawTasks.AddRange(_particleEmitter.CreateDrawTasks());
+        drawTasks.AddRange(m_particleEmitter.CreateDrawTasks());
         drawTasks.AddRange(base.GetDrawTasks());
 
-        _thrusterIsOn = false;
+        m_thrusterIsOn = false;
 
         return drawTasks;
     }
@@ -142,53 +145,59 @@ public class Player : Entity, IInputEventListener
     private void HandleMovement(int xAxis, int yAxis)
     {
         // acceleration and deceleration
-        Vector2 forward = -Vector2.UnitY.RotateVector(Rotation + Player.Pi / 2) *
-            Player.MoveSpeed * _delta;
+        Vector2 forward = -Vector2.UnitY.RotateVector(Rotation + Pi / 2) *
+            MoveSpeed * m_delta;
 
         // tilting
-        Vector2 right = Vector2.UnitX.RotateVector(Rotation + Player.Pi / 2) * Player.TiltSpeed *
-            _delta;
+        Vector2 right = Vector2.UnitX.RotateVector(Rotation + Pi / 2) * TiltSpeed *
+            m_delta;
 
         // apply velocity vectors
-        Velocity = new Vector2(
-            Math.Clamp(Velocity.X + forward.X * yAxis + right.X * xAxis, -Player.MaxSpeed, Player.MaxSpeed),
-            Math.Clamp(Velocity.Y + forward.Y * yAxis + right.Y * xAxis, -Player.MaxSpeed, Player.MaxSpeed));
+        Velocity = new Vector2
+        (
+            Math.Clamp(Velocity.X + forward.X * yAxis + right.X * xAxis, -MaxSpeed, MaxSpeed),
+            Math.Clamp(Velocity.Y + forward.Y * yAxis + right.Y * xAxis, -MaxSpeed, MaxSpeed)
+        );
 
-        if (Velocity.Length() > Player.MaxSpeed)
+        if (Velocity.Length() > MaxSpeed)
         {
             Velocity.Normalize();
-            Velocity *= Player.MaxSpeed;
+            Velocity *= MaxSpeed;
         }
-        else if (Velocity.Length() < -Player.MaxSpeed)
+        else if (Velocity.Length() < -MaxSpeed)
         {
             Velocity.Normalize();
-            Velocity *= -Player.MaxSpeed;
+            Velocity *= -MaxSpeed;
         }
     }
 
     private void HandleFiring()
     {
-        if (!_isCrosshairActive) return;
+        if (!m_isCrosshairActive) return;
 
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-        if (_lastTimeFired + Player.ShootSpeed > timeNow) return;
+        if ((m_lastTimeFired + ShootSpeed) > timeNow) return;
 
-        _lastTimeFired = timeNow;
+        m_lastTimeFired = timeNow;
 
-        float xDiff = _cursorPosition.X - (_lastCannon ? _muzzle.Item1.X : _muzzle.Item2.X);
-        float yDiff = _cursorPosition.Y - (_lastCannon ? _muzzle.Item1.Y : _muzzle.Item2.Y);
+        float xDiff = m_cursorPosition.X - (m_lastCannon ? m_muzzle.Item1.X : m_muzzle.Item2.X);
+        float yDiff = m_cursorPosition.Y - (m_lastCannon ? m_muzzle.Item1.Y : m_muzzle.Item2.Y);
 
         float rot = (float)Math.Atan2(yDiff, xDiff);
 
-        GameState.Entities.Add(
-            new Bullet(
+        GameState.Entities.Add
+        (
+            new Bullet
+            (
                 GameState,
-                _lastCannon ? _muzzle.Item1 : _muzzle.Item2,
+                m_lastCannon ? m_muzzle.Item1 : m_muzzle.Item2,
                 rot,
-                Player.BulletSpeed));
+                BulletSpeed
+            )
+        );
 
-        _lastCannon = !_lastCannon;
+        m_lastCannon = !m_lastCannon;
     }
 
     public override void Destroy()
@@ -222,10 +231,7 @@ public class Player : Entity, IInputEventListener
         else if (e.Keys.Contains(Keys.S))
             yAxis = -1;
 
-        if (yAxis == 1)
-        {
-            _thrusterIsOn = true;
-        }
+        if (yAxis == 1) m_thrusterIsOn = true;
 
         HandleMovement(xAxis, yAxis);
     }
@@ -233,35 +239,32 @@ public class Player : Entity, IInputEventListener
     public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
     {
         Point scale = new Point((int)GameState.Root.ScaleX, (int)GameState.Root.ScaleY);
-        _cursorPosition.X = e.Position.ToVector2().X / scale.X;
-        _cursorPosition.Y = e.Position.ToVector2().Y / scale.Y;
+        m_cursorPosition.X = e.Position.ToVector2().X / scale.X;
+        m_cursorPosition.Y = e.Position.ToVector2().Y / scale.Y;
     }
 
     public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)
     {
-        if (e.Button == InputEventSource.MouseButtons.Left)
-        {
-            HandleFiring();
-        }
+        if (e.Button == InputEventSource.MouseButtons.Left) HandleFiring();
     }
 
     public override void OnUpdate(object sender, UpdateEventArgs e)
     {
         base.OnUpdate(sender, e);
 
-        _particleEmitter.OnUpdate(sender, e);
+        m_particleEmitter.OnUpdate(sender, e);
 
-        _delta = e.DeltaTime;
+        m_delta = e.DeltaTime;
 
         // check range to cursor
-        float distance = Vector2.Distance(Position, _cursorPosition);
-        _isCrosshairActive = distance >= 12;
+        float distance = Vector2.Distance(Position, m_cursorPosition);
+        m_isCrosshairActive = distance >= 12;
 
         // rotate player
-        if (_isCrosshairActive)
+        if (m_isCrosshairActive)
         {
-            float xDiff = _cursorPosition.X - Position.X;
-            float yDiff = _cursorPosition.Y - Position.Y;
+            float xDiff = m_cursorPosition.X - Position.X;
+            float yDiff = m_cursorPosition.Y - Position.Y;
 
             Rotation = (float)Math.Atan2(yDiff, xDiff);
         }
@@ -274,19 +277,21 @@ public class Player : Entity, IInputEventListener
             float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
 
             Velocity -=
-                ExtensionMethods.RotateVector(Vector2.UnitX, direction) * Player.Friction * _delta * sign;
+                Vector2.UnitX.RotateVector(direction) * Friction * m_delta * sign;
         }
 
         // rotate the points for the cannon muzzles
-        float rot = Player.Pi / 8 * (float)Math.Round(Rotation / (Player.Pi / 8));
+        float rot = Pi / 8 * (float)Math.Round(Rotation / (Pi / 8));
 
-        _muzzle = new Tuple<Vector2, Vector2>(
+        m_muzzle = new Tuple<Vector2, Vector2>
+        (
             Position + new Vector2(10, -8).RotateVector(rot),
-            Position + new Vector2(8, 10).RotateVector(rot));
+            Position + new Vector2(8, 10).RotateVector(rot)
+        );
 
-        float emitterRotation = (Rotation + Player.Pi) % (2 * Player.Pi);
+        float emitterRotation = (Rotation + Pi) % (2 * Pi);
         Vector2 emitterPosition = Position + new Vector2(11, 0).RotateVector(emitterRotation);
 
-        _particleEmitter.SetTransform(emitterPosition, emitterRotation);
+        m_particleEmitter.SetTransform(emitterPosition, emitterRotation);
     }
 }

@@ -1,29 +1,28 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-
 using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
 
 public class Particle
 {
-    private Vector2 _startingPosition;
-    private Vector2 _velocity;
+    private Vector2 m_startingPosition;
+    private Vector2 m_velocity;
     public EffectContainer EffectContainer = new EffectContainer();
 
     public int TextureIndex { get; set; }
     public long TimeSpawned { get; private set; }
     public bool IsActive { get; private set; }
 
-    public Vector2 Position =>
-        _startingPosition + _velocity * (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - TimeSpawned);
+    public Vector2 Position
+    {
+        get => m_startingPosition + m_velocity * (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - TimeSpawned);
+    }
 
     public Particle(int textureIndex, Vector2 startingPosition, Vector2 velocity, long timeSpawned)
     {
         TextureIndex = textureIndex;
-        _startingPosition = startingPosition;
-        _velocity = velocity;
+        m_startingPosition = startingPosition;
+        m_velocity = velocity;
         TimeSpawned = timeSpawned;
         IsActive = true;
     }
@@ -31,8 +30,8 @@ public class Particle
     public void Set(int textureIndex, Vector2 startingPosition, Vector2 velocity, long timeSpawned)
     {
         TextureIndex = textureIndex;
-        _startingPosition = startingPosition;
-        _velocity = velocity;
+        m_startingPosition = startingPosition;
+        m_velocity = velocity;
         TimeSpawned = timeSpawned;
         IsActive = true;
     }
