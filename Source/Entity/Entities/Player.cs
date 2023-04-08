@@ -146,7 +146,8 @@ public class Player : Entity, IInputEventListener
             spriteSheet, 
             new[] { idleAnimation, tiltRightAnimation, tiltLeftAnimation }, 
             LayerDepth.Foreground,
-            transitions);
+            transitions,
+            new[] { "Tilt" });
     }
     
     public override List<DrawTask> GetDrawTasks()

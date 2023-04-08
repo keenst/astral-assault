@@ -21,9 +21,7 @@ public class Bullet : Entity
 
         Frame frame = new(new Rectangle(0, 0, 2, 2));
 
-        Animation animation = new(new[] { frame }, false);
-        
-        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
+        SpriteRenderer = new SpriteRenderer(spriteSheet, frame, LayerDepth.Foreground);
         
         Collider = new Collider(
             this, 
