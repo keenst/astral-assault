@@ -82,18 +82,13 @@ public class Asteroid : Entity
             new Rectangle(spriteSize * 3, 0, spriteSize, spriteSize)
         );
 
-        Animation animation = new Animation(new[] { frame }, true);
-
-        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
-
-        Collider = new Collider
-        (
-            this,
-            new Rectangle
-            (
-                new Point((int)Position.X - colliderSize / 2, (int)Position.Y - colliderSize / 2),
-                new Point(colliderSize, colliderSize)
-            ),
+        SpriteRenderer = new SpriteRenderer(spriteSheet, frame, LayerDepth.Foreground);
+        
+        Collider = new Collider(
+            this, 
+            new Rectangle(
+                new Point((int)Position.X - colliderSize / 2, (int)Position.Y - colliderSize / 2), 
+                new Point(colliderSize, colliderSize)),
             true,
             mass
         );

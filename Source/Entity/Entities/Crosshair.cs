@@ -12,18 +12,41 @@ public class Crosshair : Entity, IMouseEventListener
 
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Crosshair");
 
-        Frame activeFrame = new Frame(new Rectangle(0, 0, 16, 16));
-        Frame inactiveFrame = new Frame(new Rectangle(16, 0, 16, 16));
+        Frame activeFrame   = new(new Rectangle(0,  0, 16, 16));
+        Frame inactiveFrame = new(new Rectangle(64, 0, 16, 16));
 
-        Animation activeAnimation = new Animation(new[] { activeFrame }, false);
-        Animation inactiveAnimation = new Animation(new[] { inactiveFrame }, false);
+        Animation deactivateAnimation = new(
+            new[]
+            {
+                new Frame(new Rectangle(16, 0, 16, 16), 30),
+                new Frame(new Rectangle(32, 0, 16, 16), 20),
+                new Frame(new Rectangle(48, 0, 16, 16), 10)
+            },
+            false);
 
-        SpriteRenderer = new SpriteRenderer
-        (
-            spriteSheet,
-            new[] { activeAnimation, inactiveAnimation },
-            LayerDepth.Crosshair
-        );
+        Animation activateAnimation = new(
+            new[]
+            {
+                new Frame(new Rectangle(48, 0, 16, 16), 30),
+                new Frame(new Rectangle(32, 0, 16, 16), 20),
+                new Frame(new Rectangle(16, 0, 16, 16), 10)
+            },
+            false);
+
+        Animation activeAnimation   = new(new[] { activeFrame },   false);
+        Animation inactiveAnimation = new(new[] { inactiveFrame }, false);
+
+        Transition[] transitions = {
+            new(0, 1, new[] { 2, 1 }, "IsActive", 0),
+            new(1, 0, new[] { 3, 0 }, "IsActive", 1)
+        };
+
+        SpriteRenderer = new SpriteRenderer(
+            spriteSheet, 
+            new[] { activeAnimation, inactiveAnimation, deactivateAnimation, activateAnimation }, 
+            LayerDepth.Crosshair,
+            transitions,
+            new[] { "IsActive" });
 
         OutOfBoundsBehavior = OutOfBounds.DoNothing;
     }
@@ -42,8 +65,8 @@ public class Crosshair : Entity, IMouseEventListener
 
         Vector2 playerPosition = GameState.Player.Position;
         float distance = Vector2.Distance(playerPosition, Position);
-        if (distance < 12) SpriteRenderer.PlayAnimation(1);
-        else if (SpriteRenderer.ActiveAnimationIndex != 0) SpriteRenderer.PlayAnimation(0);
+
+        SpriteRenderer.SetAnimationCondition("IsActive", distance < 12 ? 0 : 1);
     }
 
     public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e) { }

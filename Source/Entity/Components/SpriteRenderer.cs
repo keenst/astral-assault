@@ -7,63 +7,119 @@ namespace AstralAssault;
 
 public class SpriteRenderer
 {
-    private readonly LayerDepth m_layerDepth;
-    private readonly Animation[] m_animations;
-    private readonly Texture2D m_spriteSheet;
-    private Animation m_activeAnimation;
+    public readonly EffectContainer EffectContainer = new();
 
-    public int ActiveAnimationIndex
+    private int CurrentAnimationIndex { get; set; }
+    private readonly LayerDepth _layerDepth;
+    private readonly Animation[] _animations;
+    private readonly Texture2D _spriteSheet;
+    private Animation CurrentAnimation => _animations[CurrentAnimationIndex];
+    private int _currentFrameIndex;
+    private int _targetAnimationIndex;
+    private int _startAnimationIndex;
+    private bool _isTransitioning;
+    private long _lastFrameUpdate;
+    private readonly Dictionary<Tuple<int, int>, Transition> _animationPaths = new();
+    private int[] _animationQueue;
+    private int _indexInQueue;
+    private readonly Dictionary<string, float> _animationConditions = new();
+
+    private const float Pi = 3.14F;
+    
+    public SpriteRenderer(
+        Texture2D spriteSheet, 
+        Animation[] animations, 
+        LayerDepth layerDepth,
+        Transition[] transitions, 
+        string[] animationConditions)
     {
-        get => m_animations.ToList().IndexOf(m_activeAnimation);
-    }
+        _animations = animations;
+        _spriteSheet = spriteSheet;
+        _layerDepth = layerDepth;
 
-    private int m_activeFrame;
-    private long m_lastFrameUpdate;
-    public readonly EffectContainer EffectContainer = new EffectContainer();
-
-    public const float Pi = 3.14F;
-
-    public SpriteRenderer(Texture2D spriteSheet, Animation[] animations, LayerDepth layerDepth)
-    {
-        m_animations = animations;
-        m_spriteSheet = spriteSheet;
-        m_layerDepth = layerDepth;
+        if (transitions != null)
+        {
+            foreach (Transition transition in transitions)
+            {
+                _animationPaths.Add(transition.FromTo, transition);
+            }
+        }
+        
+        if (animationConditions != null) InitAnimationConditions(animationConditions);
 
         UpdateEventSource.UpdateEvent += OnUpdate;
-        m_activeAnimation = m_animations[0];
+        CurrentAnimationIndex = 0;
+    }
+
+    public SpriteRenderer(
+        Texture2D spriteSheet,
+        Frame frame,
+        LayerDepth layerDepth)
+    {
+        Animation animation = new(
+            new Frame[] { frame }, 
+            frame.HasRotations);
+        
+        _animations = new[] { animation };
+        _spriteSheet = spriteSheet;
+        _layerDepth = layerDepth;
+        
+        CurrentAnimationIndex = 0;
     }
 
     public void OnUpdate(object sender, UpdateEventArgs e)
     {
-        if (m_activeAnimation.Frames.Length == 1) return;
-
-        int frameLength = m_activeAnimation.Frames[m_activeFrame].Time;
+        int frameLength = CurrentAnimation.Frames[_currentFrameIndex].Time;
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-        if (timeNow < (m_lastFrameUpdate + frameLength)) return;
+        Transition? transition = GetPossibleTransition();
 
-        m_activeFrame = (m_activeFrame + 1) % m_activeAnimation.Frames.Length;
-        m_lastFrameUpdate = timeNow;
+        if (transition.HasValue)
+        {
+            _animationQueue = transition.Value.AnimationPath;
+            CurrentAnimationIndex = _animationQueue[0];
+            _indexInQueue = 0;
+            _currentFrameIndex = 0;
+            _lastFrameUpdate = timeNow;
+            _targetAnimationIndex = transition.Value.To;
+            _isTransitioning = true;
+            return;
+        }
+
+        if (_animationQueue == null) return;
+        
+        if (timeNow < _lastFrameUpdate + frameLength) return;
+
+        if (_currentFrameIndex + 1 == CurrentAnimation.Frames.Length &&
+            _indexInQueue + 1 < _animationQueue.Length)
+        {
+            CurrentAnimationIndex = _animationQueue[++_indexInQueue];
+            _currentFrameIndex = 0;
+        }
+        else
+        {
+            _currentFrameIndex = (_currentFrameIndex + 1) % CurrentAnimation.Frames.Length;
+        }
+        
+        if (CurrentAnimationIndex == _targetAnimationIndex &&
+            _isTransitioning)
+        {
+            _isTransitioning = false;
+            _startAnimationIndex = _targetAnimationIndex;
+        }
+
+        _lastFrameUpdate = timeNow;
     }
 
-    public void PlayAnimation(int index)
+    public DrawTask CreateDrawTask(Vector2 position, float rotation)
     {
-        if ((index >= m_animations.Length) || (index < 0))
-            throw new ArgumentOutOfRangeException();
-
-        m_activeAnimation = m_animations[index];
-        m_activeFrame = 0;
-        m_lastFrameUpdate = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        return CurrentAnimation.HasRotation ? DrawRotatable(position, rotation) : DrawStatic(position);
     }
-
-    public DrawTask CreateDrawTask(Vector2 position, float rotation) =>
-        m_activeAnimation.HasRotation ? DrawRotatable(position, rotation) : DrawStatic(position);
-
+    
     private DrawTask DrawStatic(Vector2 position)
     {
-        Rectangle source = m_activeAnimation.Frames[m_activeFrame].Source;
-
-        return new DrawTask(m_spriteSheet, source, position, 0, m_layerDepth, EffectContainer.Effects);
+        Rectangle source = CurrentAnimation.Frames[_currentFrameIndex].Source;
+        return new DrawTask(_spriteSheet, source, position, 0, _layerDepth, EffectContainer.Effects);
     }
 
     private DrawTask DrawRotatable(Vector2 position, float rotation)
@@ -80,9 +136,9 @@ public class SpriteRenderer
         float spriteRotation;
         Rectangle source;
 
-        if ((rot % 4) == 0)
+        if (rot % 4 == 0)
         {
-            source = m_activeAnimation.Frames[m_activeFrame].Rotations[0];
+            source = CurrentAnimation.Frames[_currentFrameIndex].Rotations[0];
             spriteRotation = Pi / 8 * rot;
 
             return new Tuple<float, Rectangle>(spriteRotation, source);
@@ -94,11 +150,53 @@ public class SpriteRenderer
             >= Pi / 2 and < Pi => Pi / 2,
             <= 0 and > -Pi / 2 => -Pi / 2,
             <= -Pi / 2 and > -Pi => -Pi,
-            var _ => 0
+            _ => 0
         };
 
-        source = m_activeAnimation.Frames[m_activeFrame].Rotations[rot.Mod(4)];
+        source = CurrentAnimation.Frames[_currentFrameIndex].Rotations[rot.Mod(4)];
 
         return new Tuple<float, Rectangle>(spriteRotation, source);
     }
+
+    private Transition? GetPossibleTransition()
+    {
+        foreach (KeyValuePair<string, float> condition in _animationConditions)
+        {
+            foreach (Transition transition in _animationPaths.Values)
+            {
+                if (transition.From == _startAnimationIndex &&
+                    transition.To != _targetAnimationIndex &&
+                    transition.ConditionName == condition.Key &&
+                    transition.ConditionThreshold == condition.Value)
+                {
+                    return transition;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public void SetAnimationCondition(string name, float value)
+    {
+        if (!_animationConditions.ContainsKey(name))
+        {
+            throw new ArgumentException($"Animation condition '{name}' does not exist");
+        }
+        
+        _animationConditions[name] = value;
+    }
+
+    private void InitAnimationConditions(string[] name)
+    {
+        if (_animationConditions.Count != 0)
+        {
+            throw new InvalidOperationException("Animation conditions already initialized");
+        }
+
+        foreach (string s in name)
+        {
+            _animationConditions.Add(s, 0);
+        }
+    } 
 }

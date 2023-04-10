@@ -17,19 +17,13 @@ public class Bullet : Entity
 
         Frame frame = new Frame(new Rectangle(0, 0, 2, 2));
 
-        Animation animation = new Animation(new[] { frame }, false);
-
-        SpriteRenderer = new SpriteRenderer(spriteSheet, new[] { animation }, LayerDepth.Foreground);
-
-        Collider = new Collider
-        (
-            this,
-            new Rectangle
-            (
-                new Point((int)Position.X - 1, (int)Position.Y - 1),
-                new Point(2, 2)
-            )
-        );
+        SpriteRenderer = new SpriteRenderer(spriteSheet, frame, LayerDepth.Foreground);
+        
+        Collider = new Collider(
+            this, 
+            new Rectangle(
+                new Point((int)Position.X - 1, (int)Position.Y - 1), 
+                new Point(2, 2)));
         GameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Destroy;

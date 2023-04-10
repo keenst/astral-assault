@@ -12,8 +12,8 @@ public static class TextRenderer
 
     public static void Init()
     {
-        m_font = AssetManager.Load<Texture2D>("font");
-        m_dict = new Dictionary<char, int>
+        _font = AssetManager.Load<Texture2D>("Font");
+        _dict = new Dictionary<char, int>
         {
             { 'A', 0 },
             { 'B', 1 },
@@ -73,22 +73,17 @@ public static class TextRenderer
             int x = m_dict[text[i]] % 6;
             int y = m_dict[text[i]] / 6;
 
-            Rectangle source = new Rectangle(x * 10, y * 10, 10, 10);
+            Rectangle source = new(x * 8, y * 8, 8, 8);
 
-            drawTasks.Add
-            (
-                new DrawTask
-                (
-                    m_font,
-                    source,
-                    new Vector2(position.X + i * 10, position.Y),
-                    0,
-                    layerDepth,
-                    new List<IDrawTaskEffect>(),
-                    color,
-                    Vector2.Zero
-                )
-            );
+            drawTasks.Add(new DrawTask(
+                _font,
+                source,
+                new Vector2(position.X + i * 8, position.Y),
+                0,
+                layerDepth,
+                new List<IDrawTaskEffect>(),
+                color,
+                Vector2.Zero));
         }
 
         return drawTasks;

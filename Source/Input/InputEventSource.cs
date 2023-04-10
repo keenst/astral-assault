@@ -49,9 +49,7 @@ public static class InputEventSource
 
         if (m_keysDown.Count == 0)
         {
-            m_prevKeysDown.Clear();
-
-            return;
+            _prevKeysDown.Clear();
         }
 
         List<Keys> keysDown = new List<Keys>();
