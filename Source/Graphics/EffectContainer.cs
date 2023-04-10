@@ -1,13 +1,13 @@
+#region
 using System;
 using System.Collections.Generic;
 using System.Linq;
+#endregion
 
 namespace AstralAssault;
 
 public sealed class EffectContainer
 {
-    internal List<IDrawTaskEffect> Effects { get; }
-
     internal EffectContainer(List<IDrawTaskEffect> effects)
     {
         Effects = effects;
@@ -17,6 +17,8 @@ public sealed class EffectContainer
     {
         Effects = new List<IDrawTaskEffect>();
     }
+
+    internal List<IDrawTaskEffect> Effects { get; }
 
     internal void SetEffect<TEffect, TParameter>(TParameter parameter)
     {

@@ -1,17 +1,18 @@
-﻿using System;
+﻿#region
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+#endregion
 
 namespace AstralAssault;
 
 public class Asteroid : Entity
 {
+    public enum Sizes { Smallest, Small, Medium }
     private readonly DebrisController m_debrisController;
     private readonly float m_rotSpeed;
     private readonly Sizes m_size;
     private bool m_hasExploded;
-
-    public enum Sizes { Smallest, Small, Medium }
 
     public Asteroid(
         GameplayState gameState,
@@ -83,12 +84,15 @@ public class Asteroid : Entity
         );
 
         SpriteRenderer = new SpriteRenderer(spriteSheet, frame, LayerDepth.Foreground);
-        
-        Collider = new Collider(
-            this, 
-            new Rectangle(
-                new Point((int)Position.X - colliderSize / 2, (int)Position.Y - colliderSize / 2), 
-                new Point(colliderSize, colliderSize)),
+
+        Collider = new Collider
+        (
+            this,
+            new Rectangle
+            (
+                new Point((int)Position.X - colliderSize / 2, (int)Position.Y - colliderSize / 2),
+                new Point(colliderSize, colliderSize)
+            ),
             true,
             mass
         );

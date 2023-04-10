@@ -1,7 +1,9 @@
-﻿using System;
+﻿#region
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+#endregion
 
 namespace AstralAssault;
 
@@ -13,6 +15,11 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
     public GameOverState(Game1 root) : base(root)
     {
         InputEventSource.KeyboardPressedEvent += OnKeyboardPressedEvent;
+    }
+
+    public void OnKeyboardPressedEvent(object sender, KeyboardEventArgs e)
+    {
+        Root.GameStateMachine.ChangeState(new GameplayState(Root));
     }
 
     public override List<DrawTask> GetDrawTasks()
@@ -36,11 +43,6 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
             (m_restartPrompt, promptPosition, 0, LayerDepth.HUD, new List<IDrawTaskEffect>());
 
         return new List<DrawTask> { gameOverText, restartPrompt };
-    }
-
-    public void OnKeyboardPressedEvent(object sender, KeyboardEventArgs e)
-    {
-        Root.GameStateMachine.ChangeState(new GameplayState(Root));
     }
 
     public override void Enter()

@@ -1,13 +1,15 @@
-﻿using System;
+﻿#region
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+#endregion
 
 namespace AstralAssault;
 
 public class CollisionSystem
 {
-    public List<Collider> Colliders { get; } = new List<Collider>();
     private List<Tuple<Collider, Collider>> m_lastCollisions = new List<Tuple<Collider, Collider>>();
+    public List<Collider> Colliders { get; } = new List<Collider>();
 
     public void OnUpdate(object sender, UpdateEventArgs e)
     {

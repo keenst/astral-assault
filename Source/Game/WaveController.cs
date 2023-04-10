@@ -1,23 +1,25 @@
-﻿using System;
+﻿#region
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+#endregion
 
 namespace AstralAssault;
 
 public class WaveController
 {
+    private const long WaveTextDuration = 2000;
+    private const long WaveDelay = 5000;
     public readonly GameplayState GameState;
-    private readonly Game1 m_root;
     private readonly DebrisController m_debrisController;
+    private readonly Game1 m_root;
     private int m_currentWave;
 
     private bool m_drawWaveText;
     private long m_waveTextTimer;
-    private const long WaveTextDuration = 2000;
 
     private long m_waveTimer;
-    private const long WaveDelay = 5000;
 
     public WaveController(GameplayState gameState, Game1 root)
     {

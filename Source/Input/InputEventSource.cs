@@ -1,23 +1,16 @@
-﻿using System;
+﻿#region
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+#endregion
 
 namespace AstralAssault;
 
 public static class InputEventSource
 {
-    public static event EventHandler<KeyboardEventArgs>
-        KeyboardEvent,
-        KeyboardPressedEvent;
-
-    public static event EventHandler<MouseButtonEventArgs>
-        MouseButtonEvent,
-        MouseButtonPressedEvent;
-
-    public static event EventHandler<MouseMoveEventArgs>
-        MouseMoveEvent;
+    public enum MouseButtons { Left, Right, Middle, Side1, Side2 }
 
     private static List<Keys> m_keysDown = new List<Keys>();
     private static List<Keys> m_prevKeysDown = new List<Keys>();
@@ -28,7 +21,16 @@ public static class InputEventSource
     private static Point m_mousePos;
     private static Point m_prevMousePos;
 
-    public enum MouseButtons { Left, Right, Middle, Side1, Side2 }
+    public static event EventHandler<KeyboardEventArgs>
+        KeyboardEvent,
+        KeyboardPressedEvent;
+
+    public static event EventHandler<MouseButtonEventArgs>
+        MouseButtonEvent,
+        MouseButtonPressedEvent;
+
+    public static event EventHandler<MouseMoveEventArgs>
+        MouseMoveEvent;
 
     public static void Init()
     {
@@ -47,10 +49,7 @@ public static class InputEventSource
         m_prevKeysDown = m_keysDown;
         m_keysDown = Keyboard.GetState().GetPressedKeys().ToList();
 
-        if (m_keysDown.Count == 0)
-        {
-            _prevKeysDown.Clear();
-        }
+        if (m_keysDown.Count == 0) m_prevKeysDown.Clear();
 
         List<Keys> keysDown = new List<Keys>();
         List<Keys> keysPressed = new List<Keys>();

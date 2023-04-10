@@ -1,43 +1,40 @@
-﻿using System;
+﻿#region
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Vector2 = Microsoft.Xna.Framework.Vector2;
-using Vector3 = Microsoft.Xna.Framework.Vector3;
+#endregion
 
 namespace AstralAssault;
 
 public class Game1 : Game
 {
-    private enum Height { Full = 1080, Half = 540, Quarter = 270 }
-
-    private enum Width { Full = 1920, Half = 960, Quarter = 480 }
-
-    public GameStateMachine GameStateMachine;
-
-    // render
-    private SpriteBatch m_spriteBatch;
-    private RenderTarget2D m_renderTarget;
+    public const int TargetWidth = (int)Width.Quarter;
+    public const int TargetHeight = (int)Height.Quarter;
+    private const int StatUpdateInterval = 300;
     private static readonly Effect HighlightEffect = AssetManager.Load<Effect>("Highlight");
     private static readonly Effect ColorEffect = AssetManager.Load<Effect>("Color");
 
     // display
     private static readonly Color BackgroundColor = new Color(28, 23, 41);
-    public const int TargetWidth = (int)Width.Quarter;
-    public const int TargetHeight = (int)Height.Quarter;
     private readonly Matrix m_scale;
     public readonly float ScaleX;
     public readonly float ScaleY;
 
+    public GameStateMachine GameStateMachine;
+    private float m_frameRate;
+    private long m_lastStatUpdate;
+    private KeyboardState m_prevKeyState = Keyboard.GetState();
+    private RenderTarget2D m_renderTarget;
+    private float m_renderTime;
+
+    // render
+    private SpriteBatch m_spriteBatch;
+
     // debug tools
     public bool ShowDebug;
-    private float m_frameRate;
-    private float m_renderTime;
-    private long m_lastStatUpdate;
-    private const int StatUpdateInterval = 300;
-    private KeyboardState m_prevKeyState = Keyboard.GetState();
 
     public Game1()
     {
@@ -196,4 +193,8 @@ public class Game1 : Game
 
         base.Draw(gameTime);
     }
+
+    private enum Height { Full = 1080, Half = 540, Quarter = 270 }
+
+    private enum Width { Full = 1920, Half = 960, Quarter = 480 }
 }

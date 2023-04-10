@@ -1,5 +1,7 @@
-﻿using System;
+﻿#region
+using System;
 using Microsoft.Xna.Framework;
+#endregion
 
 namespace AstralAssault;
 

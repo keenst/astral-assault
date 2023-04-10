@@ -1,14 +1,16 @@
-﻿using System;
+﻿#region
+using System;
 using Microsoft.Xna.Framework.Input;
+#endregion
 
 namespace AstralAssault;
 
 public class KeyboardEventArgs : EventArgs
 {
-    public Keys[] Keys { get; }
-
     public KeyboardEventArgs(Keys[] keys)
     {
         Keys = keys;
     }
+
+    public Keys[] Keys { get; }
 }

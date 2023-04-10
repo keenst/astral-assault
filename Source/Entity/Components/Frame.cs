@@ -1,5 +1,7 @@
-﻿using System;
+﻿#region
+using System;
 using Microsoft.Xna.Framework;
+#endregion
 
 namespace AstralAssault;
 
@@ -7,7 +9,12 @@ public struct Frame
 {
     public Rectangle[] Rotations { get; } = new Rectangle[4];
     public Rectangle Source { get; }
-    public bool HasRotations => Rotations[0] != Rectangle.Empty;
+
+    public bool HasRotations
+    {
+        get => Rotations[0] != Rectangle.Empty;
+    }
+
     public int Time { get; }
 
     public Frame(Rectangle e, Rectangle see, Rectangle se, Rectangle sse, int time = 0)

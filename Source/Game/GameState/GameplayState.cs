@@ -1,25 +1,27 @@
-﻿using System;
+﻿#region
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+#endregion
 
 namespace AstralAssault;
 
 public class GameplayState : GameState
 {
-    public readonly List<Entity> Entities;
     public readonly CollisionSystem CollisionSystem = new CollisionSystem();
+    public readonly List<Entity> Entities;
     public WaveController WaveController;
-
-    public Player Player
-    {
-        get => (Player)Entities.Find(static entity => entity is Player);
-    }
 
     public GameplayState(Game1 root) : base(root)
     {
         Entities = new List<Entity>();
         WaveController = new WaveController(this, Root);
+    }
+
+    public Player Player
+    {
+        get => (Player)Entities.Find(static entity => entity is Player);
     }
 
     public override List<DrawTask> GetDrawTasks()

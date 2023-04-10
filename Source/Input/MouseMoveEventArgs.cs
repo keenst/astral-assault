@@ -1,14 +1,16 @@
-﻿using System;
+﻿#region
+using System;
 using Microsoft.Xna.Framework;
+#endregion
 
 namespace AstralAssault;
 
 public class MouseMoveEventArgs : EventArgs
 {
-    public Point Position { get; }
-
     public MouseMoveEventArgs(Point position)
     {
         Position = position;
     }
+
+    public Point Position { get; }
 }

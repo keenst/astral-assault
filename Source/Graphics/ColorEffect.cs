@@ -1,4 +1,6 @@
-using Vector4 = Microsoft.Xna.Framework.Vector4;
+#region
+using Microsoft.Xna.Framework;
+#endregion
 
 namespace AstralAssault;
 

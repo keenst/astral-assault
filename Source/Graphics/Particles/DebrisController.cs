@@ -1,15 +1,17 @@
+#region
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+#endregion
 
 namespace AstralAssault;
 
 public class DebrisController
 {
-    public readonly ParticleEmitter ParticleEmitter;
-    private readonly Random m_rnd = new Random();
     private readonly GameplayState m_gameplayState;
+    private readonly Random m_rnd = new Random();
+    public readonly ParticleEmitter ParticleEmitter;
 
     public DebrisController(GameplayState gameplayState)
     {

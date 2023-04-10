@@ -1,5 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿#region
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+#endregion
 
 namespace AstralAssault;
 
@@ -18,12 +20,16 @@ public class Bullet : Entity
         Frame frame = new Frame(new Rectangle(0, 0, 2, 2));
 
         SpriteRenderer = new SpriteRenderer(spriteSheet, frame, LayerDepth.Foreground);
-        
-        Collider = new Collider(
-            this, 
-            new Rectangle(
-                new Point((int)Position.X - 1, (int)Position.Y - 1), 
-                new Point(2, 2)));
+
+        Collider = new Collider
+        (
+            this,
+            new Rectangle
+            (
+                new Point((int)Position.X - 1, (int)Position.Y - 1),
+                new Point(2, 2)
+            )
+        );
         GameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Destroy;

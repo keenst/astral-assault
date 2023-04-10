@@ -1,31 +1,28 @@
+#region
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+#endregion
 
 namespace AstralAssault;
 
 public class ParticleEmitter
 {
+    private readonly LayerDepth m_layerDepth;
+    private readonly IParticleProperty[] m_particleProperties;
+    private readonly List<Particle> m_particles = new List<Particle>();
+    private readonly int m_particlesPerSecond;
     private readonly Texture2D m_spriteSheet;
     private readonly Rectangle[] m_textureSources;
-    private readonly int m_particlesPerSecond;
-    private readonly List<Particle> m_particles = new List<Particle>();
-    private readonly IParticleProperty[] m_particleProperties;
-    private readonly LayerDepth m_layerDepth;
-    private Vector2 m_position;
-    private float m_rotation;
-
-    private float TimeBetweenParticles
-    {
-        get => 1000F / m_particlesPerSecond;
-    }
+    private bool m_isSpawning;
+    private long m_lastTimeSpawned;
 
     private int m_particlesSpawned;
     private int m_particlesToSpawn;
-    private long m_lastTimeSpawned;
-    private bool m_isSpawning;
+    private Vector2 m_position;
+    private float m_rotation;
 
     public ParticleEmitter(
         Texture2D spriteSheet,
@@ -58,6 +55,11 @@ public class ParticleEmitter
         if (!particleProperties.Any(p => causeOfDeathPropertyType.IsInstanceOfType(p))) throw new ArgumentException();
     }
 
+    private float TimeBetweenParticles
+    {
+        get => 1000F / m_particlesPerSecond;
+    }
+
     public void OnUpdate(object sender, UpdateEventArgs e)
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
@@ -76,7 +78,8 @@ public class ParticleEmitter
 
             int textureIndex = m_textureSources.Length - 1;
 
-            if (m_particleProperties.OfType<RandomSpriteProperty>().Any()) textureIndex = m_particleProperties.OfType<RandomSpriteProperty>().First().SpriteIndex;
+            if (m_particleProperties.OfType<RandomSpriteProperty>().Any())
+                textureIndex = m_particleProperties.OfType<RandomSpriteProperty>().First().SpriteIndex;
 
             ActivateParticle
             (
@@ -89,7 +92,8 @@ public class ParticleEmitter
             m_particlesSpawned++;
         }
 
-        foreach (Particle particle in m_particles.Where(static particle => particle.IsActive)) HandleParticleProperties(particle);
+        foreach (Particle particle in m_particles.Where
+                     (static particle => particle.IsActive)) HandleParticleProperties(particle);
     }
 
     public void StartSpawning(int particlesToSpawn = 0)

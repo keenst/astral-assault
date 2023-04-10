@@ -1,17 +1,19 @@
-﻿using System;
+﻿#region
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+#endregion
 
 namespace AstralAssault;
 
 public class Collider
 {
-    public readonly Entity Parent;
-    public Rectangle Rectangle;
-    public bool IsSolid;
-    private Vector2[] m_corners;
-    private Vector2[] m_axes;
     private readonly float m_mass;
+    public readonly Entity Parent;
+    public bool IsSolid;
+    private Vector2[] m_axes;
+    private Vector2[] m_corners;
+    public Rectangle Rectangle;
 
     public Collider(Entity parent, Rectangle rectangle, bool isSolid, float mass)
     {

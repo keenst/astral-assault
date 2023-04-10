@@ -1,5 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿#region
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+#endregion
 
 namespace AstralAssault;
 
@@ -12,43 +14,53 @@ public class Crosshair : Entity, IMouseEventListener
 
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Crosshair");
 
-        Frame activeFrame   = new(new Rectangle(0,  0, 16, 16));
-        Frame inactiveFrame = new(new Rectangle(64, 0, 16, 16));
+        Frame activeFrame = new Frame(new Rectangle(0, 0, 16, 16));
+        Frame inactiveFrame = new Frame(new Rectangle(64, 0, 16, 16));
 
-        Animation deactivateAnimation = new(
+        Animation deactivateAnimation = new Animation
+        (
             new[]
             {
-                new Frame(new Rectangle(16, 0, 16, 16), 30),
-                new Frame(new Rectangle(32, 0, 16, 16), 20),
+                new Frame(new Rectangle(16, 0, 16, 16), 30), new Frame(new Rectangle(32, 0, 16, 16), 20),
                 new Frame(new Rectangle(48, 0, 16, 16), 10)
-            },
-            false);
+            }, false
+        );
 
-        Animation activateAnimation = new(
+        Animation activateAnimation = new Animation
+        (
             new[]
             {
-                new Frame(new Rectangle(48, 0, 16, 16), 30),
-                new Frame(new Rectangle(32, 0, 16, 16), 20),
+                new Frame(new Rectangle(48, 0, 16, 16), 30), new Frame(new Rectangle(32, 0, 16, 16), 20),
                 new Frame(new Rectangle(16, 0, 16, 16), 10)
-            },
-            false);
+            }, false
+        );
 
-        Animation activeAnimation   = new(new[] { activeFrame },   false);
-        Animation inactiveAnimation = new(new[] { inactiveFrame }, false);
+        Animation activeAnimation = new Animation(new[] { activeFrame }, false);
+        Animation inactiveAnimation = new Animation(new[] { inactiveFrame }, false);
 
-        Transition[] transitions = {
-            new(0, 1, new[] { 2, 1 }, "IsActive", 0),
-            new(1, 0, new[] { 3, 0 }, "IsActive", 1)
+        Transition[] transitions =
+        {
+            new Transition(0, 1, new[] { 2, 1 }, "IsActive", 0), new Transition(1, 0, new[] { 3, 0 }, "IsActive", 1)
         };
 
-        SpriteRenderer = new SpriteRenderer(
-            spriteSheet, 
-            new[] { activeAnimation, inactiveAnimation, deactivateAnimation, activateAnimation }, 
+        SpriteRenderer = new SpriteRenderer
+        (
+            spriteSheet,
+            new[] { activeAnimation, inactiveAnimation, deactivateAnimation, activateAnimation },
             LayerDepth.Crosshair,
             transitions,
-            new[] { "IsActive" });
+            new[] { "IsActive" }
+        );
 
         OutOfBoundsBehavior = OutOfBounds.DoNothing;
+    }
+
+    public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e) { }
+
+    public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
+    {
+        Point scale = new Point((int)GameState.Root.ScaleX, (int)GameState.Root.ScaleY);
+        Position = (e.Position / scale).ToVector2();
     }
 
     public override void Destroy()
@@ -67,13 +79,5 @@ public class Crosshair : Entity, IMouseEventListener
         float distance = Vector2.Distance(playerPosition, Position);
 
         SpriteRenderer.SetAnimationCondition("IsActive", distance < 12 ? 0 : 1);
-    }
-
-    public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e) { }
-
-    public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
-    {
-        Point scale = new Point((int)GameState.Root.ScaleX, (int)GameState.Root.ScaleY);
-        Position = (e.Position / scale).ToVector2();
     }
 }

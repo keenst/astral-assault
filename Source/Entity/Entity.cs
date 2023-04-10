@@ -1,42 +1,35 @@
-﻿using System;
+﻿#region
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Vector2 = Microsoft.Xna.Framework.Vector2;
-using Vector4 = Microsoft.Xna.Framework.Vector4;
+#endregion
 
 namespace AstralAssault;
 
 public class Entity
 {
-    public Vector2 Position;
-    public Vector2 Velocity;
-    protected float Rotation;
-    protected Collider Collider;
-    protected SpriteRenderer SpriteRenderer;
     protected readonly GameplayState GameState;
-    protected OutOfBounds OutOfBoundsBehavior = OutOfBounds.Wrap;
-    protected bool IsActor = false;
-    protected float MaxHP;
-    protected float HP;
-    protected float ContactDamage;
 
-    private bool m_isHighlighted;
-    private long m_timeStartedHighlightingMS;
-    private float m_highlightAlpha;
+    private readonly long m_timeSpawned;
+    protected Collider Collider;
+    protected float ContactDamage;
+    protected float HP;
+    protected bool IsActor = false;
 
     public bool IsFriendly;
 
-    private readonly long m_timeSpawned;
-
-    public long TimeSinceSpawned
-    {
-        get => DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - m_timeSpawned;
-    }
-
     private Texture2D m_healthBarTexture;
+    private float m_highlightAlpha;
 
-    protected enum OutOfBounds { DoNothing, Wrap, Destroy }
+    private bool m_isHighlighted;
+    private long m_timeStartedHighlightingMS;
+    protected float MaxHP;
+    protected OutOfBounds OutOfBoundsBehavior = OutOfBounds.Wrap;
+    public Vector2 Position;
+    protected float Rotation;
+    protected SpriteRenderer SpriteRenderer;
+    public Vector2 Velocity;
 
     protected Entity(GameplayState gameState, Vector2 position)
     {
@@ -45,6 +38,11 @@ public class Entity
         m_timeSpawned = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
         CreateHealthBarTexture();
+    }
+
+    public long TimeSinceSpawned
+    {
+        get => DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - m_timeSpawned;
     }
 
     public virtual void OnUpdate(object sender, UpdateEventArgs e)
@@ -201,4 +199,6 @@ public class Entity
 
         return new List<DrawTask> { background, empty, full };
     }
+
+    protected enum OutOfBounds { DoNothing, Wrap, Destroy }
 }

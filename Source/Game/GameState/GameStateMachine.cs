@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#region
+using System.Collections.Generic;
+#endregion
 
 namespace AstralAssault;
 
