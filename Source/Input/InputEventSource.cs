@@ -98,11 +98,11 @@ public static class InputEventSource
             MouseButtons button = (MouseButtons)i;
             
             MouseDown.Add(button);
-            MouseButtonEvent?.Invoke(null, new MouseButtonEventArgs(button));
+            MouseButtonEvent?.Invoke(null, new MouseButtonEventArgs(button, _mousePos));
 
             if (!_prevMouseDown.Contains(button))
             {
-                MouseButtonPressedEvent?.Invoke(null, new MouseButtonEventArgs(button));
+                MouseButtonPressedEvent?.Invoke(null, new MouseButtonEventArgs(button, _mousePos));
             }
         }
     }
