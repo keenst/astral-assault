@@ -81,10 +81,10 @@ public class Game1 : Game
 
         AssetManager.Init(this);
         TextRenderer.Init();
-        InputEventSource.Init();
+        InputEventSource.Init(this);
         Palette.Init();
         
-        GameStateMachine = new GameStateMachine(new GameplayState(this));
+        GameStateMachine = new GameStateMachine(new MainMenuState(this));
 
         base.Initialize();
     }

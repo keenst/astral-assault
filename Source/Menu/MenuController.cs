@@ -1,19 +1,28 @@
-using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using MouseButtons = AstralAssault.InputEventSource.MouseButtons;
 
 namespace AstralAssault.Source.Menu;
 
-public class MenuController : IMouseEventListener
+public class MenuController : IMouseEventListener, IMousePressedEventListener
 {
     private bool _isMenuOpen;
     private Menu _menu;
     private IMenuItem _prevHoveredMenuItem;
+    private Texture2D _buttonTexture;
+    private Game1 _root;
 
-    public MenuController(Menu menu)
+    public MenuController(Menu menu, GameState gameState)
     {
         _menu = menu;
+        _root = gameState.Root;
+
+        _buttonTexture = new Texture2D(_root.GraphicsDevice, 1, 1);
+        _buttonTexture.SetData(new[] { Color.White });
+        
+        Open();
     }
     
     private void OnUpdate(object sender, UpdateEventArgs e)
@@ -27,7 +36,17 @@ public class MenuController : IMouseEventListener
 
         if (!_isMenuOpen) return drawTasks;
         
-        throw new NotImplementedException();
+        DrawTask drawTask = new(
+            _buttonTexture,
+            new Rectangle(0, 0, 1, 1),
+            new Rectangle(0, 0, 32, 32),
+            0,
+            LayerDepth.HUD,
+            new List<IDrawTaskEffect>(),
+            Color.White);
+
+        drawTasks.Add(drawTask);
+        return drawTasks;
     }
 
     public void Open()
@@ -64,23 +83,25 @@ public class MenuController : IMouseEventListener
     private void StartListening()
     {
         UpdateEventSource.UpdateEvent += OnUpdate;
-        InputEventSource.MouseButtonEvent += OnMouseButtonEvent;
+        InputEventSource.MouseButtonEvent += OnMouseButtonPressedEvent;
         InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
     }
 
     private void StopListening()
     {
         UpdateEventSource.UpdateEvent -= OnUpdate;
-        InputEventSource.MouseButtonEvent -= OnMouseButtonEvent;
+        InputEventSource.MouseButtonEvent -= OnMouseButtonPressedEvent;
         InputEventSource.MouseMoveEvent -= OnMouseMoveEvent;
     }
 
-    public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)
+    public void OnMousePressedEvent(object sender, MouseButtonEventArgs e)
     {
         if (e.Button != MouseButtons.Left) return;
 
+        Debug.WriteLine("Click");
         IMenuItem clickedMenuItem = GetCollidingMenuItem(e.Position.X, e.Position.Y);
-        clickedMenuItem?.OnClick();
+        if (clickedMenuItem != null) Debug.WriteLine("Clicksdalkj");
+        clickedMenuItem?.ClickAction();
     }
 
     public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)

@@ -8,27 +8,31 @@ public struct Button : IMenuItem
     public int Y { get; }
     public int Width { get; }
     public int Height { get; }
-
-    public Button(int x, int y, int width, int height)
+    public Action ClickAction { get; }
+    public string Text { get; }
+    
+    public Button(int x, int y, int width, int height, string text, Action clickAction)
     {
         X = x;
         Y = y;
         Width = width;
         Height = height;
+        Text = text;
+        ClickAction = clickAction;
     }
     
     public void OnClick()
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnHoverEnter()
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnHoverExit()
     {
-        throw new NotImplementedException();
+        
     }
 }

@@ -76,7 +76,6 @@ public class Crosshair : Entity, IMouseEventListener
 
     public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
     {
-        Point scale = new((int)GameState.Root.ScaleX, (int)GameState.Root.ScaleY);
-        Position = (e.Position / scale).ToVector2();
+        Position = e.Position.ToVector2();
     }
 }

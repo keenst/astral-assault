@@ -28,6 +28,8 @@ public static class InputEventSource
     private static Point _mousePos;
     private static Point _prevMousePos;
 
+    private static Game1 _root;
+
     public enum MouseButtons
     {
         Left,
@@ -37,9 +39,10 @@ public static class InputEventSource
         Side2
     }
 
-    public static void Init()
+    public static void Init(Game1 root)
     {
         UpdateEventSource.UpdateEvent += OnUpdate;
+        _root = root;
     }
 
     private static void OnUpdate(object sender, UpdateEventArgs e)
@@ -112,9 +115,11 @@ public static class InputEventSource
         _prevMousePos = _mousePos;
         _mousePos = Mouse.GetState().Position;
 
-        if (_mousePos != _prevMousePos)
-        {
-            MouseMoveEvent?.Invoke(null, new MouseMoveEventArgs(_mousePos));
-        }
+        if (_mousePos == _prevMousePos) return;
+        
+        Point scale = new((int)_root.ScaleX, (int)_root.ScaleY);
+        Point screenPosition = _mousePos / scale;
+            
+        MouseMoveEvent?.Invoke(null, new MouseMoveEventArgs(screenPosition));
     }
 }
