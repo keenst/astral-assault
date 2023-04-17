@@ -10,7 +10,7 @@ public class GameplayState : GameState
     public readonly List<Entity> Entities;
     public readonly CollisionSystem CollisionSystem = new();
     public WaveController WaveController;
-    
+
     public Player Player => (Player) Entities.Find(entity => entity is Player);
 
     public GameplayState(Game1 root) : base(root)
@@ -30,6 +30,11 @@ public class GameplayState : GameState
 
         drawTasks.AddRange(WaveController.GetDrawTasks());
 
+        string scoreText = $"Score: {Root.Score}";
+        Color textColor = Palette.GetColor(Palette.Colors.Grey9);
+        List<DrawTask> scoreTasks = scoreText.CreateDrawTasks(new Vector2(4, 4), textColor, LayerDepth.HUD);
+        drawTasks.AddRange(scoreTasks);
+        
         if (!Root.ShowDebug) return drawTasks;
         
         foreach (Collider collider in CollisionSystem.Colliders)
@@ -61,6 +66,7 @@ public class GameplayState : GameState
     {
         Entities.Add(new Player(this, new Vector2(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F)));
         Entities.Add(new Crosshair(this));
+        Root.Score = 0;
     }
 
     public override void Exit()

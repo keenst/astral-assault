@@ -26,6 +26,7 @@ public class Game1 : Game
     }
     
     public GameStateMachine GameStateMachine;
+    public int Score;
     
     // render
     private SpriteBatch _spriteBatch;

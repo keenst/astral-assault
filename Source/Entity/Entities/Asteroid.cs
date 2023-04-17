@@ -119,6 +119,14 @@ public class Asteroid : Entity
 
         _debrisController.SpawnDebris(Position, (int)_size);
         
+        GameState.Root.Score += _size switch
+        {
+            Sizes.Smallest => 100,
+            Sizes.Small => 300,
+            Sizes.Medium => 700,
+            _ => 0
+        };
+        
         base.OnDeath();
     }
 

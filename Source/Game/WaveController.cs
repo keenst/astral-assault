@@ -78,10 +78,11 @@ public class WaveController : IUpdateEventListener
     {
         List<DrawTask> drawTasks = _debrisController.GetDrawTasks();
         
-        if (!_drawWaveText) return drawTasks;
+        //if (!_drawWaveText) return drawTasks;
         
         string text = $"Wave: {_currentWave}";
-        drawTasks.AddRange(text.CreateDrawTasks(new Vector2(10, 10), Color.White, LayerDepth.HUD));
+        Color color = Palette.GetColor(Palette.Colors.Grey9);
+        drawTasks.AddRange(text.CreateDrawTasks(new Vector2(4, 16), color, LayerDepth.HUD));
 
         return drawTasks;
     }
