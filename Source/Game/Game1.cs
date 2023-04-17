@@ -38,9 +38,10 @@ public class Game1 : Game
     private static readonly Color BackgroundColor = new(28, 23, 41);
     public const int TargetWidth = (int)Width.Quarter;
     public const int TargetHeight = (int)Height.Quarter;
-    private readonly Matrix _scale;
-    public readonly float ScaleX;
-    public readonly float ScaleY;
+    private Matrix _scale;
+    public float ScaleX;
+    public float ScaleY;
+    private readonly GraphicsDeviceManager _graphics;
 
     // debug tools
     public bool ShowDebug;
@@ -53,18 +54,18 @@ public class Game1 : Game
     public Game1()
     {
         // set up game class
-        GraphicsDeviceManager graphics = new(this);
+        _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
 
         // set up rendering
-        graphics.PreferredBackBufferWidth = (int)Width.Half;
-        graphics.PreferredBackBufferHeight = (int)Height.Half;
+        _graphics.PreferredBackBufferWidth = (int)Width.Half;
+        _graphics.PreferredBackBufferHeight = (int)Height.Half;
 
-        ScaleX = graphics.PreferredBackBufferWidth / (float)TargetWidth;
-        ScaleY = graphics.PreferredBackBufferHeight / (float)TargetHeight;
+        ScaleX = _graphics.PreferredBackBufferWidth / (float)TargetWidth;
+        ScaleY = _graphics.PreferredBackBufferHeight / (float)TargetHeight;
         _scale = Matrix.CreateScale(new Vector3(ScaleX, ScaleY, 1));
 
-        graphics.SynchronizeWithVerticalRetrace = false;
+        _graphics.SynchronizeWithVerticalRetrace = false;
         IsFixedTimeStep = false;
         
         ShowDebug = false;
@@ -104,6 +105,28 @@ public class Game1 : Game
         if (Keyboard.GetState().IsKeyDown(Keys.F3) && !_prevKeyState.IsKeyDown(Keys.F3))
             ShowDebug = !ShowDebug;
 
+        if (Keyboard.GetState().IsKeyDown(Keys.F) && !_prevKeyState.IsKeyDown(Keys.F))
+        {
+            if (_graphics.IsFullScreen)
+            {
+                _graphics.PreferredBackBufferWidth = (int)Width.Half;
+                _graphics.PreferredBackBufferHeight = (int)Height.Half;
+                _graphics.IsFullScreen = false;
+                _graphics.ApplyChanges();
+            }
+            else
+            {
+                _graphics.PreferredBackBufferWidth = (int)Width.Full;
+                _graphics.PreferredBackBufferHeight = (int)Height.Full;
+                _graphics.IsFullScreen = true;
+                _graphics.ApplyChanges();
+            }
+            
+            //ScaleX = _graphics.PreferredBackBufferWidth / (float)TargetWidth;
+            //ScaleY = _graphics.PreferredBackBufferHeight / (float)TargetHeight;
+            //_scale = Matrix.CreateScale(new Vector3(ScaleX, ScaleY, 1));
+        }
+
         _prevKeyState = Keyboard.GetState();
 
         UpdateEventSource.Update(gameTime);
@@ -118,7 +141,16 @@ public class Game1 : Game
         
         GraphicsDevice.Clear(BackgroundColor);
 
-        List<DrawTask> drawTasks = GameStateMachine.GetDrawTasks().OrderBy(dt => (int)dt.LayerDepth).ToList();
+        List<DrawTask> drawTasks = new();
+        
+        string fullscreenText = "Press F for fullscreen";
+        List<DrawTask> fullscreenTextTasks = 
+            fullscreenText.CreateDrawTasks(new Vector2(4, 258), Color.White, LayerDepth.Background);
+        drawTasks.AddRange(fullscreenTextTasks);
+        
+        drawTasks.AddRange(GameStateMachine.GetDrawTasks());
+        
+        drawTasks = drawTasks.OrderBy(dt => (int)dt.LayerDepth).ToList();
 
         if (ShowDebug)
         {
