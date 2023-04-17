@@ -70,9 +70,6 @@ public class GameplayState : GameState
     {
         Entities.Add(new Player(this, new Vector2(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F)));
         Entities.Add(new Crosshair(this));
-        Entities.Add(new Quad(this, new Vector2(100, 100)));
-        Entities.Add(new Haste(this, new Vector2(200, 200)));
-        Entities.Add(new MegaHealth(this, new Vector2(380, 200)));
         Root.Score = 0;
     }
 
