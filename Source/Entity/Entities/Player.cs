@@ -240,7 +240,8 @@ public class Player : Entity, IInputEventListener
                 GameState, 
                 _lastCannon ? _muzzle.Item1 : _muzzle.Item2, 
                 rot, 
-                BulletSpeed));
+                BulletSpeed,
+                false));
             
         _lastCannon = !_lastCannon;
     }
