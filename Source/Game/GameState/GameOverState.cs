@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace AstralAssault;
 
@@ -63,6 +64,8 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
 
     public void OnKeyboardPressedEvent(object sender, KeyboardEventArgs e)
     {
+        if (e.Keys.Contains(Keys.F)) return;
+        
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         if (timeNow - _timeEntered < 300)
         {
