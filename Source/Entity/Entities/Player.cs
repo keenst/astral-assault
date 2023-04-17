@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
+using AstralAssault.Items;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace AstralAssault;
+
+public enum PowerUps
+{
+    QuadDamage,
+    Haste
+}
 
 public class Player : Entity, IInputEventListener
 {
@@ -19,14 +25,15 @@ public class Player : Entity, IInputEventListener
     private long _lastTimeFired;
     private float _delta;
     private readonly ParticleEmitter _particleEmitter;
+    private readonly List<Tuple<long, PowerUps>> _powerUps = new(); // (time of pick up, power up)
 
-    private const float MoveSpeed = 200;
-    private const float MaxSpeed = 100;
-    private const float TiltSpeed = 200;
+    private float _moveSpeed = 200;
+    private float _maxSpeed = 100;
+    private float _tiltSpeed = 200;
     private const float Friction = 30;
     private const float Pi = 3.14F;
     private const float BulletSpeed = 250;
-    private const int ShootSpeed = 200;
+    private int _shootSpeed = 200;
 
     public Player(GameplayState gameState, Vector2 position) :base(gameState, position)
     {
@@ -168,6 +175,43 @@ public class Player : Entity, IInputEventListener
         
         _thrusterIsOn = false;
         
+        for (int i = 0; i < _powerUps.Count; i++)
+        {
+            Tuple<long, PowerUps> powerUp = _powerUps[i];
+            
+            long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            if (timeNow - powerUp.Item1 > 10 * 1000)
+            {
+                _powerUps.Remove(powerUp);
+                i--;
+                continue;
+            }
+
+            string powerUpName = powerUp.Item2 switch
+            {
+                PowerUps.QuadDamage => "quad damage",
+                PowerUps.Haste => "haste",
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            
+            Vector4 color = powerUp.Item2 switch
+            {
+                PowerUps.QuadDamage => Palette.GetColorVector(Palette.Colors.Purple6),
+                PowerUps.Haste => Palette.GetColorVector(Palette.Colors.Red8),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            List<DrawTask> powerUpTask = powerUpName.CreateDrawTasks(
+                new Vector2(4, 28 + i * 12),
+                Color.White,
+                LayerDepth.HUD);
+            
+            foreach (DrawTask task in powerUpTask)
+                task.EffectContainer.SetEffect<ColorEffect, Vector4>(color);
+
+            drawTasks.AddRange(powerUpTask);
+        }
+
         return drawTasks;
     }
 
@@ -192,31 +236,31 @@ public class Player : Entity, IInputEventListener
         Vector2 forward = new Vector2(
             (float)Math.Cos(Rotation), 
             (float)Math.Sin(Rotation)
-        ) * MoveSpeed * _delta;
+        ) * _moveSpeed * _delta;
         
         Velocity = new Vector2(
-            Math.Clamp(Velocity.X + forward.X * yAxis, -MaxSpeed, MaxSpeed),
-            Math.Clamp(Velocity.Y + forward.Y * yAxis, -MaxSpeed, MaxSpeed));
+            Math.Clamp(Velocity.X + forward.X * yAxis, -_maxSpeed, _maxSpeed),
+            Math.Clamp(Velocity.Y + forward.Y * yAxis, -_maxSpeed, _maxSpeed));
 
         // tilting
         Vector2 right = new Vector2(
             (float)Math.Cos(Rotation + Pi / 2), 
             (float)Math.Sin(Rotation + Pi / 2)
-        ) * TiltSpeed * _delta;
+        ) * _tiltSpeed * _delta;
         
         Velocity = new Vector2(
-            Math.Clamp(Velocity.X + right.X * xAxis, -MaxSpeed, MaxSpeed),
-            Math.Clamp(Velocity.Y + right.Y * xAxis, -MaxSpeed, MaxSpeed));
+            Math.Clamp(Velocity.X + right.X * xAxis, -_maxSpeed, _maxSpeed),
+            Math.Clamp(Velocity.Y + right.Y * xAxis, -_maxSpeed, _maxSpeed));
 
-        if (Velocity.Length() > MaxSpeed)
+        if (Velocity.Length() > _maxSpeed)
         {
             Velocity.Normalize();
-            Velocity *= MaxSpeed;
+            Velocity *= _maxSpeed;
         }
-        else if (Velocity.Length() < -MaxSpeed)
+        else if (Velocity.Length() < -_maxSpeed)
         {
             Velocity.Normalize();
-            Velocity *= -MaxSpeed;
+            Velocity *= -_maxSpeed;
         }
     }
 
@@ -226,7 +270,7 @@ public class Player : Entity, IInputEventListener
         
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         
-        if (_lastTimeFired + ShootSpeed > timeNow) return;
+        if (_lastTimeFired + _shootSpeed > timeNow) return;
 
         _lastTimeFired = timeNow;
         
@@ -241,9 +285,37 @@ public class Player : Entity, IInputEventListener
                 _lastCannon ? _muzzle.Item1 : _muzzle.Item2, 
                 rot, 
                 BulletSpeed,
-                false));
+                _powerUps.Any(t => t.Item2 == PowerUps.QuadDamage)));
             
         _lastCannon = !_lastCannon;
+    }
+
+    public override void OnCollision(Collider other)
+    {
+        base.OnCollision(other);
+
+        long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        
+        if (other.Parent is Quad)
+        {
+            if (_powerUps.Any(t => t.Item2 == PowerUps.QuadDamage))
+            {
+                _powerUps.RemoveAll(t => t.Item2 == PowerUps.QuadDamage);
+            }
+            _powerUps.Add(new Tuple<long, PowerUps>(timeNow, PowerUps.QuadDamage));
+        }
+        else if (other.Parent is Haste)
+        {
+            if (_powerUps.Any(t => t.Item2 == PowerUps.Haste))
+            {
+                _powerUps.RemoveAll(t => t.Item2 == PowerUps.Haste);
+            }
+            _powerUps.Add(new Tuple<long, PowerUps>(timeNow, PowerUps.Haste));
+        }
+        else if (other.Parent is MegaHealth)
+        {
+            HP = Math.Min(MaxHP, HP + 30);
+        }
     }
 
     public override void Destroy()
@@ -313,6 +385,21 @@ public class Player : Entity, IInputEventListener
     public override void OnUpdate(object sender, UpdateEventArgs e)
     {
         base.OnUpdate(sender, e);
+
+        if (_powerUps.Any(t => t.Item2 == PowerUps.Haste))
+        {
+            _shootSpeed = 100;
+            _maxSpeed = 150;
+            _moveSpeed = 400;
+            _tiltSpeed = 400;
+        }
+        else
+        {
+            _shootSpeed = 200;
+            _maxSpeed = 100;
+            _moveSpeed = 200;
+            _tiltSpeed = 200;
+        }
         
         _delta = e.DeltaTime;
 

@@ -35,7 +35,7 @@ public class WaveController : IUpdateEventListener
     {
         _currentWave++;
         
-        int enemiesToSpawn = (int)(_currentWave * 1.5F);
+        int enemiesToSpawn = (int)(_currentWave * 1.1F);
         
         Random rnd = new();
         for (int i = 0; i < enemiesToSpawn; i++)

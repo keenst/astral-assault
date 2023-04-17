@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AstralAssault.Items;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -10,6 +11,7 @@ public class GameplayState : GameState
     public readonly List<Entity> Entities;
     public readonly CollisionSystem CollisionSystem = new();
     public WaveController WaveController;
+    public ItemController ItemController;
 
     public Player Player => (Player) Entities.Find(entity => entity is Player);
 
@@ -17,6 +19,8 @@ public class GameplayState : GameState
     {
         Entities = new List<Entity>();
         WaveController = new WaveController(this, Root);
+        ItemController = new ItemController(this);
+        ItemController.StartListening();
     }
 
     public override List<DrawTask> GetDrawTasks()
@@ -66,12 +70,16 @@ public class GameplayState : GameState
     {
         Entities.Add(new Player(this, new Vector2(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F)));
         Entities.Add(new Crosshair(this));
+        Entities.Add(new Quad(this, new Vector2(100, 100)));
+        Entities.Add(new Haste(this, new Vector2(200, 200)));
+        Entities.Add(new MegaHealth(this, new Vector2(380, 200)));
         Root.Score = 0;
     }
 
     public override void Exit()
     {
         WaveController.StopListening();
+        ItemController.StopListening();
         while (Entities.Count > 0) Entities[0].Destroy();
     }
 }

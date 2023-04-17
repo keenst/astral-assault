@@ -33,7 +33,7 @@ public class Bullet : Entity
 
         OutOfBoundsBehavior = OutOfBounds.Destroy;
 
-        ContactDamage = 4;
+        ContactDamage = isQuadDamage ? 16 : 4;
         IsFriendly = true;
     }
 

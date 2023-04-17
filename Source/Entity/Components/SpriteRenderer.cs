@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -24,6 +24,8 @@ public class SpriteRenderer : IUpdateEventListener
     private int[] _animationQueue;
     private int _indexInQueue;
     private readonly Dictionary<string, float> _animationConditions = new();
+
+    public bool Debugging = false;
 
     private const float Pi = 3.14F;
     
@@ -70,6 +72,11 @@ public class SpriteRenderer : IUpdateEventListener
 
     public void OnUpdate(object sender, UpdateEventArgs e)
     {
+        if (Debugging)
+        {
+            Debug.WriteLine(_currentFrameIndex);
+        }
+        
         int frameLength = CurrentAnimation.Frames[_currentFrameIndex].Time;
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
@@ -77,6 +84,7 @@ public class SpriteRenderer : IUpdateEventListener
 
         if (transition.HasValue)
         {
+            if (Debugging) Debug.WriteLine("Transitioning");
             _animationQueue = transition.Value.AnimationPath;
             CurrentAnimationIndex = _animationQueue[0];
             _indexInQueue = 0;
@@ -87,9 +95,17 @@ public class SpriteRenderer : IUpdateEventListener
             return;
         }
 
-        if (_animationQueue == null) return;
-        
         if (timeNow < _lastFrameUpdate + frameLength) return;
+        
+        if (_animationQueue == null)
+        {
+            if (!CurrentAnimation.IsLooping) return;
+            
+            _currentFrameIndex = (_currentFrameIndex + 1) % CurrentAnimation.Frames.Length;
+            _lastFrameUpdate = timeNow;
+
+            return;
+        }
 
         if (_currentFrameIndex + 1 == CurrentAnimation.Frames.Length &&
             _indexInQueue + 1 < _animationQueue.Length)
