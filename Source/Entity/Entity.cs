@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AstralAssault.Items;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
@@ -110,6 +111,8 @@ public class Entity : IUpdateEventListener
         if (!IsActor || other.Parent.IsFriendly == IsFriendly) return;
 
         HP = Math.Max(0, HP - other.Parent.ContactDamage);
+
+        if (this is Asteroid && other.Parent is MegaHealth or Haste or Quad) return;
 
         _isHighlighted = true;
         _timeStartedHighlightingMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
