@@ -67,7 +67,7 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
         if (e.Keys.Contains(Keys.F)) return;
         
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        if (timeNow - _timeEntered < 300)
+        if (timeNow - _timeEntered < 1000)
         {
             return;
         }
