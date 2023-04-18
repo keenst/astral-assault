@@ -38,6 +38,7 @@ public static class Palette
     public static void Init()
     {
         string path = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+        //string path = Directory.GetCurrentDirectory();
         string[] lines = File.ReadAllLines(path + "/Content/gora64.hex");
         
         foreach (string line in lines)
