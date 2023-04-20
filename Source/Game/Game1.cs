@@ -85,6 +85,7 @@ public class Game1 : Game
         TextRenderer.Init();
         InputEventSource.Init();
         Palette.Init();
+        Jukebox.Init();
         
         GameStateMachine = new GameStateMachine(new GameplayState(this));
 

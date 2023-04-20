@@ -98,9 +98,26 @@ public class Asteroid : Entity
 
     protected override void OnDeath()
     {
-        if (!_hasExploded && _size - 1 >= 0)
+        if (!_hasExploded)
         {
             Random rnd = new();
+
+            string soundToPlay = rnd.Next(3) switch
+            {
+                0 => "Explosion1",
+                1 => "Explosion2",
+                2 => "Explosion3",
+                _ => throw new ArgumentOutOfRangeException()
+            };
+                
+            Jukebox.PlaySound(soundToPlay);
+
+            if (_size - 1 < 0)
+            {
+                _hasExploded = true;
+                return;
+            }
+            
             int amount = rnd.Next(1, 4);
 
             Vector2 playerPosition = GameState.Player.Position;

@@ -272,6 +272,14 @@ public class Player : Entity, IInputEventListener
         
         if (_lastTimeFired + _shootSpeed > timeNow) return;
 
+        Random rnd = new();
+        string soundName = 
+            (_powerUps.Any(t => t.Item2 is PowerUps.QuadDamage) ? "Quad" : "") + 
+            "Shoot" +
+            rnd.Next(1, 4);
+        
+        Jukebox.PlaySound(soundName, 0.5F);
+        
         _lastTimeFired = timeNow;
         
         float xDiff = _cursorPosition.X - (_lastCannon ? _muzzle.Item1.X : _muzzle.Item2.X);
@@ -328,6 +336,8 @@ public class Player : Entity, IInputEventListener
     protected override void OnDeath()
     {
         Game1 root = GameState.Root;
+        
+        Jukebox.PlaySound("GameOver");
         
         root.GameStateMachine.ChangeState(new GameOverState(root));
         

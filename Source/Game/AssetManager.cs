@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
@@ -8,6 +9,7 @@ public static class AssetManager
 {
     private static readonly Dictionary<string, Texture2D> Textures = new();
     private static readonly Dictionary<string, Effect> Effects = new();
+    private static readonly Dictionary<string, SoundEffect> SoundEffects = new();
     private static Game1 _root;
     
     public static void Init(Game1 root)
@@ -25,6 +27,11 @@ public static class AssetManager
             activeDictionary = Textures as Dictionary<string, T>;
             activeDirectory = "Assets";
         }
+        else if (typeof(T) == typeof(SoundEffect))
+        {
+            activeDictionary = SoundEffects as Dictionary<string, T>;
+            activeDirectory = "Assets";
+        }
         else if (typeof(T) == typeof(Effect))
         {
             activeDictionary = Effects as Dictionary<string, T>;
@@ -32,7 +39,7 @@ public static class AssetManager
         }
         else
         {
-            throw new ArgumentException("T must be either Texture2D or Effect");
+            throw new ArgumentException("T must be Texture2D, SoundEffect or Effect");
         }
 
         if (activeDictionary.ContainsKey(path))
