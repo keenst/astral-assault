@@ -9,9 +9,9 @@ namespace AstralAssault;
 
 public class GameOverState : GameState, IKeyboardPressedEventListener
 {
+    private readonly long _timeEntered;
     private Texture2D _gameOverText;
     private Texture2D _restartPrompt;
-    private long _timeEntered;
     
     public GameOverState(Game1 root) : base(root)
     {
@@ -41,6 +41,7 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
         drawTasks.Add(gameOverText);
         
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        
         if (timeNow - _timeEntered > 1000)
         {
             DrawTask restartPrompt = new(
@@ -53,9 +54,10 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
             drawTasks.Add(restartPrompt);
         }
 
-        string scoreText = $"Score: {Root.Score}";
+        int score = (int)Lerp(0, Root.Score, MathF.Min((timeNow - _timeEntered) / 800F, 1));
+        string scoreText = $"Score: {score}";
         Color textColor = Palette.GetColor(Palette.Colors.Grey9);
-        int textX = 240 - scoreText.Length * 4;
+        int textX = 240 - $"Score: {Root.Score}".Length * 4;
         List<DrawTask> scoreTasks = scoreText.CreateDrawTasks(new Vector2(textX, 150), textColor, LayerDepth.HUD);
         drawTasks.AddRange(scoreTasks);
 
@@ -84,5 +86,10 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
     public override void Exit()
     {
         InputEventSource.KeyboardPressedEvent -= OnKeyboardPressedEvent;
+    }
+    
+    private float Lerp(float firstFloat, float secondFloat, float by)
+    {
+        return firstFloat * (1 - by) + secondFloat * by;
     }
 }
