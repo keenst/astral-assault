@@ -83,7 +83,7 @@ public class DebrisController
                 continue;
             }
             
-            string scoreText = $"{_scores[i].Item2.Item2}";
+            string scoreText = ((int)(_scores[i].Item2.Item2 * (_gameplayState.Player.Multiplier - 0.1F))).ToString();
             int scoreX = (int)_scores[i].Item2.Item1.X - scoreText.Length * 4;
             Vector2 scorePosition = new(scoreX, _scores[i].Item2.Item1.Y - 5);
             

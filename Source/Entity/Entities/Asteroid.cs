@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -136,13 +137,17 @@ public class Asteroid : Entity
 
         _debrisController.SpawnDebris(Position, (int)_size);
         
-        GameState.Root.Score += _size switch
+        GameState.Player.Multiplier += 0.1F;
+
+        int score = _size switch
         {
             Sizes.Smallest => 100,
             Sizes.Small => 300,
             Sizes.Medium => 700,
             _ => 0
         };
+        
+        GameState.Root.Score += (int)(score * GameState.Player.Multiplier);
         
         base.OnDeath();
     }

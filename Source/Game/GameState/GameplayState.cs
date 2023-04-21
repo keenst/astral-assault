@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using AstralAssault.Items;
+using System.Globalization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
 
-public class GameplayState : GameState
+public class GameplayState : GameState, IUpdateEventListener
 {
     public readonly List<Entity> Entities;
     public readonly CollisionSystem CollisionSystem = new();
@@ -15,6 +15,13 @@ public class GameplayState : GameState
 
     public Player Player => (Player) Entities.Find(entity => entity is Player);
 
+    private static readonly Vector4 MultiplierBrokenColor = new(1, 0, 0, 1);
+    private static readonly Vector4 MultiplierIncreaseColor = new(1, 1, 0, 1);
+    private static readonly Vector4 MultiplierDefaultColor = new(1, 1, 1, 1);
+    private Vector4 _multiplierColor = MultiplierDefaultColor;
+    private float _prevMultiplier = 1;
+    
+    
     public GameplayState(Game1 root) : base(root)
     {
         Entities = new List<Entity>();
@@ -39,6 +46,14 @@ public class GameplayState : GameState
         List<DrawTask> scoreTasks = scoreText.CreateDrawTasks(new Vector2(4, 4), textColor, LayerDepth.HUD);
         drawTasks.AddRange(scoreTasks);
         
+        string multiplierText = $"X{Player.Multiplier.ToString("0.0", CultureInfo.GetCultureInfo("en-US"))}";
+        List<DrawTask> multiplierTasks = multiplierText.CreateDrawTasks(
+            new Vector2(480 - multiplierText.Length * 8 - 4, 4), 
+            textColor, 
+            LayerDepth.HUD,
+            new List<IDrawTaskEffect> { new ColorEffect(_multiplierColor) });
+        drawTasks.AddRange(multiplierTasks);
+
         if (!Root.ShowDebug) return drawTasks;
         
         foreach (Collider collider in CollisionSystem.Colliders)
@@ -71,6 +86,8 @@ public class GameplayState : GameState
         Entities.Add(new Player(this, new Vector2(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F)));
         Entities.Add(new Crosshair(this));
         Root.Score = 0;
+
+        UpdateEventSource.UpdateEvent += OnUpdate;
     }
 
     public override void Exit()
@@ -78,5 +95,24 @@ public class GameplayState : GameState
         WaveController.StopListening();
         ItemController.StopListening();
         while (Entities.Count > 0) Entities[0].Destroy();
+        
+        UpdateEventSource.UpdateEvent -= OnUpdate;
+    }
+
+    public void OnUpdate(object sender, UpdateEventArgs e)
+    {
+        if (Player == null) return;
+        
+        float multiplier = Player.Multiplier;
+        
+        if (multiplier != _prevMultiplier)
+        {
+            _multiplierColor = multiplier > _prevMultiplier ? MultiplierIncreaseColor : MultiplierBrokenColor;
+            _prevMultiplier = multiplier;
+        }
+        else
+        {
+            _multiplierColor = Vector4.Lerp(_multiplierColor, MultiplierDefaultColor, e.DeltaTime * 2);
+        }
     }
 }

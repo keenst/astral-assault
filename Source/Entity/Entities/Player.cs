@@ -17,6 +17,8 @@ public enum PowerUps
 
 public class Player : Entity, IInputEventListener
 {
+    public float Multiplier = 1;
+    
     private Vector2 _cursorPosition;
     private Tuple<Vector2, Vector2> _muzzle = new(Vector2.Zero, Vector2.Zero);
     private bool _lastCannon;
@@ -323,6 +325,10 @@ public class Player : Entity, IInputEventListener
         else if (other.Parent is MegaHealth)
         {
             HP = Math.Min(MaxHP, HP + 30);
+        }
+        else if (other.Parent is Asteroid)
+        {
+            Multiplier = 1;
         }
     }
 

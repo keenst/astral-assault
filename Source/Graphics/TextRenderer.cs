@@ -63,7 +63,8 @@ public static class TextRenderer
         this string input, 
         Vector2 position, 
         Color color,
-        LayerDepth layerDepth)
+        LayerDepth layerDepth,
+        List<IDrawTaskEffect> effects)
     {
         string text = input.ToUpper();
         List<DrawTask> drawTasks = new();
@@ -81,11 +82,20 @@ public static class TextRenderer
                 new Vector2(position.X + i * 8, position.Y),
                 0,
                 layerDepth,
-                new List<IDrawTaskEffect>(),
+                effects,
                 color,
                 Vector2.Zero));
         }
 
         return drawTasks;
+    }
+    
+    public static List<DrawTask> CreateDrawTasks(
+        this string input, 
+        Vector2 position, 
+        Color color,
+        LayerDepth layerDepth)
+    {
+        return input.CreateDrawTasks(position, color, layerDepth, new List<IDrawTaskEffect>());
     }
 }
