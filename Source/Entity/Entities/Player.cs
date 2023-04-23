@@ -36,9 +36,15 @@ public class Player : Entity, IInputEventListener
     private const float Pi = 3.14F;
     private const float BulletSpeed = 250;
     private int _shootSpeed = 200;
+    
+    private const int PowerUpDuration = 10 * 1000;
+    private Texture2D _square;
 
     public Player(GameplayState gameState, Vector2 position) :base(gameState, position)
     {
+        _square = new Texture2D(GameState.Root.GraphicsDevice, 1, 1);
+        _square.SetData(new[] { Color.White });
+        
         Position = position;
         Rotation = Pi / 2;
 
@@ -182,7 +188,7 @@ public class Player : Entity, IInputEventListener
             Tuple<long, PowerUps> powerUp = _powerUps[i];
             
             long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-            if (timeNow - powerUp.Item1 > 10 * 1000)
+            if (timeNow - powerUp.Item1 > PowerUpDuration)
             {
                 _powerUps.Remove(powerUp);
                 i--;
@@ -203,6 +209,37 @@ public class Player : Entity, IInputEventListener
                 _ => throw new ArgumentOutOfRangeException()
             };
 
+            Vector4 backgroundColor = Palette.GetColorVector(Palette.Colors.Black);
+            Vector4 barColor = ((timeNow - powerUp.Item1) / (float)PowerUpDuration) switch
+            {
+                < 0.25F => Palette.GetColorVector(Palette.Colors.Green7),
+                < 0.5F => Palette.GetColorVector(Palette.Colors.Green4),
+                < 0.75F => Palette.GetColorVector(Palette.Colors.Red8),
+                < 1 => Palette.GetColorVector(Palette.Colors.Red4),
+                _ => Palette.GetColorVector(Palette.Colors.Black)
+            };
+
+            DrawTask lifetimeBackground = new(
+                _square,
+                new Rectangle(0, 0, 1, 1),
+                new Rectangle(1, 28 + i * 12, 2, 8),
+                0,
+                LayerDepth.HUD,
+                new List<IDrawTaskEffect> { new ColorEffect(backgroundColor) },
+                Color.White);
+
+            //int barLength = (int)((timeNow - powerUp.Item1) / (float)PowerUpDuration * 2);
+            int barLength = 8 - (int)Math.Floor((timeNow - powerUp.Item1) / (float)PowerUpDuration * 8);
+            
+            DrawTask lifetimeBar = new(
+                _square,
+                new Rectangle(0, 0, 1, 1),
+                new Rectangle(1, 36 + i * 12 - barLength, 2, barLength),
+                0,
+                LayerDepth.HUD,
+                new List<IDrawTaskEffect> { new ColorEffect(barColor) },
+                Color.White);
+
             List<DrawTask> powerUpTask = powerUpName.CreateDrawTasks(
                 new Vector2(4, 28 + i * 12),
                 Color.White,
@@ -212,6 +249,8 @@ public class Player : Entity, IInputEventListener
                 task.EffectContainer.SetEffect<ColorEffect, Vector4>(color);
 
             drawTasks.AddRange(powerUpTask);
+            drawTasks.Add(lifetimeBackground);
+            drawTasks.Add(lifetimeBar);
         }
 
         return drawTasks;

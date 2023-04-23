@@ -46,7 +46,9 @@ public class GameplayState : GameState, IUpdateEventListener
         List<DrawTask> scoreTasks = scoreText.CreateDrawTasks(new Vector2(4, 4), textColor, LayerDepth.HUD);
         drawTasks.AddRange(scoreTasks);
         
-        string multiplierText = $"X{Player.Multiplier.ToString("0.0", CultureInfo.GetCultureInfo("en-US"))}";
+        string multiplierText = 
+            $"Score multi.: X{Player.Multiplier.ToString("0.0", CultureInfo.GetCultureInfo("en-US"))}";
+        
         List<DrawTask> multiplierTasks = multiplierText.CreateDrawTasks(
             new Vector2(480 - multiplierText.Length * 8 - 4, 4), 
             textColor, 
