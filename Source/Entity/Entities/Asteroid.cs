@@ -158,5 +158,10 @@ public class Asteroid : Entity
         
         Rotation += _rotSpeed * e.DeltaTime;
         if (Rotation > Math.PI) Rotation = (float)-Math.PI;
+
+        if (Velocity.Length() > 200)
+        {
+            Velocity = Vector2.Normalize(Velocity) * 200;
+        }
     }
 }
