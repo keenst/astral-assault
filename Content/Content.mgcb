@@ -253,6 +253,12 @@
 /processorParam:TextureFormat=Color
 /build:Assets/Restart.png
 
+#begin Assets/RestartGame1.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/RestartGame1.ogg
+
 #begin Assets/Shoot1.ogg
 /importer:OggImporter
 /processor:SoundEffectProcessor

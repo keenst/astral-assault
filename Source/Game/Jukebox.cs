@@ -25,6 +25,7 @@ public static class Jukebox
         SoundEffects.Add("Hurt3", AssetManager.Load<SoundEffect>("Hurt3"));
         SoundEffects.Add("PickUp", AssetManager.Load<SoundEffect>("PickUp"));
         SoundEffects.Add("MultiplierBroken", AssetManager.Load<SoundEffect>("MultiplierBroken1"));
+        SoundEffects.Add("RestartGame", AssetManager.Load<SoundEffect>("RestartGame1"));
     }
 
     public static void PlaySound(string name, float volume = 1)

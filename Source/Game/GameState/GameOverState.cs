@@ -107,6 +107,7 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
             return;
         }
         
+        Jukebox.PlaySound("RestartGame");
         Root.GameStateMachine.ChangeState(new GameplayState(Root));
     }
 
