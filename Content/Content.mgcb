@@ -175,6 +175,12 @@
 /processorParam:TextureFormat=Color
 /build:Assets/MegaHealth.png
 
+#begin Assets/MultiplierBroken1.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/MultiplierBroken1.ogg
+
 #begin Assets/Particle.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -186,6 +192,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Assets/Particle.png
+
+#begin Assets/PickUp.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/PickUp.ogg
 
 #begin Assets/Player.png
 /importer:TextureImporter

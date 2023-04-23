@@ -23,6 +23,8 @@ public static class Jukebox
         SoundEffects.Add("Hurt1", AssetManager.Load<SoundEffect>("Hurt1"));
         SoundEffects.Add("Hurt2", AssetManager.Load<SoundEffect>("Hurt2"));
         SoundEffects.Add("Hurt3", AssetManager.Load<SoundEffect>("Hurt3"));
+        SoundEffects.Add("PickUp", AssetManager.Load<SoundEffect>("PickUp"));
+        SoundEffects.Add("MultiplierBroken", AssetManager.Load<SoundEffect>("MultiplierBroken1"));
     }
 
     public static void PlaySound(string name, float volume = 1)

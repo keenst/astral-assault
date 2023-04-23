@@ -347,6 +347,8 @@ public class Player : Entity, IInputEventListener
         
         if (other.Parent is Quad)
         {
+            Jukebox.PlaySound("PickUp");
+            
             if (_powerUps.Any(t => t.Item2 == PowerUps.QuadDamage))
             {
                 _powerUps.RemoveAll(t => t.Item2 == PowerUps.QuadDamage);
@@ -355,6 +357,8 @@ public class Player : Entity, IInputEventListener
         }
         else if (other.Parent is Haste)
         {
+            Jukebox.PlaySound("PickUp");
+            
             if (_powerUps.Any(t => t.Item2 == PowerUps.Haste))
             {
                 _powerUps.RemoveAll(t => t.Item2 == PowerUps.Haste);
@@ -363,10 +367,17 @@ public class Player : Entity, IInputEventListener
         }
         else if (other.Parent is MegaHealth)
         {
+            Jukebox.PlaySound("PickUp");
+            
             HP = Math.Min(MaxHP, HP + 30);
         }
         else if (other.Parent is Asteroid)
         {
+            if (Multiplier > 1)
+            {
+                Jukebox.PlaySound("MultiplierBroken");
+            }
+            
             Multiplier = 1;
 
             Random rnd = new();
