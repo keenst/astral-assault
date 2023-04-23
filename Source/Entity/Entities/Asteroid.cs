@@ -164,4 +164,23 @@ public class Asteroid : Entity
             Velocity = Vector2.Normalize(Velocity) * 200;
         }
     }
+
+    public override void OnCollision(Collider other)
+    {
+        base.OnCollision(other);
+
+        if (other.Parent is not Bullet) return;
+        
+        Random rnd = new();
+        
+        string soundName = rnd.Next(3) switch
+        {
+            0 => "Hurt1",
+            1 => "Hurt2",
+            2 => "Hurt3",
+            _ => throw new ArgumentOutOfRangeException()
+        };
+        
+        Jukebox.PlaySound(soundName, 0.5F);
+    }
 }

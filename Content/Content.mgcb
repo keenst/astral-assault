@@ -145,6 +145,24 @@
 /processorParam:TextureFormat=Color
 /build:Assets/Haste.png
 
+#begin Assets/Hurt1.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/Hurt1.ogg
+
+#begin Assets/Hurt2.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/Hurt2.ogg
+
+#begin Assets/Hurt3.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/Hurt3.ogg
+
 #begin Assets/MegaHealth.png
 /importer:TextureImporter
 /processor:TextureProcessor

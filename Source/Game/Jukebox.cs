@@ -20,6 +20,9 @@ public static class Jukebox
         SoundEffects.Add("QuadShoot1", AssetManager.Load<SoundEffect>("QuadShoot1"));
         SoundEffects.Add("QuadShoot2", AssetManager.Load<SoundEffect>("QuadShoot2"));
         SoundEffects.Add("QuadShoot3", AssetManager.Load<SoundEffect>("QuadShoot3"));
+        SoundEffects.Add("Hurt1", AssetManager.Load<SoundEffect>("Hurt1"));
+        SoundEffects.Add("Hurt2", AssetManager.Load<SoundEffect>("Hurt2"));
+        SoundEffects.Add("Hurt3", AssetManager.Load<SoundEffect>("Hurt3"));
     }
 
     public static void PlaySound(string name, float volume = 1)
