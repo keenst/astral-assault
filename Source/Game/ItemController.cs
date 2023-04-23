@@ -10,6 +10,7 @@ public class ItemController : IUpdateEventListener
     private int _spawnInterval = 5000;
     private readonly GameplayState _gameState;
     private readonly Random _rnd = new();
+    private int _spawnedThisWave;
     
     public ItemController(GameplayState gameState)
     {
@@ -38,8 +39,11 @@ public class ItemController : IUpdateEventListener
 
     private void SpawnItem()
     {
+        if (_spawnedThisWave >= 3) return;
+        
+        _spawnedThisWave++;
+        
         Vector2 position;
-
         bool isTooCloseToPlayer;
 
         do
@@ -66,5 +70,10 @@ public class ItemController : IUpdateEventListener
         };
         
         _gameState.Entities.Add(item);
+    }
+    
+    public void NewWave()
+    {
+        _spawnedThisWave = 0;
     }
 }

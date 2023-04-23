@@ -25,8 +25,8 @@ public class GameplayState : GameState, IUpdateEventListener
     public GameplayState(Game1 root) : base(root)
     {
         Entities = new List<Entity>();
-        WaveController = new WaveController(this, Root);
         ItemController = new ItemController(this);
+        WaveController = new WaveController(this, Root);
         ItemController.StartListening();
     }
 
