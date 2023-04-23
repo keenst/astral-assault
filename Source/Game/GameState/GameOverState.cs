@@ -9,14 +9,22 @@ namespace AstralAssault;
 
 public class GameOverState : GameState, IKeyboardPressedEventListener
 {
+    private readonly bool _newHighScore;
     private readonly long _timeEntered;
     private Texture2D _gameOverText;
     private Texture2D _restartPrompt;
+    private bool _showNewHighScore;
+    private long _lastToggle;
     
     public GameOverState(Game1 root) : base(root)
     {
         InputEventSource.KeyboardPressedEvent += OnKeyboardPressedEvent;
         _timeEntered = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+
+        if (Root.Score <= Root.HighScore) return;
+        
+        Root.HighScore = Root.Score;
+        _newHighScore = true;
     }
     
     public override List<DrawTask> GetDrawTasks()
@@ -56,10 +64,35 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
 
         int score = (int)Lerp(0, Root.Score, MathF.Min((timeNow - _timeEntered) / 800F, 1));
         string scoreText = $"Score: {score}";
-        Color textColor = Palette.GetColor(Palette.Colors.Grey9);
         int textX = 240 - $"Score: {Root.Score}".Length * 4;
-        List<DrawTask> scoreTasks = scoreText.CreateDrawTasks(new Vector2(textX, 150), textColor, LayerDepth.HUD);
+        List<DrawTask> scoreTasks = scoreText.CreateDrawTasks(new Vector2(textX, 150), Color.White, LayerDepth.HUD);
         drawTasks.AddRange(scoreTasks);
+
+        if (!_newHighScore)
+        {
+            string highScoreText = $"High score: {Root.HighScore}";
+            int highScoreX = 240 - highScoreText.Length * 4;
+            List<DrawTask> highScoreTasks = 
+                highScoreText.CreateDrawTasks(new Vector2(highScoreX, 170), Color.White, LayerDepth.HUD);
+            drawTasks.AddRange(highScoreTasks);
+            
+            return drawTasks;
+        }
+
+        long timeSinceToggle = timeNow - _lastToggle;
+        if (timeSinceToggle > 500)
+        {
+            _showNewHighScore = !_showNewHighScore;
+            _lastToggle = timeNow;
+        }
+        
+        if (!_showNewHighScore) return drawTasks;
+
+        string newHighScoreText = "New high score!";
+        int newHighScoreX = 240 - newHighScoreText.Length * 4;
+        List<DrawTask> newHighScoreTasks = 
+            newHighScoreText.CreateDrawTasks(new Vector2(newHighScoreX, 170), Color.White, LayerDepth.HUD);
+        drawTasks.AddRange(newHighScoreTasks);
 
         return drawTasks;
     }
