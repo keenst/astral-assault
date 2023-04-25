@@ -6,7 +6,7 @@ using MouseButtons = AstralAssault.InputEventSource.MouseButtons;
 
 namespace AstralAssault.Source.Menu;
 
-public class MenuController : IMouseEventListener, IMousePressedEventListener
+public class MenuController : IMouseMoveEventListener, IMousePressedEventListener
 {
     private bool _isMenuOpen;
     private Menu _menu;
@@ -83,24 +83,22 @@ public class MenuController : IMouseEventListener, IMousePressedEventListener
     private void StartListening()
     {
         UpdateEventSource.UpdateEvent += OnUpdate;
-        InputEventSource.MouseButtonEvent += OnMouseButtonPressedEvent;
+        InputEventSource.MousePressedEvent += OnMousePressedEvent;
         InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
     }
 
     private void StopListening()
     {
         UpdateEventSource.UpdateEvent -= OnUpdate;
-        InputEventSource.MouseButtonEvent -= OnMouseButtonPressedEvent;
+        InputEventSource.MousePressedEvent -= OnMousePressedEvent;
         InputEventSource.MouseMoveEvent -= OnMouseMoveEvent;
     }
 
     public void OnMousePressedEvent(object sender, MouseButtonEventArgs e)
     {
         if (e.Button != MouseButtons.Left) return;
-
-        Debug.WriteLine("Click");
+        
         IMenuItem clickedMenuItem = GetCollidingMenuItem(e.Position.X, e.Position.Y);
-        if (clickedMenuItem != null) Debug.WriteLine("Clicksdalkj");
         clickedMenuItem?.ClickAction();
     }
 

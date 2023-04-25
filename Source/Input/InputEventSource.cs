@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -14,7 +15,7 @@ public static class InputEventSource
     
     public static event EventHandler<MouseButtonEventArgs> 
         MouseButtonEvent, 
-        MouseButtonPressedEvent;
+        MousePressedEvent;
 
     public static event EventHandler<MouseMoveEventArgs>
         MouseMoveEvent;
@@ -84,7 +85,7 @@ public static class InputEventSource
     {
         MouseState mouseState = Mouse.GetState();
 
-        _prevMouseDown = MouseDown;
+        _prevMouseDown = MouseDown.ToList();
         MouseDown.Clear();
 
         ButtonState[] buttonStates = new ButtonState[5];
@@ -101,11 +102,14 @@ public static class InputEventSource
             MouseButtons button = (MouseButtons)i;
             
             MouseDown.Add(button);
-            MouseButtonEvent?.Invoke(null, new MouseButtonEventArgs(button, _mousePos));
+            
+            Point screenPosition = GetScreenPosition(_mousePos);
+            
+            MouseButtonEvent?.Invoke(null, new MouseButtonEventArgs(button, screenPosition));
 
             if (!_prevMouseDown.Contains(button))
             {
-                MouseButtonPressedEvent?.Invoke(null, new MouseButtonEventArgs(button, _mousePos));
+                MousePressedEvent?.Invoke(null, new MouseButtonEventArgs(button, screenPosition));
             }
         }
     }
@@ -117,9 +121,14 @@ public static class InputEventSource
 
         if (_mousePos == _prevMousePos) return;
         
-        Point scale = new((int)_root.ScaleX, (int)_root.ScaleY);
-        Point screenPosition = _mousePos / scale;
+        Point screenPosition = GetScreenPosition(_mousePos);
             
         MouseMoveEvent?.Invoke(null, new MouseMoveEventArgs(screenPosition));
+    }
+
+    private static Point GetScreenPosition(Point position)
+    {
+        Point scale = new((int)_root.ScaleX, (int)_root.ScaleY);
+        return position / scale;
     }
 }
