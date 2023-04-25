@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using AstralAssault.Source.Menu;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -16,9 +15,9 @@ public class MainMenuState : GameState, IMouseMoveEventListener
     {
         Menu menu = new();
         
-        menu.AddMenuItem(new Button(0, 0, 32, 32, "Test", () =>
+        menu.AddMenuItem(new Button(8, 8, 48, 12, "Play", () =>
         {
-            Debug.WriteLine("Clicked!");
+            Root.GameStateMachine.ChangeState(new GameplayState(Root));
         }));
         
         _menuController = new MenuController(menu, this);
@@ -54,6 +53,7 @@ public class MainMenuState : GameState, IMouseMoveEventListener
     public override void Exit()
     {
         InputEventSource.MouseMoveEvent -= OnMouseMoveEvent;
+        _menuController.Destroy();
     }
 
     public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)

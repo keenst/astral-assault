@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MouseButtons = AstralAssault.InputEventSource.MouseButtons;
@@ -36,16 +35,7 @@ public class MenuController : IMouseMoveEventListener, IMousePressedEventListene
 
         if (!_isMenuOpen) return drawTasks;
         
-        DrawTask drawTask = new(
-            _buttonTexture,
-            new Rectangle(0, 0, 1, 1),
-            new Rectangle(0, 0, 32, 32),
-            0,
-            LayerDepth.HUD,
-            new List<IDrawTaskEffect>(),
-            Color.White);
-
-        drawTasks.Add(drawTask);
+        drawTasks.AddRange(_menu.GetDrawTasks(_buttonTexture));
         return drawTasks;
     }
 
