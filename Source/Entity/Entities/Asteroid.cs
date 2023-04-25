@@ -88,14 +88,12 @@ public class Asteroid : Entity
         Collider = new Collider
         (
             this,
-            new Rectangle
-            (
-                new Point((int)Position.X - colliderSize / 2, (int)Position.Y - colliderSize / 2),
-                new Point(colliderSize, colliderSize)
-            ),
             true,
             mass
         );
+
+        Collider.radius = colliderSize;
+
         GameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Wrap;

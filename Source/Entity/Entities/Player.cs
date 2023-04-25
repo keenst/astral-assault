@@ -39,14 +39,12 @@ public class Player : Entity, IInputEventListener
         Collider = new Collider
         (
             this,
-            new Rectangle
-            (
-                new Point((int)Position.X - 12, (int)Position.Y - 12),
-                new Point(24, 24)
-            ),
             true,
             10
         );
+
+        Collider.radius = 17;
+
         GameState.CollisionSystem.AddCollider(Collider);
 
         Texture2D particleSpriteSheet = AssetManager.Load<Texture2D>("Particle");

@@ -39,8 +39,10 @@ public class SpriteRenderer
         _layerDepth = layerDepth;
 
         if (transitions != null)
+        {
             foreach (Transition transition in transitions)
                 _animationPaths.Add(transition.FromTo, transition);
+        }
 
         if (animationConditions != null) InitAnimationConditions(animationConditions);
 

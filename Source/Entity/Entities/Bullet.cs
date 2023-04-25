@@ -23,13 +23,11 @@ public class Bullet : Entity
 
         Collider = new Collider
         (
-            this,
-            new Rectangle
-            (
-                new Point((int)Position.X - 1, (int)Position.Y - 1),
-                new Point(2, 2)
-            )
+            this
         );
+
+        Collider.radius = 3;
+
         GameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Destroy;

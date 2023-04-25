@@ -24,6 +24,37 @@ public class GameplayState : GameState
         get => (Player)Entities.Find(static entity => entity is Player);
     }
 
+    Texture2D createCircleText(int radius, Color color)
+    {
+        Texture2D texture = new Texture2D(Root.GraphicsDevice, radius, radius);
+        Color[] colorData = new Color[radius * radius];
+
+        float diam = radius / 2f;
+        float diamsq = diam * diam;
+
+        for (int x = 0; x < radius; x++)
+        {
+            for (int y = 0; y < radius; y++)
+            {
+                int index = x * radius + y;
+                Vector2 pos = new Vector2(x - diam, y - diam);
+
+                if (pos.LengthSquared() <= diamsq)
+                {
+                    colorData[index] = color;
+                }
+                else
+                {
+                    colorData[index] = Color.Transparent;
+                }
+            }
+        }
+
+        texture.SetData(colorData);
+
+        return texture;
+    }
+
     public override List<DrawTask> GetDrawTasks()
     {
         List<DrawTask> drawTasks = new List<DrawTask>();
@@ -36,22 +67,14 @@ public class GameplayState : GameState
 
         foreach (Collider collider in CollisionSystem.Colliders)
         {
-            int width = collider.Rectangle.Width;
-            int height = collider.Rectangle.Height;
-
-            Texture2D rect = new Texture2D(Root.GraphicsDevice, width, height);
-
-            Color[] data = new Color[width * height];
-
-            Array.Fill(data, new Color(Palette.GetColor(Palette.Colors.Grey9), 0.15F));
-            rect.SetData(data);
+            Texture2D circle = createCircleText(collider.radius, new Color(Palette.GetColor(Palette.Colors.Grey9), 0.15F));
 
             drawTasks.Add
             (
                 new DrawTask
                 (
-                    rect,
-                    collider.Rectangle.Location.ToVector2(),
+                    circle,
+                    collider.Parent.Position - (new Vector2(collider.radius) / 2),
                     0,
                     LayerDepth.Debug,
                     new List<IDrawTaskEffect>(),

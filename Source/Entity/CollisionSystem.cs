@@ -28,25 +28,11 @@ public class CollisionSystem
                 if (!collider.CollidesWith
                     (
                         other,
-                        e.DeltaTime,
-                        out Vector2 initialImpulseThis,
-                        out Vector2 initialImpulseOther,
-                        out Vector2 totalImpulseThis,
-                        out Vector2 totalImpulseOther
+                        e.DeltaTime
                     ))
                     continue;
 
-                if (collider.IsSolid && other.IsSolid && (collider.Parent.TimeSinceSpawned > 512))
-                {
-                    collider.Parent.Position += initialImpulseThis * e.DeltaTime;
-                    other.Parent.Position += initialImpulseOther * e.DeltaTime;
-
-                    collider.Parent.Velocity += totalImpulseThis * e.DeltaTime * 1000F;
-                    other.Parent.Velocity += totalImpulseOther * e.DeltaTime * 1000F;
-
-                    collider.SetPosition(collider.Parent.Position.ToPoint());
-                    other.SetPosition(other.Parent.Position.ToPoint());
-                }
+                Collider.ResolveCollision(collider, other);
 
                 Tuple<Collider, Collider> colliderPair = new Tuple<Collider, Collider>(collider, other);
                 currentCollisions.Add(colliderPair);

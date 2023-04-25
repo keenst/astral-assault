@@ -57,7 +57,6 @@ public class Entity
         }
 
         Position += Velocity * e.DeltaTime;
-        Collider?.SetPosition(Position.ToPoint());
 
         switch (OutOfBoundsBehavior)
         {
