@@ -1,5 +1,6 @@
-﻿#region
+#region
 using System;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -8,26 +9,32 @@ namespace AstralAssault;
 
 public class Asteroid : Entity
 {
-    public enum Sizes { Smallest, Small, Medium }
-    private readonly DebrisController m_debrisController;
-    private readonly float m_rotSpeed;
-    private readonly Sizes m_size;
-    private bool m_hasExploded;
+    private readonly DebrisController _debrisController;
+    private readonly float _rotSpeed;
+    private readonly Sizes _size;
+    private bool _hasExploded;
+
+    public enum Sizes
+    {
+        Smallest,
+        Small,
+        Medium
+    }
 
     public Asteroid(
-        GameplayState gameState,
-        Vector2 position,
-        float direction,
-        Sizes size,
-        DebrisController debrisController)
-        : base(gameState, position)
+        GameplayState gameState, 
+        Vector2 position, 
+        float direction, 
+        Sizes size, 
+        DebrisController debrisController) 
+        :base(gameState, position)
     {
-        m_debrisController = debrisController;
+        _debrisController = debrisController;
+        
+        _size = size;
 
-        m_size = size;
-
-        Random rnd = new Random();
-        m_rotSpeed = rnd.Next(5, 20) / 10F;
+        Random rnd = new();
+        _rotSpeed = rnd.Next(5, 20) / 10F;
         int speed = rnd.Next(30, 100);
 
         Velocity = Vector2.UnitX.RotateVector(direction) * speed;
@@ -104,9 +111,26 @@ public class Asteroid : Entity
 
     protected override void OnDeath()
     {
-        if (!m_hasExploded && ((m_size - 1) >= 0))
+        if (!_hasExploded)
         {
-            Random rnd = new Random();
+            Random rnd = new();
+
+            string soundToPlay = rnd.Next(3) switch
+            {
+                0 => "Explosion1",
+                1 => "Explosion2",
+                2 => "Explosion3",
+                _ => throw new ArgumentOutOfRangeException()
+            };
+                
+            Jukebox.PlaySound(soundToPlay);
+
+            if (_size - 1 < 0)
+            {
+                _hasExploded = true;
+                return;
+            }
+            
             int amount = rnd.Next(1, 4);
 
             Vector2 playerPosition = GameState.Player.Position;
@@ -123,13 +147,13 @@ public class Asteroid : Entity
             }
         }
 
-        m_hasExploded = true;
+        _hasExploded = true;
 
-        m_debrisController.SpawnDebris(Position, (int)m_size);
-
+        _debrisController.SpawnDebris(Position, (int)_size);
+        
         GameState.Player.Multiplier += 0.1F;
 
-        int score = m_size switch
+        int score = _size switch
         {
             Sizes.Smallest => 100,
             Sizes.Small => 300,
@@ -137,7 +161,7 @@ public class Asteroid : Entity
             _ => 0
         };
         
-        //GameState.Root.Score += (int)(score * GameState.Player.Multiplier);
+        GameState.Root.Score += (int)(score * GameState.Player.Multiplier);
         
         base.OnDeath();
     }
@@ -150,5 +174,29 @@ public class Asteroid : Entity
 
         Rotation += m_rotSpeed * e.DeltaTime;
         if (Rotation > Math.PI) Rotation = (float)-Math.PI;
+
+        if (Velocity.Length() > 200)
+        {
+            Velocity = Vector2.Normalize(Velocity) * 200;
+        }
+    }
+
+    public override void OnCollision(Collider other)
+    {
+        base.OnCollision(other);
+
+        if (other.Parent is not Bullet) return;
+        
+        Random rnd = new();
+        
+        string soundName = rnd.Next(3) switch
+        {
+            0 => "Hurt1",
+            1 => "Hurt2",
+            2 => "Hurt3",
+            _ => throw new ArgumentOutOfRangeException()
+        };
+        
+        Jukebox.PlaySound(soundName, 0.5F);
     }
 }

@@ -9,19 +9,23 @@ namespace AstralAssault;
 
 public class DebrisController
 {
-    private readonly GameplayState m_gameplayState;
-    private readonly Random m_rnd = new Random();
-    public readonly ParticleEmitter ParticleEmitter;
-
+    private readonly ParticleEmitter _particleEmitter;
+    private readonly Random _rnd = new();
+    private readonly GameplayState _gameplayState;
+    private readonly List<Tuple<long, Tuple<Vector2, int>>> _scores = new(); // (timeSpawned, (coords, score))
+    
     public DebrisController(GameplayState gameplayState)
     {
-        m_gameplayState = gameplayState;
-
+        _gameplayState = gameplayState;
+        
         Texture2D particleSpriteSheet = AssetManager.Load<Texture2D>("AsteroidDebris");
 
         Rectangle[] textureSources =
         {
-            new Rectangle(0, 0, 8, 8), new Rectangle(8, 0, 8, 8), new Rectangle(16, 0, 8, 8), new Rectangle(32, 0, 8, 8)
+            new(0,  0, 8, 8),
+            new(8,  0, 8, 8),
+            new(16, 0, 8, 8),
+            new(32, 0, 8, 8)
         };
 
         IParticleProperty[] particleProperties =
@@ -31,8 +35,7 @@ public class DebrisController
             new CauseOfDeathProperty(CauseOfDeathProperty.CausesOfDeath.OutOfBounds)
         };
 
-        ParticleEmitter = new ParticleEmitter
-        (
+        _particleEmitter = new ParticleEmitter(
             particleSpriteSheet,
             textureSources,
             0,
@@ -45,17 +48,54 @@ public class DebrisController
 
     public void SpawnDebris(Vector2 position, int asteroidSize)
     {
-        int amount = m_rnd.Next(4, (1 + asteroidSize) * 4);
+        int amount = _rnd.Next(4, (1 + asteroidSize) * 4);
+        
+        float angleFromPlayer = MathF.Atan2(
+            position.Y - _gameplayState.Player.Position.Y,
+            position.X - _gameplayState.Player.Position.X);
 
-        float angleFromPlayer = MathF.Atan2
-        (
-            position.Y - m_gameplayState.Player.Position.Y,
-            position.X - m_gameplayState.Player.Position.X
-        );
+        _particleEmitter.SetTransform(position, angleFromPlayer);
+        _particleEmitter.StartSpawning(amount);
+        
+        int score = (Asteroid.Sizes)asteroidSize switch
+        {
+            Asteroid.Sizes.Smallest => 100,
+            Asteroid.Sizes.Small => 300,
+            Asteroid.Sizes.Medium => 700,
+            _ => 0
+        };
 
-        ParticleEmitter.SetTransform(position, angleFromPlayer);
-        ParticleEmitter.StartSpawning(amount);
+        _scores.Add(new Tuple<long, Tuple<Vector2, int>>(
+            DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond,
+            new Tuple<Vector2, int>(position, score)));
     }
+    
+    public List<DrawTask> GetDrawTasks()
+    {
+        List<DrawTask> drawTasks = _particleEmitter.CreateDrawTasks();
 
-    public List<DrawTask> GetDrawTasks() => ParticleEmitter.CreateDrawTasks();
+        if (_scores.Count == 0) return drawTasks;
+        
+        long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        for (int i = 0; i < _scores.Count; i++)
+        {
+            if (timeNow - _scores[i].Item1 > 1000)
+            {
+                _scores.RemoveAt(i);
+                i--;
+                continue;
+            }
+            
+            string scoreText = ((int)(_scores[i].Item2.Item2 * (_gameplayState.Player.Multiplier - 0.1F))).ToString();
+            int scoreX = (int)_scores[i].Item2.Item1.X - scoreText.Length * 4;
+            Vector2 scorePosition = new(scoreX, _scores[i].Item2.Item1.Y - 5);
+            
+            drawTasks.AddRange(scoreText.CreateDrawTasks(
+                scorePosition,
+                Palette.GetColor(Palette.Colors.Grey9),
+                LayerDepth.Background));
+        }
+
+        return drawTasks;
+    }
 }

@@ -1,4 +1,5 @@
 ﻿#region
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -7,17 +8,21 @@ namespace AstralAssault;
 
 public class Bullet : Entity
 {
-    public Bullet(GameplayState gameState, Vector2 position, float rotation, float speed) : base(gameState, position)
+    public bool IsQuadDamage { get; }
+    
+    public Bullet(GameplayState gameState, Vector2 position, float rotation, float speed, bool isQuadDamage) 
+        :base(gameState, position)
     {
-        Velocity = Vector2.UnitX.RotateVector(rotation) * speed;
+        IsQuadDamage = isQuadDamage;
+        
+        Velocity = new Vector2(
+            (float)Math.Cos(rotation),
+            (float)Math.Sin(rotation)
+            ) * speed;
 
-        Texture2D spriteSheet = new Texture2D(GameState.Root.GraphicsDevice, 2, 2);
-
-        Color[] data = new Color[2 * 2];
-        for (int i = 0; i < data.Length; ++i) data[i] = Palette.GetColor(Palette.Colors.Grey9);
-        spriteSheet.SetData(data);
-
-        Frame frame = new Frame(new Rectangle(0, 0, 2, 2));
+        Texture2D spriteSheet = AssetManager.Load<Texture2D>("Bullet");
+        
+        Frame frame = new(new Rectangle(isQuadDamage ? 4 : 0, 0, 4, 4));
 
         SpriteRenderer = new SpriteRenderer(spriteSheet, frame, LayerDepth.Foreground);
 
@@ -33,7 +38,7 @@ public class Bullet : Entity
 
         OutOfBoundsBehavior = OutOfBounds.Destroy;
 
-        ContactDamage = 4;
+        ContactDamage = isQuadDamage ? 16 : 4;
         IsFriendly = true;
     }
 

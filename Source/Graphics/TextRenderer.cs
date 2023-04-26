@@ -8,14 +8,14 @@ namespace AstralAssault;
 
 public static class TextRenderer
 {
-    private static Texture2D m_font;
+    private static Texture2D _font;
 
-    private static Dictionary<char, int> m_dict;
+    private static Dictionary<char, int> _dict;
 
     public static void Init()
     {
-        m_font = AssetManager.Load<Texture2D>("Font");
-        m_dict = new Dictionary<char, int>
+        _font = AssetManager.Load<Texture2D>("Font");
+        _dict = new Dictionary<char, int>
         {
             { 'A', 0 },
             { 'B', 1 },
@@ -57,7 +57,8 @@ public static class TextRenderer
             { ';', 37 },
             { '.', 38 },
             { ',', 39 },
-            { ' ', 40 }
+            { '!', 40 },
+            { ' ', 41 }
         };
     }
 
@@ -65,23 +66,33 @@ public static class TextRenderer
         this string input,
         Vector2 position,
         Color color,
-        LayerDepth layerDepth)
+        LayerDepth layerDepth,
+        List<IDrawTaskEffect> effects)
     {
         string text = input.ToUpper();
         List<DrawTask> drawTasks = new List<DrawTask>();
 
         for (int i = 0; i < text.Length; i++)
         {
-            int x = m_dict[text[i]] % 6;
-            int y = m_dict[text[i]] / 6;
+            int x = _dict[text[i]] % 6;
+            int y = _dict[text[i]] / 6;
 
             Rectangle source = new Rectangle(x * 8, y * 8, 8, 8);
 
+            drawTasks.Add(new DrawTask(
+                _font,
+                source,
+                new Vector2(position.X + i * 8, position.Y),
+                0,
+                layerDepth,
+                effects,
+                color,
+                Vector2.Zero));
             drawTasks.Add
             (
                 new DrawTask
                 (
-                    m_font,
+                    _font,
                     source,
                     new Vector2(position.X + i * 8, position.Y),
                     0,
@@ -94,5 +105,14 @@ public static class TextRenderer
         }
 
         return drawTasks;
+    }
+    
+    public static List<DrawTask> CreateDrawTasks(
+        this string input, 
+        Vector2 position, 
+        Color color,
+        LayerDepth layerDepth)
+    {
+        return input.CreateDrawTasks(position, color, layerDepth, new List<IDrawTaskEffect>());
     }
 }

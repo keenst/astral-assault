@@ -61,6 +61,18 @@
 /processorParam:TextureFormat=Color
 /build:Assets/AsteroidDebris.png
 
+#begin Assets/Bullet.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Assets/Bullet.png
+
 #begin Assets/Crosshair.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -72,6 +84,24 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Assets/Crosshair.png
+
+#begin Assets/Explosion1.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/Explosion1.ogg
+
+#begin Assets/Explosion2.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/Explosion2.ogg
+
+#begin Assets/Explosion3.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/Explosion3.ogg
 
 #begin Assets/Font.png
 /importer:TextureImporter
@@ -97,6 +127,60 @@
 /processorParam:TextureFormat=Color
 /build:Assets/GameOver.png
 
+#begin Assets/GameOverSound.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/GameOverSound.ogg
+
+#begin Assets/Haste.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Assets/Haste.png
+
+#begin Assets/Hurt1.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/Hurt1.ogg
+
+#begin Assets/Hurt2.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/Hurt2.ogg
+
+#begin Assets/Hurt3.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/Hurt3.ogg
+
+#begin Assets/MegaHealth.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Assets/MegaHealth.png
+
+#begin Assets/MultiplierBroken1.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/MultiplierBroken1.ogg
+
 #begin Assets/Particle.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -108,6 +192,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Assets/Particle.png
+
+#begin Assets/PickUp.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/PickUp.ogg
 
 #begin Assets/Player.png
 /importer:TextureImporter
@@ -121,6 +211,36 @@
 /processorParam:TextureFormat=Color
 /build:Assets/Player.png
 
+#begin Assets/Quad.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Assets/Quad.png
+
+#begin Assets/QuadShoot1.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/QuadShoot1.ogg
+
+#begin Assets/QuadShoot2.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/QuadShoot2.ogg
+
+#begin Assets/QuadShoot3.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/QuadShoot3.ogg
+
 #begin Assets/Restart.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -132,6 +252,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Assets/Restart.png
+
+#begin Assets/RestartGame1.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/RestartGame1.ogg
+
+#begin Assets/Shoot1.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/Shoot1.ogg
+
+#begin Assets/Shoot2.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/Shoot2.ogg
+
+#begin Assets/Shoot3.ogg
+/importer:OggImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Assets/Shoot3.ogg
 
 #begin Shaders/Color.fx
 /importer:EffectImporter

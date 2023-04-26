@@ -1,6 +1,7 @@
 ﻿#region
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -9,24 +10,27 @@ namespace AstralAssault;
 
 public class SpriteRenderer
 {
-    private const float Pi = 3.14F;
-    private readonly Dictionary<string, float> _animationConditions = new Dictionary<string, float>();
+    public readonly EffectContainer EffectContainer = new();
 
-    private readonly Dictionary<Tuple<int, int>, Transition> _animationPaths = new Dictionary<Tuple<int, int>,
-        Transition>();
-
-    private readonly Animation[] _animations;
+    private int CurrentAnimationIndex { get; set; }
     private readonly LayerDepth _layerDepth;
+    private readonly Animation[] _animations;
     private readonly Texture2D _spriteSheet;
-    public readonly EffectContainer EffectContainer = new EffectContainer();
-    private int[] _animationQueue;
+    private Animation CurrentAnimation => _animations[CurrentAnimationIndex];
     private int _currentFrameIndex;
-    private int _indexInQueue;
+    private int _targetAnimationIndex;
+    private int _startAnimationIndex;
     private bool _isTransitioning;
     private long _lastFrameUpdate;
-    private int _startAnimationIndex;
-    private int _targetAnimationIndex;
+    private readonly Dictionary<Tuple<int, int>, Transition> _animationPaths = new();
+    private int[] _animationQueue;
+    private int _indexInQueue;
+    private readonly Dictionary<string, float> _animationConditions = new();
 
+    public bool Debugging = false;
+
+    private const float Pi = 3.14F;
+    
     public SpriteRenderer(
         Texture2D spriteSheet,
         Animation[] animations,
@@ -64,15 +68,13 @@ public class SpriteRenderer
         CurrentAnimationIndex = 0;
     }
 
-    private int CurrentAnimationIndex { get; set; }
-
-    private Animation CurrentAnimation
-    {
-        get => _animations[CurrentAnimationIndex];
-    }
-
     public void OnUpdate(object sender, UpdateEventArgs e)
     {
+        if (Debugging)
+        {
+            Debug.WriteLine(_currentFrameIndex);
+        }
+        
         int frameLength = CurrentAnimation.Frames[_currentFrameIndex].Time;
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
@@ -80,6 +82,7 @@ public class SpriteRenderer
 
         if (transition.HasValue)
         {
+            if (Debugging) Debug.WriteLine("Transitioning");
             _animationQueue = transition.Value.AnimationPath;
             CurrentAnimationIndex = _animationQueue[0];
             _indexInQueue = 0;
@@ -91,12 +94,20 @@ public class SpriteRenderer
             return;
         }
 
-        if (_animationQueue == null) return;
+        if (timeNow < _lastFrameUpdate + frameLength) return;
+        
+        if (_animationQueue == null)
+        {
+            if (!CurrentAnimation.IsLooping) return;
+            
+            _currentFrameIndex = (_currentFrameIndex + 1) % CurrentAnimation.Frames.Length;
+            _lastFrameUpdate = timeNow;
 
-        if (timeNow < (_lastFrameUpdate + frameLength)) return;
+            return;
+        }
 
-        if (((_currentFrameIndex + 1) == CurrentAnimation.Frames.Length) &&
-            ((_indexInQueue + 1) < _animationQueue.Length))
+        if (_currentFrameIndex + 1 == CurrentAnimation.Frames.Length &&
+            _indexInQueue + 1 < _animationQueue.Length)
         {
             CurrentAnimationIndex = _animationQueue[++_indexInQueue];
             _currentFrameIndex = 0;
