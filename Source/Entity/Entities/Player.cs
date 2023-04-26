@@ -11,6 +11,8 @@ namespace AstralAssault;
 
 public class Player : Entity, IInputEventListener
 {
+    public float Multiplier = 1;
+
     private const float MoveSpeed = 200;
     private const float MaxSpeed = 100;
     private const float TiltSpeed = 200;
@@ -41,9 +43,10 @@ public class Player : Entity, IInputEventListener
             this,
             true,
             10
-        );
-
-        Collider.radius = 17;
+        )
+        {
+            radius = 10
+        };
 
         GameState.CollisionSystem.AddCollider(Collider);
 
@@ -119,6 +122,11 @@ public class Player : Entity, IInputEventListener
             m_thrusterIsOn = true;
         }
         else if (e.Keys.Contains(Keys.S)) yAxis = -1;
+
+        if (e.Keys.Contains(Keys.G))
+        {
+            GameState.WaveController.StartNextWave();
+        }
 
         HandleMovement(xAxis, yAxis);
     }
@@ -277,6 +285,16 @@ public class Player : Entity, IInputEventListener
         );
 
         m_lastCannon = !m_lastCannon;
+    }
+
+    public override void OnCollision(Collider other)
+    {
+        base.OnCollision(other);
+
+        if (other.Parent is Asteroid)
+        {
+            Multiplier = 1;
+        }
     }
 
     public override void Destroy()

@@ -35,14 +35,14 @@ public class Asteroid : Entity
         Texture2D spriteSheet;
         int colliderSize;
         int spriteSize;
-        float mass;
+        int mass;
 
         switch (size)
         {
         case Sizes.Smallest:
             spriteSheet = AssetManager.Load<Texture2D>("Asteroid1");
             spriteSize = 16;
-            colliderSize = 10;
+            colliderSize = 6;
             MaxHP = 12;
             HP = MaxHP;
             ContactDamage = 5;
@@ -53,7 +53,7 @@ public class Asteroid : Entity
         case Sizes.Small:
             spriteSheet = AssetManager.Load<Texture2D>("Asteroid2");
             spriteSize = 24;
-            colliderSize = 16;
+            colliderSize = 12;
             MaxHP = 24;
             HP = MaxHP;
             ContactDamage = 7;
@@ -64,7 +64,7 @@ public class Asteroid : Entity
         case Sizes.Medium:
             spriteSheet = AssetManager.Load<Texture2D>("Asteroid3");
             spriteSize = 32;
-            colliderSize = 24;
+            colliderSize = 20;
             MaxHP = 36;
             HP = MaxHP;
             ContactDamage = 12;
@@ -90,9 +90,10 @@ public class Asteroid : Entity
             this,
             true,
             mass
-        );
-
-        Collider.radius = colliderSize;
+        )
+        {
+            radius = colliderSize
+        };
 
         GameState.CollisionSystem.AddCollider(Collider);
 
@@ -126,6 +127,18 @@ public class Asteroid : Entity
 
         m_debrisController.SpawnDebris(Position, (int)m_size);
 
+        GameState.Player.Multiplier += 0.1F;
+
+        int score = m_size switch
+        {
+            Sizes.Smallest => 100,
+            Sizes.Small => 300,
+            Sizes.Medium => 700,
+            _ => 0
+        };
+        
+        //GameState.Root.Score += (int)(score * GameState.Player.Multiplier);
+        
         base.OnDeath();
     }
 

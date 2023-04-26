@@ -32,7 +32,7 @@ public class CollisionSystem
                     ))
                     continue;
 
-                Collider.ResolveCollision(collider, other);
+                Collider.ResolveCollision1(collider, other);
 
                 Tuple<Collider, Collider> colliderPair = new Tuple<Collider, Collider>(collider, other);
                 currentCollisions.Add(colliderPair);

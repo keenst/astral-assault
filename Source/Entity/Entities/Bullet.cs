@@ -24,9 +24,10 @@ public class Bullet : Entity
         Collider = new Collider
         (
             this
-        );
-
-        Collider.radius = 3;
+        )
+        {
+            radius = 3
+        };
 
         GameState.CollisionSystem.AddCollider(Collider);
 

@@ -31,7 +31,7 @@ public class WaveController
         StartNextWave();
     }
 
-    private void StartNextWave()
+    public void StartNextWave()
     {
         m_currentWave++;
 

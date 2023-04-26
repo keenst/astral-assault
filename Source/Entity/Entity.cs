@@ -12,7 +12,7 @@ public class Entity
     protected readonly GameplayState GameState;
 
     private readonly long m_timeSpawned;
-    protected Collider Collider;
+    public Collider Collider;
     protected float ContactDamage;
     protected float HP;
     protected bool IsActor = false;
