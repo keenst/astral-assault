@@ -121,14 +121,13 @@ public class GameplayState : GameState
 
     public override void Exit()
     {
-        WaveController.StopListening();
         ItemController.StopListening();
         while (Entities.Count > 0) Entities[0].Destroy();
         
         UpdateEventSource.UpdateEvent -= OnUpdate;
     }
 
-    public void OnUpdate(object sender, UpdateEventArgs e)
+    public override void OnUpdate(object sender, UpdateEventArgs e)
     {
         if (Player == null) return;
         

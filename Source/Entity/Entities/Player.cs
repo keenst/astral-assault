@@ -95,7 +95,7 @@ public class Player : Entity, IInputEventListener
             new VelocityProperty(-1F, 1F, 0.04F, 0.1F)
         };
 
-        m_particleEmitter = new ParticleEmitter
+        _particleEmitter = new ParticleEmitter
         (
             particleSpriteSheet,
             textureSources,
@@ -506,13 +506,13 @@ public class Player : Entity, IInputEventListener
             float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
 
             Velocity -=
-                Vector2.UnitX.RotateVector(direction) * Friction * m_delta * sign;
+                Vector2.UnitX.RotateVector(direction) * Friction * _delta * sign;
         }
 
         // rotate the points for the cannon muzzles
         float rot = Pi / 8 * (float)Math.Round(Rotation / (Pi / 8));
 
-        m_muzzle = new Tuple<Vector2, Vector2>
+        _muzzle = new Tuple<Vector2, Vector2>
         (
             Position + new Vector2(10, -8).RotateVector(rot),
             Position + new Vector2(8, 10).RotateVector(rot)

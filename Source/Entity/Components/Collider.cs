@@ -28,6 +28,13 @@ public class Collider
         IsSolid = false;
         m_mass = 0f;
     }
+    
+    public Collider(Entity parent, Rectangle rectangle)
+    {
+        Parent = parent;
+        IsSolid = false;
+        m_mass = 0f;
+    }
 
     public bool CollidesWith(
         Collider other,

@@ -69,7 +69,7 @@ public class WaveController
             float angleToCenter = MathF.Atan2(gameCenter.Y - position.Y, gameCenter.X - position.X);
             angleToCenter += MathHelper.ToRadians(rnd.Next(-45, 45));
 
-            GameState.Entities.Add(new Asteroid(GameState, position, angleToCenter, size, m_debrisController));
+            GameState.Entities.Add(new Asteroid(GameState, position, angleToCenter, size, _debrisController));
         }
 
         _drawWaveText = true;

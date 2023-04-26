@@ -142,7 +142,7 @@ public class Asteroid : Entity
 
                 GameState.Entities.Add
                 (
-                    new Asteroid(GameState, Position, angleToPlayer, m_size - 1, m_debrisController)
+                    new Asteroid(GameState, Position, angleToPlayer, _size - 1, _debrisController)
                 );
             }
         }
@@ -170,9 +170,9 @@ public class Asteroid : Entity
     {
         base.OnUpdate(sender, e);
 
-        m_debrisController.ParticleEmitter.OnUpdate(sender, e);
+        _debrisController._particleEmitter.OnUpdate(sender, e);
 
-        Rotation += m_rotSpeed * e.DeltaTime;
+        Rotation += _rotSpeed * e.DeltaTime;
         if (Rotation > Math.PI) Rotation = (float)-Math.PI;
 
         if (Velocity.Length() > 200)
