@@ -20,6 +20,11 @@ public class MainMenuState : GameState, IMouseMoveEventListener
             Root.GameStateMachine.ChangeState(new GameplayState(Root));
         }));
         
+        menu.AddMenuItem(new Button(8, 24, 48, 12, "Exit", () =>
+        {
+            Root.Exit();
+        }));
+        
         _menuController = new MenuController(menu, this);
         
         Color[] data = { Color.White };
