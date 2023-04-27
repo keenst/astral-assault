@@ -15,7 +15,6 @@ public class Button : IMenuItem
     public string Text { get; }
     public Texture2D Texture { get; }
     public bool IsHovered { get; set; }
-    private Texture2D empty;
 
     public Button(int x, int y, int width, int height, string text, Action clickAction)
     {
@@ -28,9 +27,6 @@ public class Button : IMenuItem
 
         Texture = AssetManager.Load<Texture2D>("Button");
 
-        empty = new Texture2D(Texture.GraphicsDevice, 1, 1);
-        empty.SetData(new Color[] { Color.White });
-        
         if (width % 2 != 0 && height % 2 != 0)
         {
             throw new ArgumentException("Button width and height must be even");
