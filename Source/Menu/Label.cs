@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault.Source.Menu;
 
-public struct Label : IMenuItem
+public class Label : IMenuItem
 {
     public int X { get; }
     public int Y { get; }
@@ -14,6 +14,7 @@ public struct Label : IMenuItem
     public Action ClickAction { get; }
     public string Text { get; }
     public Texture2D Texture { get; }
+    public bool IsHovered { get; set; }
 
     public Label(int x, int y, int width, int height, string text)
     {

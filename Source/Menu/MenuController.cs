@@ -99,17 +99,17 @@ public class MenuController : IMouseMoveEventListener, IMousePressedEventListene
         if (hoveredMenuItem == null)
         {
             if (_prevHoveredMenuItem == null) return;
-            
-            _prevHoveredMenuItem.OnHoverExit();
+
+            _prevHoveredMenuItem.IsHovered = false;
             _prevHoveredMenuItem = null;
         }
         else
         {
             if (_prevHoveredMenuItem == hoveredMenuItem) return;
+            
+            if (_prevHoveredMenuItem != null) _prevHoveredMenuItem.IsHovered = false;
 
-            _prevHoveredMenuItem?.OnHoverExit();
-
-            hoveredMenuItem.OnHoverEnter();
+            hoveredMenuItem.IsHovered = true;
             _prevHoveredMenuItem = hoveredMenuItem;
         }
     }

@@ -15,6 +15,7 @@ public interface IMenuItem
     public Action ClickAction { get; }
     public string Text { get; }
     public Texture2D Texture { get; }
+    public bool IsHovered { get; set; }
 
     public void OnClick();
     public void OnHoverEnter();
