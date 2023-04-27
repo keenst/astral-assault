@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault.Source.Menu;
 
@@ -10,6 +12,7 @@ public struct Button : IMenuItem
     public int Height { get; }
     public Action ClickAction { get; }
     public string Text { get; }
+    public Texture2D Texture { get; }
     
     public Button(int x, int y, int width, int height, string text, Action clickAction)
     {
@@ -19,6 +22,8 @@ public struct Button : IMenuItem
         Height = height;
         Text = text;
         ClickAction = clickAction;
+
+        Texture = AssetManager.Load<Texture2D>("Button");
     }
     
     public void OnClick()
@@ -35,4 +40,13 @@ public struct Button : IMenuItem
     {
         
     }
+
+    public List<DrawTask> GetDrawTasks()
+    {
+        List<DrawTask> drawTasks = new();
+
+        
+        
+        return drawTasks;
+    } 
 }

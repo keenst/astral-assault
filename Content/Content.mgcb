@@ -61,6 +61,18 @@
 /processorParam:TextureFormat=Color
 /build:Assets/AsteroidDebris.png
 
+#begin Assets/Button.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Assets/Button.png
+
 #begin Assets/Crosshair.png
 /importer:TextureImporter
 /processor:TextureProcessor

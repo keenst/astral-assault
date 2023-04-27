@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault.Source.Menu;
 
@@ -10,6 +13,7 @@ public struct Label : IMenuItem
     public int Height { get; }
     public Action ClickAction { get; }
     public string Text { get; }
+    public Texture2D Texture { get; }
 
     public Label(int x, int y, int width, int height, string text)
     {
@@ -19,6 +23,8 @@ public struct Label : IMenuItem
         Height = height;
         ClickAction = () => { };
         Text = text;
+
+        Texture = null;
     }
     
     public void OnClick()
@@ -34,5 +40,19 @@ public struct Label : IMenuItem
     public void OnHoverExit()
     {
         
+    }
+
+    public List<DrawTask> GetDrawTasks()
+    {
+        List<DrawTask> drawTasks = new();
+
+        int textX = X + Width / 2 - Text.Length * 4;
+        int textY = Y + Height / 2 - 4;
+        Vector2 textPos = new(textX, textY);
+        List<DrawTask> textTasks = Text.CreateDrawTasks(textPos, Color.White, LayerDepth.HUD);
+        
+        drawTasks.AddRange(textTasks);
+
+        return drawTasks;
     }
 }

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault.Source.Menu;
 
@@ -12,8 +14,10 @@ public interface IMenuItem
     public Rectangle Rectangle => new(X, Y, Width, Height);
     public Action ClickAction { get; }
     public string Text { get; }
+    public Texture2D Texture { get; }
 
     public void OnClick();
     public void OnHoverEnter();
     public void OnHoverExit();
+    public List<DrawTask> GetDrawTasks();
 }
