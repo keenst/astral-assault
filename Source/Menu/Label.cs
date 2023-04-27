@@ -27,21 +27,6 @@ public class Label : IMenuItem
 
         Texture = null;
     }
-    
-    public void OnClick()
-    {
-        
-    }
-
-    public void OnHoverEnter()
-    {
-        
-    }
-
-    public void OnHoverExit()
-    {
-        
-    }
 
     public List<DrawTask> GetDrawTasks()
     {

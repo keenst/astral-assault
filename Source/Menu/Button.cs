@@ -38,21 +38,6 @@ public class Button : IMenuItem
         InitDrawTasks();
     }
 
-    public void OnClick()
-    {
-
-    }
-
-    public void OnHoverEnter()
-    {
-
-    }
-
-    public void OnHoverExit()
-    {
-
-    }
-
     public List<DrawTask> GetDrawTasks()
     {
         return IsHovered ? _hovered : _default;
