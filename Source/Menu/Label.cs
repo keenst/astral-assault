@@ -16,12 +16,12 @@ public class Label : IMenuItem
     public Texture2D Texture { get; }
     public bool IsHovered { get; set; }
 
-    public Label(int x, int y, int width, int height, string text)
+    public Label(int x, int y, string text)
     {
         X = x;
         Y = y;
-        Width = width;
-        Height = height;
+        Width = text.Length * 8;
+        Height = 8;
         ClickAction = () => { };
         Text = text;
 
