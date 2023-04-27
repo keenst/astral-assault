@@ -15,12 +15,14 @@ public class MainMenuState : GameState, IMouseMoveEventListener
     {
         Menu menu = new();
         
-        menu.AddMenuItem(new Button(8, 8, 48, 12, "Play", () =>
+        menu.AddMenuItem(new Label(8, 8, 128, 12, "Astral Assault"));
+        
+        menu.AddMenuItem(new Button(8, 24, 48, 12, "Play", () =>
         {
             Root.GameStateMachine.ChangeState(new GameplayState(Root));
         }));
         
-        menu.AddMenuItem(new Button(8, 24, 48, 12, "Exit", () =>
+        menu.AddMenuItem(new Button(8, 40, 48, 12, "Exit", () =>
         {
             Root.Exit();
         }));
