@@ -15,7 +15,7 @@ public class MainMenuState : GameState, IMouseMoveEventListener
     {
         Menu menu = new();
         
-        menu.AddMenuItem(new Label(8, 8, 128, 12, "Astral Assault"));
+        menu.AddMenuItem(new Label(8, 8, 112, 8, "Astral Assault"));
         
         menu.AddMenuItem(new Button(8, 24, 48, 12, "Play", () =>
         {
