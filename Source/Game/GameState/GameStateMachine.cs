@@ -4,23 +4,23 @@ namespace AstralAssault;
 
 public class GameStateMachine
 {
-    private GameState _currentState;
+    public GameState CurrentState { get; private set; }
 
     public GameStateMachine(GameState initialState)
     {
-        _currentState = initialState;
-        _currentState.Enter();
+        CurrentState = initialState;
+        CurrentState.Enter();
     }
 
     public void ChangeState(GameState newState)
     {
-        _currentState?.Exit();
-        _currentState = newState;
-        _currentState.Enter();
+        CurrentState?.Exit();
+        CurrentState = newState;
+        CurrentState.Enter();
     }
     
     public List<DrawTask> GetDrawTasks()
     {
-        return _currentState.GetDrawTasks();
+        return CurrentState.GetDrawTasks();
     }
 }
