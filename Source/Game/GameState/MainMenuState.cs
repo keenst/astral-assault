@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using AstralAssault.Source.Menu;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -13,19 +15,22 @@ public class MainMenuState : GameState, IMouseMoveEventListener
     
     public MainMenuState(Game1 root) : base(root)
     {
-        Menu menu = new();
+        string path = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+        string json = File.ReadAllText(path + "/Content/Menus/Main.json");
+
+        Menu menu = Menu.Parse(json);
         
-        menu.AddMenuItem(new Label(8, 8, "Astral Assault"));
-        
-        menu.AddMenuItem(new Button(8, 24, 48, 12, "Play", () =>
-        {
-            Root.GameStateMachine.ChangeState(new GameplayState(Root));
-        }));
-        
-        menu.AddMenuItem(new Button(8, 40, 48, 12, "Exit", () =>
-        {
-            Root.Exit();
-        }));
+        // menu.AddMenuItem(new Label(8, 8, "Astral Assault"));
+        //
+        // menu.AddMenuItem(new Button(8, 24, 48, 12, "Play", () =>
+        // {
+        //     Root.GameStateMachine.ChangeState(new GameplayState(Root));
+        // }));
+        //
+        // menu.AddMenuItem(new Button(8, 40, 48, 12, "Exit", () =>
+        // {
+        //     Root.Exit();
+        // }));
         
         _menuController = new MenuController(menu, this);
         
