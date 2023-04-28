@@ -1,16 +1,15 @@
 ﻿#region
 using System;
-using static AstralAssault.InputEventSource;
 #endregion
 
 namespace AstralAssault;
 
 public class MouseButtonEventArgs : EventArgs
 {
-    public MouseButtonEventArgs(MouseButtons button)
+    public MouseButtonEventArgs(InputEventSource.MouseButtons button)
     {
         Button = button;
     }
 
-    public MouseButtons Button { get; }
+    public InputEventSource.MouseButtons Button { get; }
 }

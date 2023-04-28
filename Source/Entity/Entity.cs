@@ -1,52 +1,49 @@
-﻿using System;
+﻿#region
+using System;
 using System.Collections.Generic;
 using AstralAssault.Items;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Vector2 = Microsoft.Xna.Framework.Vector2;
-using Vector4 = Microsoft.Xna.Framework.Vector4;
+#endregion
 
 namespace AstralAssault;
 
 public class Entity
 {
-    public Vector2 Position;
-    public Vector2 Velocity;
-    protected float Rotation;
-    protected Collider Collider;
-    protected SpriteRenderer SpriteRenderer;
     protected readonly GameplayState GameState;
-    protected OutOfBounds OutOfBoundsBehavior = OutOfBounds.Wrap;
-    protected bool IsActor = false;
-    protected float MaxHP;
-    protected float HP;
+
+    private readonly long m_timeSpawned;
+    protected Collider Collider;
     protected float ContactDamage;
-    
-    private bool _isHighlighted;
-    private long _timeStartedHighlightingMS;
-    private float _highlightAlpha;
+    protected float HP;
+    protected bool IsActor = false;
 
     public bool IsFriendly;
 
-    private readonly long _timeSpawned;
-    public long TimeSinceSpawned => DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - _timeSpawned;
+    private Texture2D m_healthBarTexture;
+    private float m_highlightAlpha;
 
-    private Texture2D _healthBarTexture;
-
-    protected enum OutOfBounds
-    {
-        DoNothing,
-        Wrap,
-        Destroy
-    }
+    private bool m_isHighlighted;
+    private long m_timeStartedHighlightingMS;
+    protected float MaxHP;
+    protected OutOfBounds OutOfBoundsBehavior = OutOfBounds.Wrap;
+    public Vector2 Position;
+    protected float Rotation;
+    protected SpriteRenderer SpriteRenderer;
+    public Vector2 Velocity;
 
     protected Entity(GameplayState gameState, Vector2 position)
     {
         GameState = gameState;
         Position = position;
-        _timeSpawned = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        m_timeSpawned = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
         CreateHealthBarTexture();
+    }
+
+    public long TimeSinceSpawned
+    {
+        get => DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - m_timeSpawned;
     }
 
     public virtual void OnUpdate(object sender, UpdateEventArgs e)
@@ -111,33 +108,33 @@ public class Entity
 
         if (this is Asteroid && other.Parent is MegaHealth or Haste or Quad) return;
 
-        _isHighlighted = true;
-        _timeStartedHighlightingMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        _highlightAlpha = 0.7F;
-        
-        SpriteRenderer.EffectContainer.SetEffect<HighlightEffect, float>(_highlightAlpha);
+        m_isHighlighted = true;
+        m_timeStartedHighlightingMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        m_highlightAlpha = 0.7F;
+
+        SpriteRenderer.EffectContainer.SetEffect<HighlightEffect, float>(m_highlightAlpha);
     }
 
     public virtual List<DrawTask> GetDrawTasks()
     {
-        List<DrawTask> drawTasks = new();
-        
-        if (_isHighlighted)
+        List<DrawTask> drawTasks = new List<DrawTask>();
+
+        if (m_isHighlighted)
         {
             const float decayRate = 0.005F;
 
             long timeNowMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-            float timeSinceStartedS = (timeNowMS - _timeStartedHighlightingMS) / 1000F;
-            
-            _highlightAlpha = 0.7F * MathF.Pow(decayRate, timeSinceStartedS);
-            
-            if (_highlightAlpha <= 0.01)
+            float timeSinceStartedS = (timeNowMS - m_timeStartedHighlightingMS) / 1000F;
+
+            m_highlightAlpha = 0.7F * MathF.Pow(decayRate, timeSinceStartedS);
+
+            if (m_highlightAlpha <= 0.01)
             {
-                _isHighlighted = false;
-                _highlightAlpha = 0;
+                m_isHighlighted = false;
+                m_highlightAlpha = 0;
                 SpriteRenderer.EffectContainer.RemoveEffect<HighlightEffect>();
             }
-            else SpriteRenderer.EffectContainer.SetEffect<HighlightEffect, float>(_highlightAlpha);
+            else SpriteRenderer.EffectContainer.SetEffect<HighlightEffect, float>(m_highlightAlpha);
         }
 
         if (IsActor) drawTasks.AddRange(CreateHealthBarDrawTasks());
@@ -159,9 +156,9 @@ public class Entity
 
     private void CreateHealthBarTexture()
     {
-        _healthBarTexture = new Texture2D(GameState.Root.GraphicsDevice, 1, 1);
+        m_healthBarTexture = new Texture2D(GameState.Root.GraphicsDevice, 1, 1);
         Color[] data = { Color.White };
-        _healthBarTexture.SetData(data);
+        m_healthBarTexture.SetData(data);
     }
 
     private List<DrawTask> CreateHealthBarDrawTasks()
@@ -186,22 +183,24 @@ public class Entity
 
         DrawTask background = new DrawTask
         (
-            _healthBarTexture, source, outline, 0, LayerDepth.HUD,
+            m_healthBarTexture, source, outline, 0, LayerDepth.HUD,
             new List<IDrawTaskEffect> { new ColorEffect(outlineColor) }, Palette.GetColor(Palette.Colors.Black)
         );
 
         DrawTask empty = new DrawTask
         (
-            _healthBarTexture, source, emptyHealthBar, 0, LayerDepth.HUD,
+            m_healthBarTexture, source, emptyHealthBar, 0, LayerDepth.HUD,
             new List<IDrawTaskEffect> { new ColorEffect(emptyColor) }, Palette.GetColor(Palette.Colors.Red9)
         );
 
         DrawTask full = new DrawTask
         (
-            _healthBarTexture, source, fullHealthBar, 0, LayerDepth.HUD,
+            m_healthBarTexture, source, fullHealthBar, 0, LayerDepth.HUD,
             new List<IDrawTaskEffect> { new ColorEffect(fullColor) }, Palette.GetColor(Palette.Colors.Green9)
         );
 
         return new List<DrawTask> { background, empty, full };
     }
+
+    protected enum OutOfBounds { DoNothing, Wrap, Destroy }
 }

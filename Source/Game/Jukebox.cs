@@ -1,12 +1,14 @@
+#region
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
+#endregion
 
 namespace AstralAssault;
 
 public static class Jukebox
 {
-    private static readonly Dictionary<string, SoundEffect> SoundEffects = new();
-    private static float _masterVolume = 0.5F;
+    private static readonly Dictionary<string, SoundEffect> SoundEffects = new Dictionary<string, SoundEffect>();
+    private static float m_masterVolume = 0.5F;
 
     public static void Init()
     {
@@ -31,12 +33,12 @@ public static class Jukebox
     public static void PlaySound(string name, float volume = 1)
     {
         if (!SoundEffects.ContainsKey(name)) throw new KeyNotFoundException($"SoundEffect {name} not found");
-        
-        SoundEffects[name].Play(volume * _masterVolume, 0, 0);
+
+        SoundEffects[name].Play(volume * m_masterVolume, 0, 0);
     }
-    
+
     public static void SetMasterVolume(float volume)
     {
-        _masterVolume = volume;
+        m_masterVolume = volume;
     }
 }

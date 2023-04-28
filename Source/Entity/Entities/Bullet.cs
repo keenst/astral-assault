@@ -1,5 +1,4 @@
 ﻿#region
-using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -8,21 +7,16 @@ namespace AstralAssault;
 
 public class Bullet : Entity
 {
-    public bool IsQuadDamage { get; }
-    
-    public Bullet(GameplayState gameState, Vector2 position, float rotation, float speed, bool isQuadDamage) 
-        :base(gameState, position)
+    public Bullet(GameplayState gameState, Vector2 position, float rotation, float speed, bool isQuadDamage)
+        : base(gameState, position)
     {
         IsQuadDamage = isQuadDamage;
-        
-        Velocity = new Vector2(
-            (float)Math.Cos(rotation),
-            (float)Math.Sin(rotation)
-            ) * speed;
+
+        Velocity = Vector2.UnitX.RotateVector(rotation) * speed;
 
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Bullet");
-        
-        Frame frame = new(new Rectangle(isQuadDamage ? 4 : 0, 0, 4, 4));
+
+        Frame frame = new Frame(new Rectangle(isQuadDamage ? 4 : 0, 0, 4, 4));
 
         SpriteRenderer = new SpriteRenderer(spriteSheet, frame, LayerDepth.Foreground);
 
@@ -31,7 +25,7 @@ public class Bullet : Entity
             this
         )
         {
-            radius = 3
+            Radius = 3
         };
 
         GameState.CollisionSystem.AddCollider(Collider);
@@ -41,6 +35,8 @@ public class Bullet : Entity
         ContactDamage = isQuadDamage ? 16 : 4;
         IsFriendly = true;
     }
+
+    public bool IsQuadDamage { get; }
 
     public override void OnCollision(Collider other)
     {

@@ -1,6 +1,5 @@
 ﻿#region
 using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 #endregion
 
@@ -12,7 +11,4 @@ public static class ExtensionMethods
         Vector2.Transform(inVector, Matrix.CreateRotationZ(rotation));
 
     public static int Mod(this int x, int y) => (Math.Abs(x * y) + x) % y;
-
-    public static Tuple<TKey, TValue> ToTuple<TKey, TValue>(this KeyValuePair<TKey, TValue> keyValuePair) =>
-        new Tuple<TKey, TValue>(keyValuePair.Key, keyValuePair.Value);
 }

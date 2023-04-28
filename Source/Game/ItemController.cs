@@ -1,79 +1,82 @@
+#region
 using System;
 using AstralAssault.Items;
 using Microsoft.Xna.Framework;
+#endregion
 
 namespace AstralAssault;
 
 public class ItemController : IUpdateEventListener
 {
-    private long _lastSpawnTimeMS;
-    private int _spawnInterval = 5000;
-    private readonly GameplayState _gameState;
-    private readonly Random _rnd = new();
-    private int _spawnedThisWave;
-    
+    private readonly GameplayState m_gameState;
+    private readonly Random m_rnd = new Random();
+    private long m_lastSpawnTimeMS;
+    private int m_spawnedThisWave;
+    private readonly int m_spawnInterval = 5000;
+
     public ItemController(GameplayState gameState)
     {
-        _gameState = gameState;
+        m_gameState = gameState;
+    }
+
+    public void OnUpdate(object sender, UpdateEventArgs e)
+    {
+        long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+
+        if ((timeNow - m_lastSpawnTimeMS) <= m_spawnInterval) return;
+
+        m_lastSpawnTimeMS = timeNow;
+        SpawnItem();
     }
 
     public void StartListening()
     {
         UpdateEventSource.UpdateEvent += OnUpdate;
     }
-    
+
     public void StopListening()
     {
         UpdateEventSource.UpdateEvent -= OnUpdate;
     }
-    
-    public void OnUpdate(object sender, UpdateEventArgs e)
-    {
-        long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        
-        if (timeNow - _lastSpawnTimeMS <= _spawnInterval) return;
-        
-        _lastSpawnTimeMS = timeNow;
-        SpawnItem();
-    }
 
     private void SpawnItem()
     {
-        if (_spawnedThisWave >= 3) return;
-        
-        _spawnedThisWave++;
-        
+        if (m_spawnedThisWave >= 3) return;
+
+        m_spawnedThisWave++;
+
         Vector2 position;
         bool isTooCloseToPlayer;
 
         do
         {
-            position = new Vector2(_rnd.Next(Game1.TargetWidth), _rnd.Next(Game1.TargetHeight));
-            if (Vector2.Distance(position, _gameState.Player.Position) < 100 ||
+            position = new Vector2(m_rnd.Next(Game1.TargetWidth), m_rnd.Next(Game1.TargetHeight));
+
+            if ((Vector2.Distance(position, m_gameState.Player.Position) < 100) ||
                 position.X is < 100 or > Game1.TargetWidth - 100 ||
                 position.Y is < 100 or > Game1.TargetHeight - 100)
             {
                 isTooCloseToPlayer = true;
+
                 continue;
             }
 
             isTooCloseToPlayer = false;
-        }
-        while (isTooCloseToPlayer);
-        
-        Entity item = _rnd.Next(3) switch
+        } while (isTooCloseToPlayer);
+
+        Entity item = m_rnd.Next(3) switch
         {
-            0 => new Quad(_gameState, position),
-            1 => new Haste(_gameState, position),
-            2 => new MegaHealth(_gameState, position),
-            _ => throw new ArgumentOutOfRangeException()
+            0 => new Quad(m_gameState, position),
+            1 => new Haste(m_gameState, position),
+            2 => new MegaHealth(m_gameState, position),
+            var _ => throw new ArgumentOutOfRangeException()
         };
-        
-        _gameState.Entities.Add(item);
+
+        m_gameState.Entities.Add(item);
     }
-    
+
     public void NewWave()
     {
-        _spawnedThisWave = 0;
+        m_spawnedThisWave = 0;
     }
 }

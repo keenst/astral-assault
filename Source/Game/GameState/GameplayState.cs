@@ -1,5 +1,4 @@
 ﻿#region
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.Xna.Framework;
@@ -10,20 +9,17 @@ namespace AstralAssault;
 
 public class GameplayState : GameState
 {
+    private static readonly Vector4 MultiplierBrokenColor = new Vector4(1, 0, 0, 1);
+    private static readonly Vector4 MultiplierIncreaseColor = new Vector4(1, 1, 0, 1);
+    private static readonly Vector4 MultiplierDefaultColor = new Vector4(1, 1, 1, 1);
+    public readonly CollisionSystem CollisionSystem = new CollisionSystem();
     public readonly List<Entity> Entities;
-    public readonly CollisionSystem CollisionSystem = new();
-    public WaveController WaveController;
     public ItemController ItemController;
+    private Vector4 m_multiplierColor = MultiplierDefaultColor;
+    private float m_prevMultiplier = 1;
+    public WaveController WaveController;
 
-    public Player Player => (Player) Entities.Find(entity => entity is Player);
 
-    private static readonly Vector4 MultiplierBrokenColor = new(1, 0, 0, 1);
-    private static readonly Vector4 MultiplierIncreaseColor = new(1, 1, 0, 1);
-    private static readonly Vector4 MultiplierDefaultColor = new(1, 1, 1, 1);
-    private Vector4 _multiplierColor = MultiplierDefaultColor;
-    private float _prevMultiplier = 1;
-    
-    
     public GameplayState(Game1 root) : base(root)
     {
         Entities = new List<Entity>();
@@ -32,7 +28,12 @@ public class GameplayState : GameState
         ItemController.StartListening();
     }
 
-    Texture2D createCircleText(int radius, Color color)
+    public Player Player
+    {
+        get => (Player)Entities.Find(entity => entity is Player);
+    }
+
+    private Texture2D CreateCircleText(int radius, Color color)
     {
         Texture2D texture = new Texture2D(Root.GraphicsDevice, radius, radius);
         Color[] colorData = new Color[radius * radius];
@@ -47,14 +48,8 @@ public class GameplayState : GameState
                 int index = x * radius + y;
                 Vector2 pos = new Vector2(x - diam, y - diam);
 
-                if (pos.LengthSquared() <= diamsq)
-                {
-                    colorData[index] = color;
-                }
-                else
-                {
-                    colorData[index] = Color.Transparent;
-                }
+                if (pos.LengthSquared() <= diamsq) colorData[index] = color;
+                else colorData[index] = Color.Transparent;
             }
         }
 
@@ -75,29 +70,32 @@ public class GameplayState : GameState
         Color textColor = Palette.GetColor(Palette.Colors.Grey9);
         List<DrawTask> scoreTasks = scoreText.CreateDrawTasks(new Vector2(4, 4), textColor, LayerDepth.HUD);
         drawTasks.AddRange(scoreTasks);
-        
-        string multiplierText = 
+
+        string multiplierText =
             $"Score multi.: X{Player.Multiplier.ToString("0.0", CultureInfo.GetCultureInfo("en-US"))}";
-        
-        List<DrawTask> multiplierTasks = multiplierText.CreateDrawTasks(
-            new Vector2(480 - multiplierText.Length * 8 - 4, 4), 
-            textColor, 
+
+        List<DrawTask> multiplierTasks = multiplierText.CreateDrawTasks
+        (
+            new Vector2(480 - multiplierText.Length * 8 - 4, 4),
+            textColor,
             LayerDepth.HUD,
-            new List<IDrawTaskEffect> { new ColorEffect(_multiplierColor) });
+            new List<IDrawTaskEffect> { new ColorEffect(m_multiplierColor) }
+        );
         drawTasks.AddRange(multiplierTasks);
 
         if (!Root.ShowDebug) return drawTasks;
 
         foreach (Collider collider in CollisionSystem.Colliders)
         {
-            Texture2D circle = createCircleText(collider.radius, new Color(Palette.GetColor(Palette.Colors.Grey9), 0.15F));
+            Texture2D circle = CreateCircleText
+                (collider.Radius, new Color(Palette.GetColor(Palette.Colors.Grey9), 0.15F));
 
             drawTasks.Add
             (
                 new DrawTask
                 (
                     circle,
-                    collider.Parent.Position - (new Vector2(collider.radius) / 2),
+                    collider.Parent.Position - new Vector2(collider.Radius) / 2,
                     0,
                     LayerDepth.Debug,
                     new List<IDrawTaskEffect>(),
@@ -123,26 +121,23 @@ public class GameplayState : GameState
     {
         ItemController.StopListening();
         while (Entities.Count > 0) Entities[0].Destroy();
-        
+
         UpdateEventSource.UpdateEvent -= OnUpdate;
     }
 
     public override void OnUpdate(object sender, UpdateEventArgs e)
     {
         if (Player == null) return;
-        
+
         float multiplier = Player.Multiplier;
-        
-        if (multiplier != _prevMultiplier)
+
+        if (multiplier != m_prevMultiplier)
         {
-            _multiplierColor = multiplier > _prevMultiplier ? MultiplierIncreaseColor : MultiplierBrokenColor;
-            _prevMultiplier = multiplier;
+            m_multiplierColor = multiplier > m_prevMultiplier ? MultiplierIncreaseColor : MultiplierBrokenColor;
+            m_prevMultiplier = multiplier;
         }
-        else
-        {
-            _multiplierColor = Vector4.Lerp(_multiplierColor, MultiplierDefaultColor, e.DeltaTime * 2);
-        }
-        
+        else m_multiplierColor = Vector4.Lerp(m_multiplierColor, MultiplierDefaultColor, e.DeltaTime * 2);
+
         CollisionSystem.OnUpdate(sender, e);
         WaveController.OnUpdate(sender, e);
 

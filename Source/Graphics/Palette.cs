@@ -12,13 +12,69 @@ public static class Palette
 {
     public enum Colors
     {
-        Grey1,   Grey2,   Grey3,   Grey4,   Grey5,   Grey6,   Grey7,   Grey8,   Grey9,
-        Blue1,   Blue2,   Blue3,   Blue4,   Blue5,   Blue6,   Blue7,   Blue8,   Blue9,
-        Green1,  Green2,  Green3,  Green4,  Green5,  Green6,  Green7,  Green8,  Green9,
-        Beige1,  Beige2,  Beige3,  Beige4,  Beige5,  Beige6,  Beige7,  Beige8,  Beige9,
-        Yellow1, Yellow2, Yellow3, Yellow4, Yellow5, Yellow6, Yellow7, Yellow8, Yellow9,
-        Red1,    Red2,    Red3,    Red4,    Red5,    Red6,    Red7,    Red8,    Red9,
-        Purple1, Purple2, Purple3, Purple4, Purple5, Purple6, Purple7, Purple8, Purple9,
+        Grey1,
+        Grey2,
+        Grey3,
+        Grey4,
+        Grey5,
+        Grey6,
+        Grey7,
+        Grey8,
+        Grey9,
+        Blue1,
+        Blue2,
+        Blue3,
+        Blue4,
+        Blue5,
+        Blue6,
+        Blue7,
+        Blue8,
+        Blue9,
+        Green1,
+        Green2,
+        Green3,
+        Green4,
+        Green5,
+        Green6,
+        Green7,
+        Green8,
+        Green9,
+        Beige1,
+        Beige2,
+        Beige3,
+        Beige4,
+        Beige5,
+        Beige6,
+        Beige7,
+        Beige8,
+        Beige9,
+        Yellow1,
+        Yellow2,
+        Yellow3,
+        Yellow4,
+        Yellow5,
+        Yellow6,
+        Yellow7,
+        Yellow8,
+        Yellow9,
+        Red1,
+        Red2,
+        Red3,
+        Red4,
+        Red5,
+        Red6,
+        Red7,
+        Red8,
+        Red9,
+        Purple1,
+        Purple2,
+        Purple3,
+        Purple4,
+        Purple5,
+        Purple6,
+        Purple7,
+        Purple8,
+        Purple9,
         Black
     }
 
@@ -26,7 +82,8 @@ public static class Palette
 
     public static void Init()
     {
-        string path = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
+        string path = Directory.GetParent(Environment.CurrentDirectory)?.Parent.Parent.FullName;
+
         //string path = Directory.GetCurrentDirectory();
         string[] lines = File.ReadAllLines(path + "/Content/gora64.hex");
 

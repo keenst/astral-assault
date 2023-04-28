@@ -9,24 +9,21 @@ namespace AstralAssault;
 
 public class WaveController
 {
-    public readonly GameplayState GameState;
-    private readonly Game1 _root;
-    private readonly DebrisController _debrisController;
-    private int _currentWave;
-
-    private bool _drawWaveText;
-    private long _waveTextTimer;
     private const long WaveTextDuration = 2000;
-    
-    private long _waveTimer;
     private const long WaveDelay = 5000;
-    
+    public readonly GameplayState GameState;
+    private readonly Game1 m_root;
+    private int m_currentWave;
+
+    private bool m_drawWaveText;
+    private long m_waveTextTimer;
+
+    private long m_waveTimer;
+
     public WaveController(GameplayState gameState, Game1 root)
     {
         GameState = gameState;
-        _root = root;
-
-        _debrisController = new DebrisController(gameState);
+        m_root = root;
 
         StartNextWave();
     }
@@ -34,12 +31,13 @@ public class WaveController
     public void StartNextWave()
     {
         GameState.ItemController.NewWave();
-        
-        _currentWave++;
-        
-        int enemiesToSpawn = (int)(_currentWave * 1.1F);
-        
-        Random rnd = new();
+
+        m_currentWave++;
+
+        int enemiesToSpawn = (int)(m_currentWave * 1.1F);
+
+        Random rnd = new Random();
+
         for (int i = 0; i < enemiesToSpawn; i++)
         {
             int side = rnd.Next(0, 4);
@@ -69,20 +67,20 @@ public class WaveController
             float angleToCenter = MathF.Atan2(gameCenter.Y - position.Y, gameCenter.X - position.X);
             angleToCenter += MathHelper.ToRadians(rnd.Next(-45, 45));
 
-            GameState.Entities.Add(new Asteroid(GameState, position, angleToCenter, size, _debrisController));
+            GameState.Entities.Add(new Asteroid(GameState, position, angleToCenter, size));
         }
 
-        _drawWaveText = true;
-        _waveTextTimer = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        m_drawWaveText = true;
+        m_waveTextTimer = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
     }
 
     public List<DrawTask> GetDrawTasks()
     {
-        List<DrawTask> drawTasks = _debrisController.GetDrawTasks();
-        
+        List<DrawTask> drawTasks = new List<DrawTask>();
+
         //if (!_drawWaveText) return drawTasks;
-        
-        string text = $"Wave: {_currentWave}";
+
+        string text = $"Wave: {m_currentWave}";
         Color color = Palette.GetColor(Palette.Colors.Grey9);
         drawTasks.AddRange(text.CreateDrawTasks(new Vector2(4, 16), color, LayerDepth.HUD));
 
@@ -92,18 +90,17 @@ public class WaveController
     public void OnUpdate(object sender, UpdateEventArgs e)
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        if (_drawWaveText && timeNow - _waveTextTimer > WaveTextDuration)
-        {
-            _drawWaveText = false;
-        }
+
+        if (m_drawWaveText && ((timeNow - m_waveTextTimer) > WaveTextDuration)) m_drawWaveText = false;
 
         int enemiesAlive = GameState.Entities.Count(x => x is Asteroid);
+
         if (enemiesAlive == 0)
         {
-            if ((timeNow - _waveTimer) < WaveDelay) return;
+            if ((timeNow - m_waveTimer) < WaveDelay) return;
 
             StartNextWave();
-            _waveTimer = timeNow;
+            m_waveTimer = timeNow;
         }
     }
 }

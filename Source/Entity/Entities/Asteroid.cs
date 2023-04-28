@@ -1,6 +1,5 @@
 #region
 using System;
-using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -9,32 +8,23 @@ namespace AstralAssault;
 
 public class Asteroid : Entity
 {
-    private readonly DebrisController _debrisController;
-    private readonly float _rotSpeed;
-    private readonly Sizes _size;
-    private bool _hasExploded;
-
-    public enum Sizes
-    {
-        Smallest,
-        Small,
-        Medium
-    }
+    public enum Sizes { Smallest, Small, Medium }
+    private readonly float m_rotSpeed;
+    private readonly Sizes m_size;
+    private bool m_hasExploded;
 
     public Asteroid(
-        GameplayState gameState, 
-        Vector2 position, 
-        float direction, 
-        Sizes size, 
-        DebrisController debrisController) 
-        :base(gameState, position)
+        GameplayState gameState,
+        Vector2 position,
+        float direction,
+        Sizes size
+    )
+        : base(gameState, position)
     {
-        _debrisController = debrisController;
-        
-        _size = size;
+        m_size = size;
 
-        Random rnd = new();
-        _rotSpeed = rnd.Next(5, 20) / 10F;
+        Random rnd = new Random();
+        m_rotSpeed = rnd.Next(5, 20) / 10F;
         int speed = rnd.Next(30, 100);
 
         Velocity = Vector2.UnitX.RotateVector(direction) * speed;
@@ -85,7 +75,8 @@ public class Asteroid : Entity
 
         Frame frame = new Frame
         (
-            new Rectangle(0, 0, spriteSize, spriteSize), new Rectangle(spriteSize, 0, spriteSize, spriteSize),
+            new Rectangle(0, 0, spriteSize, spriteSize),
+            new Rectangle(spriteSize, 0, spriteSize, spriteSize),
             new Rectangle(spriteSize * 2, 0, spriteSize, spriteSize),
             new Rectangle(spriteSize * 3, 0, spriteSize, spriteSize)
         );
@@ -99,7 +90,7 @@ public class Asteroid : Entity
             mass
         )
         {
-            radius = colliderSize
+            Radius = colliderSize
         };
 
         GameState.CollisionSystem.AddCollider(Collider);
@@ -111,26 +102,27 @@ public class Asteroid : Entity
 
     protected override void OnDeath()
     {
-        if (!_hasExploded)
+        if (!m_hasExploded)
         {
-            Random rnd = new();
+            Random rnd = new Random();
 
             string soundToPlay = rnd.Next(3) switch
             {
                 0 => "Explosion1",
                 1 => "Explosion2",
                 2 => "Explosion3",
-                _ => throw new ArgumentOutOfRangeException()
+                var _ => throw new ArgumentOutOfRangeException()
             };
-                
+
             Jukebox.PlaySound(soundToPlay);
 
-            if (_size - 1 < 0)
+            if ((m_size - 1) < 0)
             {
-                _hasExploded = true;
+                m_hasExploded = true;
+
                 return;
             }
-            
+
             int amount = rnd.Next(1, 4);
 
             Vector2 playerPosition = GameState.Player.Position;
@@ -142,27 +134,25 @@ public class Asteroid : Entity
 
                 GameState.Entities.Add
                 (
-                    new Asteroid(GameState, Position, angleToPlayer, _size - 1, _debrisController)
+                    new Asteroid(GameState, Position, angleToPlayer, m_size - 1)
                 );
             }
         }
 
-        _hasExploded = true;
+        m_hasExploded = true;
 
-        _debrisController.SpawnDebris(Position, (int)_size);
-        
         GameState.Player.Multiplier += 0.1F;
 
-        int score = _size switch
+        int score = m_size switch
         {
             Sizes.Smallest => 100,
             Sizes.Small => 300,
             Sizes.Medium => 700,
-            _ => 0
+            var _ => 0
         };
-        
+
         GameState.Root.Score += (int)(score * GameState.Player.Multiplier);
-        
+
         base.OnDeath();
     }
 
@@ -170,15 +160,11 @@ public class Asteroid : Entity
     {
         base.OnUpdate(sender, e);
 
-        _debrisController._particleEmitter.OnUpdate(sender, e);
+        Rotation += m_rotSpeed * e.DeltaTime;
 
-        Rotation += _rotSpeed * e.DeltaTime;
         if (Rotation > Math.PI) Rotation = (float)-Math.PI;
 
-        if (Velocity.Length() > 200)
-        {
-            Velocity = Vector2.Normalize(Velocity) * 200;
-        }
+        if (Velocity.Length() > 200) Velocity = Vector2.Normalize(Velocity) * 200;
     }
 
     public override void OnCollision(Collider other)
@@ -186,17 +172,17 @@ public class Asteroid : Entity
         base.OnCollision(other);
 
         if (other.Parent is not Bullet) return;
-        
-        Random rnd = new();
-        
+
+        Random rnd = new Random();
+
         string soundName = rnd.Next(3) switch
         {
             0 => "Hurt1",
             1 => "Hurt2",
             2 => "Hurt3",
-            _ => throw new ArgumentOutOfRangeException()
+            var _ => throw new ArgumentOutOfRangeException()
         };
-        
+
         Jukebox.PlaySound(soundName, 0.5F);
     }
 }

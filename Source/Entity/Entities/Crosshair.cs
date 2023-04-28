@@ -1,4 +1,5 @@
 ﻿#region
+using AstralAssault.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -14,33 +15,62 @@ public class Crosshair : Entity, IMouseEventListener
 
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Crosshair");
 
-        Frame activeFrame = new Frame(new Rectangle(0, 0, 16, 16));
-        Frame inactiveFrame = new Frame(new Rectangle(64, 0, 16, 16));
-
-        Animation deactivateAnimation = new Animation
+        Animation activateAnimation = AnimationCreator.CreateAnimFromSpriteSheet
         (
-            new[]
-            {
-                new Frame(new Rectangle(16, 0, 16, 16), 30), new Frame(new Rectangle(32, 0, 16, 16), 20),
-                new Frame(new Rectangle(48, 0, 16, 16), 10)
-            }, false
+            16,
+            16,
+            3,
+            5,
+            3,
+            new[] { 30, 20, 10 },
+            false,
+            false,
+            true
         );
 
-        Animation activateAnimation = new Animation
+        Animation deactivateAnimation = AnimationCreator.CreateAnimFromSpriteSheet
         (
-            new[]
-            {
-                new Frame(new Rectangle(48, 0, 16, 16), 30), new Frame(new Rectangle(32, 0, 16, 16), 20),
-                new Frame(new Rectangle(16, 0, 16, 16), 10)
-            }, false
+            16,
+            16,
+            1,
+            5,
+            3,
+            new[] { 30, 20, 10 },
+            false,
+            false,
+            false
         );
 
-        Animation activeAnimation = new Animation(new[] { activeFrame }, false);
-        Animation inactiveAnimation = new Animation(new[] { inactiveFrame }, false);
+        Animation activeAnimation = AnimationCreator.CreateAnimFromSpriteSheet
+        (
+            16,
+            16,
+            0,
+            5,
+            1,
+            new[] { 0 },
+            false,
+            false,
+            false
+        );
+
+        Animation inactiveAnimation = AnimationCreator.CreateAnimFromSpriteSheet
+        (
+            16,
+            16,
+            4,
+            5,
+            1,
+            new[] { 0 },
+            false,
+            false,
+            false
+        );
 
         Transition[] transitions =
         {
-            new Transition(0, 1, new[] { 2, 1 }, "IsActive", 0), new Transition(1, 0, new[] { 3, 0 }, "IsActive", 1)
+            new Transition(0, 1, new[] { 2, 1 }, "IsActive", 0),
+            new Transition(1, 0, new[] { 3, 0 }, "IsActive", 1)
         };
 
         SpriteRenderer = new SpriteRenderer
