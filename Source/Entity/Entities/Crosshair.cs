@@ -25,7 +25,9 @@ public class Crosshair : Entity, IMouseEventListener
             new[] { 30, 20, 10 },
             false,
             false,
-            true
+            true,
+            false,
+            0
         );
 
         Animation deactivateAnimation = AnimationCreator.CreateAnimFromSpriteSheet
@@ -38,7 +40,9 @@ public class Crosshair : Entity, IMouseEventListener
             new[] { 30, 20, 10 },
             false,
             false,
-            false
+            false,
+            false,
+            0
         );
 
         Animation activeAnimation = AnimationCreator.CreateAnimFromSpriteSheet
@@ -51,7 +55,9 @@ public class Crosshair : Entity, IMouseEventListener
             new[] { 0 },
             false,
             false,
-            false
+            false,
+            false,
+            0
         );
 
         Animation inactiveAnimation = AnimationCreator.CreateAnimFromSpriteSheet
@@ -64,7 +70,9 @@ public class Crosshair : Entity, IMouseEventListener
             new[] { 0 },
             false,
             false,
-            false
+            false,
+            false,
+            0
         );
 
         Transition[] transitions =

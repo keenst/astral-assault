@@ -131,7 +131,9 @@ public class Player : Entity, IInputEventListener
             new[] { 0 },
             true,
             true,
-            false
+            false,
+            false,
+            0
         );
 
         Animation tiltLeftAnimation = AnimationCreator.CreateAnimFromSpriteSheet
@@ -144,7 +146,9 @@ public class Player : Entity, IInputEventListener
             new[] { 0 },
             true,
             false,
-            false
+            false,
+            false,
+            0
         );
 
         Animation tiltRightAnimation = AnimationCreator.CreateAnimFromSpriteSheet
@@ -157,7 +161,9 @@ public class Player : Entity, IInputEventListener
             new[] { 0 },
             true,
             false,
-            false
+            false,
+            false,
+            0
         );
 
         Transition[] transitions =
@@ -393,11 +399,8 @@ public class Player : Entity, IInputEventListener
     private void HandleMovement(int xAxis, int yAxis)
     {
         // acceleration and deceleration
-        Vector2 forward = new Vector2
-        (
-            (float)Math.Cos(Rotation),
-            (float)Math.Sin(Rotation)
-        ) * m_moveSpeed * m_delta;
+        Vector2 forward = Vector2.UnitX.RotateVector(Rotation) *
+            m_moveSpeed * m_delta;
 
         Velocity = new Vector2
         (
@@ -406,11 +409,7 @@ public class Player : Entity, IInputEventListener
         );
 
         // tilting
-        Vector2 right = new Vector2
-        (
-            (float)Math.Cos(Rotation + Pi / 2),
-            (float)Math.Sin(Rotation + Pi / 2)
-        ) * m_tiltSpeed * m_delta;
+        Vector2 right = Vector2.UnitX.RotateVector(Rotation + Pi / 2) * m_tiltSpeed * m_delta;
 
         Velocity = new Vector2
         (

@@ -1,4 +1,5 @@
 #region
+using AstralAssault.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -20,16 +21,20 @@ public class Quad : Entity
 
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Quad");
 
-        Frame[] frames =
-        {
-            new Frame(new Rectangle(0, 0, 16, 16), 60), new Frame(new Rectangle(16, 0, 16, 16), 60),
-            new Frame(new Rectangle(32, 0, 16, 16), 60), new Frame(new Rectangle(48, 0, 16, 16), 60),
-            new Frame(new Rectangle(64, 0, 16, 16), 60), new Frame(new Rectangle(80, 0, 16, 16), 60),
-            new Frame(new Rectangle(64, 0, 16, 16), 60), new Frame(new Rectangle(48, 0, 16, 16), 60),
-            new Frame(new Rectangle(32, 0, 16, 16), 60), new Frame(new Rectangle(16, 0, 16, 16), 60)
-        };
-
-        Animation animation = new Animation(frames, false, true);
+        Animation animation = AnimationCreator.CreateAnimFromSpriteSheet
+        (
+            16,
+            16,
+            0,
+            6,
+            10,
+            new[] { 60 },
+            false,
+            true,
+            false,
+            true,
+            5
+        );
 
         SpriteRenderer = new SpriteRenderer
         (

@@ -1,4 +1,5 @@
 #region
+using AstralAssault.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -20,20 +21,20 @@ public class Haste : Entity
 
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Haste");
 
-        Frame[] frames =
-        {
-            new Frame(new Rectangle(16 * 0, 0, 16, 16), 60), new Frame(new Rectangle(16 * 1, 0, 16, 16), 60),
-            new Frame(new Rectangle(16 * 2, 0, 16, 16), 60), new Frame(new Rectangle(16 * 3, 0, 16, 16), 60),
-            new Frame(new Rectangle(16 * 4, 0, 16, 16), 60), new Frame(new Rectangle(16 * 5, 0, 16, 16), 60),
-            new Frame(new Rectangle(16 * 6, 0, 16, 16), 60), new Frame(new Rectangle(16 * 7, 0, 16, 16), 60),
-            new Frame(new Rectangle(16 * 8, 0, 16, 16), 60), new Frame(new Rectangle(16 * 9, 0, 16, 16), 60),
-            new Frame(new Rectangle(16 * 10, 0, 16, 16), 60), new Frame(new Rectangle(16 * 11, 0, 16, 16), 60),
-            new Frame(new Rectangle(16 * 12, 0, 16, 16), 60), new Frame(new Rectangle(16 * 13, 0, 16, 16), 60),
-            new Frame(new Rectangle(16 * 14, 0, 16, 16), 60), new Frame(new Rectangle(16 * 15, 0, 16, 16), 60),
-            new Frame(new Rectangle(16 * 16, 0, 16, 16), 60), new Frame(new Rectangle(16 * 17, 0, 16, 16), 60)
-        };
-
-        Animation animation = new Animation(frames, false, true);
+        Animation animation = AnimationCreator.CreateAnimFromSpriteSheet
+        (
+            16,
+            16,
+            0,
+            18,
+            18,
+            new[] { 60 },
+            false,
+            true,
+            false,
+            false,
+            0
+        );
 
         SpriteRenderer = new SpriteRenderer
         (

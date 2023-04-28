@@ -18,7 +18,10 @@ namespace AstralAssault.Source.Graphics
             int[] time,
             bool hasRotation,
             bool shouldLoop,
-            bool goBackwards)
+            bool goBackwards,
+            bool reverseDir,
+            int reverseAtIdx
+        )
         {
             Animation anim = new Animation();
 
@@ -36,9 +39,19 @@ namespace AstralAssault.Source.Graphics
                     int x = (currentFrameIdx % rowLenghtInFrames) * spriteWidth;
                     int y = (currentFrameIdx / rowLenghtInFrames) * spriteHeight;
 
-                    Frame frame = new Frame(new Rectangle(x, y, spriteWidth, spriteHeight), time[i]);
+                    Frame frame = new Frame
+                    (
+                        new Rectangle(x, y, spriteWidth, spriteHeight), (time.Length > 1)
+                            ? time[i]
+                            : time[0]
+                    );
 
                     frames.Add(frame);
+
+                    if (reverseDir && (i == reverseAtIdx))
+                    {
+                        goBackwards = !goBackwards;
+                    }
 
                     if (goBackwards)
                     {
