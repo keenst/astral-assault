@@ -72,7 +72,7 @@ public class Game1 : Game
         );
 
         AssetManager.Init(this);
-        TextRenderer.Init(this);
+        TextRenderer.Init();
         InputEventSource.Init();
         Palette.Init();
         Jukebox.Init();
