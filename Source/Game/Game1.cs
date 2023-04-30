@@ -11,6 +11,9 @@ namespace AstralAssault;
 
 public class Game1 : Game
 {
+    private enum Width { Full = 1920, Half = 960, Quarter = 480 }
+    private enum Height { Full = 1080, Half = 540, Quarter = 270 }
+
     public const int TargetWidth = (int)Width.Quarter;
     public const int TargetHeight = (int)Height.Quarter;
     private const int StatUpdateInterval = 300;
@@ -123,9 +126,6 @@ public class Game1 : Game
     protected override void Draw(GameTime gameTime)
     {
         // draw sprites to render target
-        GraphicsDevice.SetRenderTarget(m_renderTarget);
-
-        GraphicsDevice.Clear(BackgroundColor);
 
         List<DrawTask> drawTasks = new List<DrawTask>();
 
@@ -161,6 +161,9 @@ public class Game1 : Game
             drawTasks.AddRange(frameRateTask);
             drawTasks.AddRange(renderTimeTask);
         }
+
+        GraphicsDevice.SetRenderTarget(m_renderTarget);
+        GraphicsDevice.Clear(BackgroundColor);
 
         m_spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointWrap);
 
@@ -222,8 +225,4 @@ public class Game1 : Game
 
         base.Draw(gameTime);
     }
-
-    private enum Height { Full = 1080, Half = 540, Quarter = 270 }
-
-    private enum Width { Full = 1920, Half = 960, Quarter = 480 }
 }
