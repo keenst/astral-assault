@@ -295,7 +295,6 @@ public class Player : Entity, IInputEventListener
                 new List<IDrawTaskEffect> { new ColorEffect(backgroundColor) }, Color.White
             );
 
-            //int barLength = (int)((timeNow - powerUp.Item1) / (float)PowerUpDuration * 2);
             int barLength = 8 - (int)Math.Floor((timeNow - powerUp.Item1) / (float)PowerUpDuration * 8);
 
             DrawTask lifetimeBar = new DrawTask

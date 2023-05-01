@@ -131,7 +131,7 @@ public class Game1 : Game
 
         string fullscreenText = "Press F for fullscreen";
         List<DrawTask> fullscreenTextTasks =
-            fullscreenText.CreateDrawTasks(new Vector2(4, 258), Color.White, LayerDepth.Background);
+            fullscreenText.CreateDrawTasks(new Vector2(4, 258), Color.White, LayerDepth.HUD);
         drawTasks.AddRange(fullscreenTextTasks);
 
         drawTasks.AddRange(GameStateMachine.GetDrawTasks());

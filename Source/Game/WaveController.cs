@@ -17,6 +17,7 @@ public class WaveController
 
     private bool m_drawWaveText;
     private long m_waveTextTimer;
+    private bool levelUppHehe = false;
 
     private long m_waveTimer;
 
@@ -34,40 +35,53 @@ public class WaveController
 
         m_currentWave++;
 
+        if (m_currentWave == 6)
+        {
+            levelUppHehe = true;
+        }
+
         int enemiesToSpawn = (int)(m_currentWave * 1.1F);
 
         Random rnd = new Random();
 
-        for (int i = 0; i < enemiesToSpawn; i++)
+        switch (levelUppHehe)
         {
-            int side = rnd.Next(0, 4);
-
-            int x = side switch
+        case true:
+            break;
+        case false:
+            for (int i = 0; i < enemiesToSpawn; i++)
             {
-                0 => 0,
-                1 => Game1.TargetWidth,
-                2 => rnd.Next(0, Game1.TargetWidth),
-                3 => rnd.Next(0, Game1.TargetWidth),
-                var _ => throw new ArgumentOutOfRangeException()
-            };
+                int side = rnd.Next(0, 4);
 
-            int y = side switch
-            {
-                0 => rnd.Next(0, Game1.TargetHeight),
-                1 => rnd.Next(0, Game1.TargetHeight),
-                2 => 0,
-                3 => Game1.TargetHeight,
-                var _ => throw new ArgumentOutOfRangeException()
-            };
+                int x = side switch
+                {
+                    0 => 0,
+                    1 => Game1.TargetWidth,
+                    2 => rnd.Next(0, Game1.TargetWidth),
+                    3 => rnd.Next(0, Game1.TargetWidth),
+                    var _ => throw new ArgumentOutOfRangeException()
+                };
 
-            Vector2 position = new Vector2(x, y);
-            Asteroid.Sizes size = (Asteroid.Sizes)rnd.Next(0, 3);
+                int y = side switch
+                {
+                    0 => rnd.Next(0, Game1.TargetHeight),
+                    1 => rnd.Next(0, Game1.TargetHeight),
+                    2 => 0,
+                    3 => Game1.TargetHeight,
+                    var _ => throw new ArgumentOutOfRangeException()
+                };
 
-            Vector2 gameCenter = new Vector2(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F);
-            float angleToCenter = MathF.Atan2(gameCenter.Y - position.Y, gameCenter.X - position.X);
-            angleToCenter += MathHelper.ToRadians(rnd.Next(-45, 45));
+                Vector2 position = new Vector2(x, y);
+                Asteroid.Sizes size = (Asteroid.Sizes)rnd.Next(0, 3);
 
-            GameState.Entities.Add(new Asteroid(GameState, position, angleToCenter, size));
+                Vector2 gameCenter = new Vector2(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F);
+                float angleToCenter = MathF.Atan2(gameCenter.Y - position.Y, gameCenter.X - position.X);
+                angleToCenter += MathHelper.ToRadians(rnd.Next(-45, 45));
+
+                GameState.Entities.Add(new Asteroid(GameState, position, angleToCenter, size));
+            }
+
+            break;
         }
 
         m_drawWaveText = true;
