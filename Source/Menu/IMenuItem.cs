@@ -12,7 +12,7 @@ public interface IMenuItem
     public int Width { get; }
     public int Height { get; }
     public Rectangle Rectangle => new(X, Y, Width, Height);
-    public Action ClickAction { get; }
+    public MenuAction ClickAction { get; }
     public string Text { get; }
     public Texture2D Texture { get; }
     public bool IsHovered { get; set; }

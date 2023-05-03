@@ -11,7 +11,7 @@ public class Button : IMenuItem
     public int Y { get; }
     public int Width { get; }
     public int Height { get; }
-    public Action ClickAction { get; }
+    public MenuAction ClickAction { get; }
     public string Text { get; }
     public Texture2D Texture { get; }
     public bool IsHovered { get; set; }
@@ -19,7 +19,7 @@ public class Button : IMenuItem
     private readonly List<DrawTask> _default = new();
     private readonly List<DrawTask> _hovered = new();
 
-    public Button(int x, int y, int width, int height, string text, Action clickAction)
+    public Button(int x, int y, int width, int height, string text, MenuAction clickAction)
     {
         X = x;
         Y = y;

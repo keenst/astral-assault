@@ -12,15 +12,6 @@
         "width": 48,
         "height": 12,
         "text": "Play",
-		"click_action": "int x = 5;"
-    },
-    {
-        "type": "button",
-        "x": 8,
-        "y": 40,
-        "width": 48,
-        "height": 12,
-        "text": "Exit",
-		"click_action": "() => { Root.Exit(); }"
+		"clickAction": "SetVariable(Test, 15)"
     }
 ]

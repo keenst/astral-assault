@@ -89,7 +89,7 @@ public class MenuController : IMouseMoveEventListener, IMousePressedEventListene
         if (e.Button != MouseButtons.Left) return;
         
         IMenuItem clickedMenuItem = GetCollidingMenuItem(e.Position.X, e.Position.Y);
-        clickedMenuItem?.ClickAction();
+        clickedMenuItem?.ClickAction.Invoke(_menu);
     }
 
     public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)

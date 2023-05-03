@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq.Dynamic.Core;
-using System.Linq.Expressions;
 using System.Text.Json;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -12,21 +10,13 @@ public class Menu
 {
     public List<IMenuItem> MenuItems { get; }
     
-    public Menu()
-    {
-        MenuItems = new List<IMenuItem>();
-    }
-
+    private readonly Dictionary<string, object> _variables = new();
+    
     private Menu(List<IMenuItem> menuItems)
     {
         MenuItems = menuItems;
     }
-    
-    public void AddMenuItem(IMenuItem menuItem)
-    {
-        MenuItems.Add(menuItem);
-    }
-    
+
     public List<DrawTask> GetDrawTasks(Texture2D texture)
     {
         List<DrawTask> drawTasks = new();
@@ -37,6 +27,16 @@ public class Menu
         }
         
         return drawTasks;
+    }
+    
+    public void SetVariable(string name, object value)
+    {
+        _variables[name] = value;
+        using Dictionary<string, object>.Enumerator enumerator = _variables.GetEnumerator();
+        while (enumerator.MoveNext())
+        {
+            Debug.WriteLine($"{enumerator.Current.Key} = {enumerator.Current.Value}");
+        }
     }
 
     public static Menu Parse(string json)
@@ -89,11 +89,13 @@ public class Menu
             ? textElement.GetString()
             : throw new FormatException("Could not parse button: missing text property");
         
-        string action = element.TryGetProperty("click_action", out JsonElement actionElement)
+        string action = element.TryGetProperty("clickAction", out JsonElement actionElement)
             ? actionElement.GetString()
-            : throw new FormatException("Could not parse button: missing click_action property");
-
-        return new Button(x, y, width, height, text, ParseAction(action));
+            : throw new FormatException("Could not parse button: missing clickAction property");
+        
+        MenuAction menuAction = MenuAction.Parse(action);
+        
+        return new Button(x, y, width, height, text, menuAction);
     }
 
     private static Label ParseLabel(JsonElement element)
@@ -111,15 +113,5 @@ public class Menu
             : throw new FormatException("Could not parse label: missing text property");
         
         return new Label(x, y, text);
-    }
-    
-    private static Action ParseAction(string lambda)
-    {
-        LambdaExpression yepyep = DynamicExpressionParser.ParseLambda(
-            false, 
-            new ParameterExpression[] {},
-            typeof (void),
-            lambda);
-        return (Action) yepyep.Compile();
     }
 }

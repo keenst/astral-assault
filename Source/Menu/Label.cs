@@ -11,7 +11,7 @@ public class Label : IMenuItem
     public int Y { get; }
     public int Width { get; }
     public int Height { get; }
-    public Action ClickAction { get; }
+    public MenuAction ClickAction { get; }
     public string Text { get; }
     public Texture2D Texture { get; }
     public bool IsHovered { get; set; }
@@ -22,7 +22,7 @@ public class Label : IMenuItem
         Y = y;
         Width = text.Length * 8;
         Height = 8;
-        ClickAction = () => { };
+        ClickAction = new MenuAction();
         Text = text;
 
         Texture = null;
