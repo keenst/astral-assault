@@ -1,17 +1,26 @@
 [
-    {
-        "type": "label",
-        "x": 8,
-        "y": 8,
-        "text": "Astral Assault"
-    },
-    {
-        "type": "button",
-        "x": 8,
-        "y": 24,
-        "width": 48,
-        "height": 12,
-        "text": "Play",
-		"clickAction": "SetVariable(Test, 15)"
-    }
+  {
+    "type": "label",
+    "x": 8,
+    "y": 8,
+    "text": "Astral Assault"
+  },
+  {
+    "type": "button",
+    "x": 8,
+    "y": 24,
+    "width": 48,
+    "height": 12,
+    "text": "Play",
+    "clickAction": "ChangeGameState(Gameplay)"
+  },
+  {
+    "type": "button",
+    "x": 8,
+    "y": 40,
+    "width": 48,
+    "height": 12,
+    "text": "Exit",
+    "clickAction": "Exit()"
+  }
 ]

@@ -38,7 +38,7 @@ public struct MenuAction
                 
                 GameState gameState = (string)Parameters[0] switch
                 {
-                    "\"Gameplay\"" => new GameplayState(menu.Root),
+                    "Gameplay" => new GameplayState(menu.Root),
                     _ => throw new ArgumentException($"Invalid game state: {Parameters[0]}")
                 };
                 
