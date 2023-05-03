@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -34,11 +33,6 @@ public class Menu
     public void SetVariable(string name, object value)
     {
         _variables[name] = value;
-        using Dictionary<string, object>.Enumerator enumerator = _variables.GetEnumerator();
-        while (enumerator.MoveNext())
-        {
-            Debug.WriteLine($"{enumerator.Current.Key} = {enumerator.Current.Value}");
-        }
     }
 
     public static Menu Parse(Game1 root, string json)
