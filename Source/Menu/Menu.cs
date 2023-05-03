@@ -9,11 +9,13 @@ namespace AstralAssault.Source.Menu;
 public class Menu
 {
     public List<IMenuItem> MenuItems { get; }
+    public Game1 Root { get; }
     
     private readonly Dictionary<string, object> _variables = new();
     
-    private Menu(List<IMenuItem> menuItems)
+    private Menu(Game1 root, List<IMenuItem> menuItems)
     {
+        Root = root;
         MenuItems = menuItems;
     }
 
@@ -39,7 +41,7 @@ public class Menu
         }
     }
 
-    public static Menu Parse(string json)
+    public static Menu Parse(Game1 root, string json)
     {
         JsonDocument doc = JsonDocument.Parse(json);
         
@@ -58,13 +60,12 @@ public class Menu
                         menuItems.Add(ParseLabel(element));
                         break;
                     default:
-                        Debug.WriteLine($"Unknown menu item type: {type.GetString()}");
-                        break;
+                        throw new FormatException($"Unknown menu item type: {type.GetString()}");
                 }
             }
         }
         
-        return new Menu(menuItems);
+        return new Menu(root, menuItems);
     }
 
     private static Button ParseButton(JsonElement element)

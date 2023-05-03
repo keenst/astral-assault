@@ -7,18 +7,19 @@ namespace AstralAssault.Source.Menu;
 
 public class MenuController : IMouseMoveEventListener, IMousePressedEventListener
 {
+    public Game1 Root { get; }
+    
     private bool _isMenuOpen;
     private Menu _menu;
     private IMenuItem _prevHoveredMenuItem;
     private Texture2D _buttonTexture;
-    private Game1 _root;
 
     public MenuController(Menu menu, GameState gameState)
     {
         _menu = menu;
-        _root = gameState.Root;
+        Root = gameState.Root;
 
-        _buttonTexture = new Texture2D(_root.GraphicsDevice, 1, 1);
+        _buttonTexture = new Texture2D(Root.GraphicsDevice, 1, 1);
         _buttonTexture.SetData(new[] { Color.White });
         
         Open();
