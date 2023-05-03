@@ -32,6 +32,7 @@ public class Menu
     
     public void SetVariable(string name, object value)
     {
+        if (!_variables.ContainsKey(name)) throw new KeyNotFoundException($"Variable {name} not found");
         _variables[name] = value;
     }
 
