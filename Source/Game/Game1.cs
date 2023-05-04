@@ -96,18 +96,6 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
-        if (Keyboard.GetState().IsKeyDown(Keys.Escape) && !_prevKeyState.IsKeyDown(Keys.Escape))
-        {
-            if (GameStateMachine.CurrentState is not MainMenuState)
-            {
-                GameStateMachine.ChangeState(new MainMenuState(this));
-            }
-            else
-            {
-                Exit();
-            }
-        }
-
         if (Keyboard.GetState().IsKeyDown(Keys.F3) && !_prevKeyState.IsKeyDown(Keys.F3))
             ShowDebug = !ShowDebug;
 
