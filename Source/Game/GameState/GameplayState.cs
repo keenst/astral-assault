@@ -1,4 +1,5 @@
 ﻿#region
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.Xna.Framework;
@@ -12,6 +13,7 @@ public class GameplayState : GameState
     private static readonly Vector4 MultiplierBrokenColor = new Vector4(1, 0, 0, 1);
     private static readonly Vector4 MultiplierIncreaseColor = new Vector4(1, 1, 0, 1);
     private static readonly Vector4 MultiplierDefaultColor = new Vector4(1, 1, 1, 1);
+    private readonly Texture2D circle;
     public readonly CollisionSystem CollisionSystem = new CollisionSystem();
     public readonly List<Entity> Entities;
     public ItemController ItemController;
@@ -25,6 +27,9 @@ public class GameplayState : GameState
         Entities = new List<Entity>();
         ItemController = new ItemController(this);
         WaveController = new WaveController(this, Root);
+
+        circle = AssetManager.Load<Texture2D>("unitcircleofdoomyaaaZ");
+
         ItemController.StartListening();
     }
 
@@ -33,63 +38,39 @@ public class GameplayState : GameState
         get => (Player)Entities.Find(entity => entity is Player);
     }
 
-    private Texture2D CreateCircleText(int radius, Color color)
-    {
-        Texture2D texture = new Texture2D(Root.GraphicsDevice, radius, radius);
-        Color[] colorData = new Color[radius * radius];
-
-        float diam = radius / 2f;
-        float diamsq = diam * diam;
-
-        for (int x = 0; x < radius; x++)
-        {
-            for (int y = 0; y < radius; y++)
-            {
-                int index = x * radius + y;
-                Vector2 pos = new Vector2(x - diam, y - diam);
-
-                if (pos.LengthSquared() <= diamsq) colorData[index] = color;
-                else colorData[index] = Color.Transparent;
-            }
-        }
-
-        texture.SetData(colorData);
-
-        return texture;
-    }
-
     public override List<DrawTask> GetDrawTasks()
     {
         List<DrawTask> drawTasks = new List<DrawTask>();
 
         foreach (Entity entity in Entities) drawTasks.AddRange(entity.GetDrawTasks());
 
-        drawTasks.AddRange(WaveController.GetDrawTasks());
+        if (!Root.ShowDebug)
+        {
+            drawTasks.AddRange(WaveController.GetDrawTasks());
 
-        string scoreText = $"Score: {Root.Score}";
-        Color textColor = Palette.GetColor(Palette.Colors.Grey9);
-        List<DrawTask> scoreTasks = scoreText.CreateDrawTasks(new Vector2(4, 4), textColor, LayerDepth.HUD);
-        drawTasks.AddRange(scoreTasks);
+            string scoreText = $"Score: {Root.Score}";
+            Color textColor = Palette.GetColor(Palette.Colors.Grey9);
+            ReadOnlySpan<DrawTask> scoreTasks = scoreText.AsSpan().CreateDrawTasks
+                (new Vector2(4, 4), textColor, LayerDepth.HUD);
+            drawTasks.AddRange(scoreTasks.ToArray());
+        }
+
 
         string multiplierText =
             $"Score multi.: X{Player.Multiplier.ToString("0.0", CultureInfo.GetCultureInfo("en-US"))}";
 
-        List<DrawTask> multiplierTasks = multiplierText.CreateDrawTasks
+        ReadOnlySpan<DrawTask> multiplierTasks = multiplierText.AsSpan().CreateDrawTasks
         (
             new Vector2(480 - multiplierText.Length * 8 - 4, 4),
-            textColor,
-            LayerDepth.HUD,
-            new List<IDrawTaskEffect> { new ColorEffect(m_multiplierColor) }
+            new Color(m_multiplierColor),
+            LayerDepth.HUD
         );
-        drawTasks.AddRange(multiplierTasks);
+        drawTasks.AddRange(multiplierTasks.ToArray());
 
         if (!Root.ShowDebug) return drawTasks;
 
         foreach (Collider collider in CollisionSystem.Colliders)
         {
-            Texture2D circle = CreateCircleText
-                (collider.Radius, new Color(Palette.GetColor(Palette.Colors.Grey9), 0.15F));
-
             drawTasks.Add
             (
                 new DrawTask
@@ -98,7 +79,6 @@ public class GameplayState : GameState
                     collider.Parent.Position - new Vector2(collider.Radius) / 2,
                     0,
                     LayerDepth.Debug,
-                    new List<IDrawTaskEffect>(),
                     Palette.GetColor(Palette.Colors.Blue9),
                     Vector2.Zero
                 )

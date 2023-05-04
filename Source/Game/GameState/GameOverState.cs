@@ -58,7 +58,7 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
         List<DrawTask> drawTasks = new List<DrawTask>();
 
         DrawTask gameOverText = new DrawTask
-            (m_gameOverText, textPosition, 0, LayerDepth.HUD, new List<IDrawTaskEffect>());
+            (m_gameOverText, textPosition, 0, LayerDepth.HUD);
 
         drawTasks.Add(gameOverText);
 
@@ -67,7 +67,7 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
         if ((timeNow - m_timeEntered) > 1000)
         {
             DrawTask restartPrompt = new DrawTask
-                (m_restartPrompt, promptPosition, 0, LayerDepth.HUD, new List<IDrawTaskEffect>());
+                (m_restartPrompt, promptPosition, 0, LayerDepth.HUD);
 
             drawTasks.Add(restartPrompt);
         }
@@ -75,16 +75,17 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
         int score = (int)Lerp(0, Root.Score, MathF.Min((timeNow - m_timeEntered) / 800F, 1));
         string scoreText = $"Score: {score}";
         int textX = 240 - $"Score: {Root.Score}".Length * 4;
-        List<DrawTask> scoreTasks = scoreText.CreateDrawTasks(new Vector2(textX, 150), Color.White, LayerDepth.HUD);
-        drawTasks.AddRange(scoreTasks);
+        ReadOnlySpan<DrawTask> scoreTasks = scoreText.AsSpan().CreateDrawTasks
+            (new Vector2(textX, 150), Color.White, LayerDepth.HUD);
+        drawTasks.AddRange(scoreTasks.ToArray());
 
         if (!m_newHighScore)
         {
             string highScoreText = $"High score: {Root.HighScore}";
             int highScoreX = 240 - highScoreText.Length * 4;
-            List<DrawTask> highScoreTasks =
-                highScoreText.CreateDrawTasks(new Vector2(highScoreX, 170), Color.White, LayerDepth.HUD);
-            drawTasks.AddRange(highScoreTasks);
+            ReadOnlySpan<DrawTask> highScoreTasks =
+                highScoreText.AsSpan().CreateDrawTasks(new Vector2(highScoreX, 170), Color.White, LayerDepth.HUD);
+            drawTasks.AddRange(highScoreTasks.ToArray());
 
             return drawTasks;
         }
@@ -101,9 +102,9 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
 
         string newHighScoreText = "New high score!";
         int newHighScoreX = 240 - newHighScoreText.Length * 4;
-        List<DrawTask> newHighScoreTasks =
-            newHighScoreText.CreateDrawTasks(new Vector2(newHighScoreX, 170), Color.White, LayerDepth.HUD);
-        drawTasks.AddRange(newHighScoreTasks);
+        ReadOnlySpan<DrawTask> newHighScoreTasks =
+            newHighScoreText.AsSpan().CreateDrawTasks(new Vector2(newHighScoreX, 170), Color.White, LayerDepth.HUD);
+        drawTasks.AddRange(newHighScoreTasks.ToArray());
 
         return drawTasks;
     }

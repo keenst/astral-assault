@@ -1,7 +1,6 @@
 ﻿#region
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 #endregion
 
@@ -13,11 +12,11 @@ public class WaveController
     private const long WaveDelay = 5000;
     public readonly GameplayState GameState;
     private readonly Game1 m_root;
+    private bool levelUppHehe = false;
     private int m_currentWave;
 
     private bool m_drawWaveText;
     private long m_waveTextTimer;
-    private bool levelUppHehe = false;
 
     private long m_waveTimer;
 
@@ -96,7 +95,7 @@ public class WaveController
 
         string text = $"Wave: {m_currentWave}";
         Color color = Palette.GetColor(Palette.Colors.Grey9);
-        drawTasks.AddRange(text.CreateDrawTasks(new Vector2(4, 16), color, LayerDepth.HUD));
+        drawTasks.AddRange(text.AsSpan().CreateDrawTasks(new Vector2(4, 16), color, LayerDepth.HUD).ToArray());
 
         return drawTasks;
     }
@@ -107,7 +106,12 @@ public class WaveController
 
         if (m_drawWaveText && ((timeNow - m_waveTextTimer) > WaveTextDuration)) m_drawWaveText = false;
 
-        int enemiesAlive = GameState.Entities.Count(x => x is Asteroid);
+        int enemiesAlive = 0;
+
+        foreach (Entity entity in GameState.Entities)
+        {
+            if (entity is Asteroid) enemiesAlive++;
+        }
 
         if (enemiesAlive == 0)
         {

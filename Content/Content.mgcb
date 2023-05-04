@@ -208,6 +208,18 @@
 /processorParam:TextureFormat=Color
 /build:Assets/Player.png
 
+#begin Assets/unitcircleofdoomyaaaZ.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Assets/unitcircleofdoomyaaaZ.png
+
 #begin Assets/Quad.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -273,16 +285,4 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Assets/Shoot3.ogg
-
-#begin Shaders/Color.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Shaders/Color.fx
-
-#begin Shaders/Highlight.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Shaders/Highlight.fx
 

@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿#region
+using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+#endregion
 
 namespace AstralAssault;
 
@@ -60,43 +63,34 @@ public static class TextRenderer
         };
     }
 
-    public static List<DrawTask> CreateDrawTasks(
-        this string input, 
-        Vector2 position, 
-        Color color,
-        LayerDepth layerDepth,
-        List<IDrawTaskEffect> effects)
-    {
-        string text = input.ToUpper();
-        List<DrawTask> drawTasks = new();
-
-        for (int i = 0; i < text.Length; i++)
-        {
-            int x = _dict[text[i]] % 6;
-            int y = _dict[text[i]] / 6;
-
-            Rectangle source = new(x * 8, y * 8, 8, 8);
-
-            drawTasks.Add(new DrawTask(
-                _font,
-                source,
-                new Vector2(position.X + i * 8, position.Y),
-                0,
-                layerDepth,
-                effects,
-                color,
-                Vector2.Zero));
-        }
-
-        return drawTasks;
-    }
-    
-    public static List<DrawTask> CreateDrawTasks(
-        this string input, 
-        Vector2 position, 
+    public static ReadOnlySpan<DrawTask> CreateDrawTasks(
+        this ReadOnlySpan<char> input,
+        Vector2 position,
         Color color,
         LayerDepth layerDepth)
     {
-        return input.CreateDrawTasks(position, color, layerDepth, new List<IDrawTaskEffect>());
+        DrawTask[] drawTasks = new DrawTask[input.Length];
+        byte[] sourceOffsets = new byte[input.Length];
+
+        for (int i = 0; i < input.Length; i++)
+        {
+            char c = char.ToUpper(input[i]);
+            int index = c - ' ';
+            int x = index % 6;
+            int y = index / 6;
+            sourceOffsets[i] = (byte)(y * 48 + x * 8);
+            drawTasks[i] = new DrawTask
+            (
+                _font,
+                new Rectangle(sourceOffsets[i], 0, 8, 8),
+                new Vector2(position.X + i * 8, position.Y),
+                0,
+                layerDepth,
+                color,
+                Vector2.Zero
+            );
+        }
+
+        return drawTasks;
     }
 }

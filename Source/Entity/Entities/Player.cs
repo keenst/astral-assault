@@ -24,6 +24,8 @@ public class Player : Entity, IInputEventListener
     private readonly List<Tuple<long, PowerUps>>
         m_powerUps = new List<Tuple<long, PowerUps>>(); // (time of pick up, power up)
 
+    private readonly Texture2D m_square;
+
     private Vector2 m_cursorPosition;
     private float m_delta;
     private bool m_isCrosshairActive = true;
@@ -34,7 +36,6 @@ public class Player : Entity, IInputEventListener
     private float m_moveSpeed = 200;
     private Tuple<Vector2, Vector2> m_muzzle = new Tuple<Vector2, Vector2>(Vector2.Zero, Vector2.Zero);
     private int m_shootSpeed = 200;
-    private readonly Texture2D m_square;
     private bool m_thrusterIsOn;
     private float m_tiltSpeed = 200;
     public float Multiplier = 1;
@@ -292,7 +293,7 @@ public class Player : Entity, IInputEventListener
             DrawTask lifetimeBackground = new DrawTask
             (
                 m_square, new Rectangle(0, 0, 1, 1), new Rectangle(1, 28 + i * 12, 2, 8), 0, LayerDepth.HUD,
-                new List<IDrawTaskEffect> { new ColorEffect(backgroundColor) }, Color.White
+                new Color(backgroundColor)
             );
 
             int barLength = 8 - (int)Math.Floor((timeNow - powerUp.Item1) / (float)PowerUpDuration * 8);
@@ -300,20 +301,17 @@ public class Player : Entity, IInputEventListener
             DrawTask lifetimeBar = new DrawTask
             (
                 m_square, new Rectangle(0, 0, 1, 1), new Rectangle(1, 36 + i * 12 - barLength, 2, barLength), 0,
-                LayerDepth.HUD, new List<IDrawTaskEffect> { new ColorEffect(barColor) }, Color.White
+                LayerDepth.HUD, new Color(barColor)
             );
 
-            List<DrawTask> powerUpTask = powerUpName.CreateDrawTasks
+            ReadOnlySpan<DrawTask> powerUpTask = powerUpName.AsSpan().CreateDrawTasks
             (
                 new Vector2(4, 28 + i * 12),
-                Color.White,
+                new Color(color),
                 LayerDepth.HUD
             );
 
-            foreach (DrawTask task in powerUpTask)
-                task.EffectContainer.SetEffect<ColorEffect, Vector4>(color);
-
-            drawTasks.AddRange(powerUpTask);
+            drawTasks.AddRange(powerUpTask.ToArray());
             drawTasks.Add(lifetimeBackground);
             drawTasks.Add(lifetimeBar);
         }

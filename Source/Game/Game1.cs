@@ -1,7 +1,6 @@
 ﻿#region
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -11,18 +10,14 @@ namespace AstralAssault;
 
 public class Game1 : Game
 {
-    private enum Width { Full = 1920, Half = 960, Quarter = 480 }
-    private enum Height { Full = 1080, Half = 540, Quarter = 270 }
-
     public const int TargetWidth = (int)Width.Quarter;
     public const int TargetHeight = (int)Height.Quarter;
     private const int StatUpdateInterval = 300;
-    private static readonly Effect HighlightEffect = AssetManager.Load<Effect>("Highlight");
-    private static readonly Effect ColorEffect = AssetManager.Load<Effect>("Color");
 
     // display
     private static readonly Color BackgroundColor = new Color(28, 23, 41);
     private readonly GraphicsDeviceManager m_graphics;
+    private readonly Matrix m_scale;
 
     public GameStateMachine GameStateMachine;
     public int HighScore;
@@ -31,7 +26,6 @@ public class Game1 : Game
     private KeyboardState m_prevKeyState = Keyboard.GetState();
     private RenderTarget2D m_renderTarget;
     private float m_renderTime;
-    private readonly Matrix m_scale;
 
     // render
     public SpriteBatch m_spriteBatch;
@@ -130,13 +124,28 @@ public class Game1 : Game
         List<DrawTask> drawTasks = new List<DrawTask>();
 
         string fullscreenText = "Press F for fullscreen";
-        List<DrawTask> fullscreenTextTasks =
-            fullscreenText.CreateDrawTasks(new Vector2(4, 258), Color.White, LayerDepth.HUD);
-        drawTasks.AddRange(fullscreenTextTasks);
+        ReadOnlySpan<DrawTask> fullscreenTextTasks =
+            fullscreenText.AsSpan().CreateDrawTasks(new Vector2(4, 258), Color.White, LayerDepth.HUD);
+        drawTasks.AddRange(fullscreenTextTasks.ToArray());
 
         drawTasks.AddRange(GameStateMachine.GetDrawTasks());
 
-        drawTasks = drawTasks.OrderBy(dt => (int)dt.LayerDepth).ToList();
+        for (int i = 0; i < (drawTasks.Count - 1); i++)
+        {
+            int minIndex = i;
+
+            for (int j = i + 1; j < drawTasks.Count; j++)
+            {
+                if ((int)drawTasks[j].LayerDepth < (int)drawTasks[minIndex].LayerDepth) minIndex = j;
+            }
+
+            if (minIndex != i)
+            {
+                DrawTask temp = drawTasks[i];
+                drawTasks[i] = drawTasks[minIndex];
+                drawTasks[minIndex] = temp;
+            }
+        }
 
         if (ShowDebug)
         {
@@ -153,56 +162,33 @@ public class Game1 : Game
             string frameRate = Math.Round(m_frameRate).ToString();
             string renderTime = m_renderTime.ToString();
 
-            List<DrawTask> frameRateTask =
-                frameRate.CreateDrawTasks(Vector2.Zero, Color.Yellow, LayerDepth.Debug);
-            List<DrawTask> renderTimeTask =
-                renderTime.CreateDrawTasks(new Vector2(0, 9), Color.Yellow, LayerDepth.Debug);
+            ReadOnlySpan<DrawTask> frameRateTask =
+                frameRate.AsSpan().CreateDrawTasks(Vector2.Zero, Color.Yellow, LayerDepth.Debug);
+            ReadOnlySpan<DrawTask> renderTimeTask =
+                renderTime.AsSpan().CreateDrawTasks(new Vector2(0, 9), Color.Yellow, LayerDepth.Debug);
 
-            drawTasks.AddRange(frameRateTask);
-            drawTasks.AddRange(renderTimeTask);
+            drawTasks.AddRange(frameRateTask.ToArray());
+            drawTasks.AddRange(renderTimeTask.ToArray());
         }
 
         GraphicsDevice.SetRenderTarget(m_renderTarget);
         GraphicsDevice.Clear(BackgroundColor);
 
-        m_spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointWrap);
+        m_spriteBatch.Begin(SpriteSortMode.Immediate, samplerState: SamplerState.PointWrap);
 
         foreach (DrawTask drawTask in drawTasks)
         {
-            foreach (IDrawTaskEffect effect in drawTask.EffectContainer.Effects)
-            {
-                switch (effect)
-                {
-                case HighlightEffect highlightEffect:
-                    HighlightEffect.CurrentTechnique.Passes[1].Apply();
-                    HighlightEffect.Parameters["blendAlpha"].SetValue(highlightEffect.Alpha);
-                    HighlightEffect.CurrentTechnique.Passes[0].Apply();
-
-                    break;
-
-                case ColorEffect colorEffect:
-                    ColorEffect.CurrentTechnique.Passes[1].Apply();
-                    ColorEffect.Parameters["newColor"].SetValue(colorEffect.Color);
-                    ColorEffect.CurrentTechnique.Passes[0].Apply();
-
-                    break;
-                }
-            }
-
             m_spriteBatch.Draw
             (
                 drawTask.Texture,
                 drawTask.Destination,
                 drawTask.Source,
-                Color.White,
+                drawTask.Color,
                 drawTask.Rotation,
                 drawTask.Origin,
                 SpriteEffects.None,
                 0
             );
-
-            HighlightEffect.CurrentTechnique.Passes[1].Apply();
-            ColorEffect.CurrentTechnique.Passes[1].Apply();
         }
 
         m_spriteBatch.End();
@@ -225,4 +211,7 @@ public class Game1 : Game
 
         base.Draw(gameTime);
     }
+
+    private enum Width { Full = 1920, Half = 960, Quarter = 480 }
+    private enum Height { Full = 1080, Half = 540, Quarter = 270 }
 }

@@ -11,7 +11,6 @@ namespace AstralAssault;
 public class SpriteRenderer
 {
     private const float Pi = 3.14F;
-    public readonly EffectContainer EffectContainer = new EffectContainer();
     private readonly Dictionary<string, float> m_animationConditions = new Dictionary<string, float>();
 
     private readonly Dictionary<Tuple<int, int>, Transition> m_animationPaths = new Dictionary<Tuple<int, int>,
@@ -136,14 +135,14 @@ public class SpriteRenderer
     {
         Rectangle source = CurrentAnimation.Frames[m_currentFrameIndex].Source;
 
-        return new DrawTask(m_spriteSheet, source, position, 0, m_layerDepth, EffectContainer.Effects);
+        return new DrawTask(m_spriteSheet, source, position, 0, m_layerDepth);
     }
 
     private DrawTask DrawRotatable(Vector2 position, float rotation)
     {
         (float spriteRotation, Rectangle source) = GetRotation(rotation);
 
-        return new DrawTask(m_spriteSheet, source, position, spriteRotation, m_layerDepth, EffectContainer.Effects);
+        return new DrawTask(m_spriteSheet, source, position, spriteRotation, m_layerDepth);
     }
 
     private Tuple<float, Rectangle> GetRotation(float rotation)

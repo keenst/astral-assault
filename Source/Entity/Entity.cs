@@ -38,7 +38,7 @@ public class Entity
         Position = position;
         m_timeSpawned = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-        CreateHealthBarTexture();
+        if (this is not Bullet) CreateHealthBarTexture();
     }
 
     public long TimeSinceSpawned
@@ -111,8 +111,6 @@ public class Entity
         m_isHighlighted = true;
         m_timeStartedHighlightingMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         m_highlightAlpha = 0.7F;
-
-        SpriteRenderer.EffectContainer.SetEffect<HighlightEffect, float>(m_highlightAlpha);
     }
 
     public virtual List<DrawTask> GetDrawTasks()
@@ -132,9 +130,7 @@ public class Entity
             {
                 m_isHighlighted = false;
                 m_highlightAlpha = 0;
-                SpriteRenderer.EffectContainer.RemoveEffect<HighlightEffect>();
             }
-            else SpriteRenderer.EffectContainer.SetEffect<HighlightEffect, float>(m_highlightAlpha);
         }
 
         if (IsActor) drawTasks.AddRange(CreateHealthBarDrawTasks());
@@ -183,20 +179,17 @@ public class Entity
 
         DrawTask background = new DrawTask
         (
-            m_healthBarTexture, source, outline, 0, LayerDepth.HUD,
-            new List<IDrawTaskEffect> { new ColorEffect(outlineColor) }, Palette.GetColor(Palette.Colors.Black)
+            m_healthBarTexture, source, outline, 0, LayerDepth.HUD, new Color(outlineColor)
         );
 
         DrawTask empty = new DrawTask
         (
-            m_healthBarTexture, source, emptyHealthBar, 0, LayerDepth.HUD,
-            new List<IDrawTaskEffect> { new ColorEffect(emptyColor) }, Palette.GetColor(Palette.Colors.Red9)
+            m_healthBarTexture, source, emptyHealthBar, 0, LayerDepth.HUD, new Color(emptyColor)
         );
 
         DrawTask full = new DrawTask
         (
-            m_healthBarTexture, source, fullHealthBar, 0, LayerDepth.HUD,
-            new List<IDrawTaskEffect> { new ColorEffect(fullColor) }, Palette.GetColor(Palette.Colors.Green9)
+            m_healthBarTexture, source, fullHealthBar, 0, LayerDepth.HUD, new Color(fullColor)
         );
 
         return new List<DrawTask> { background, empty, full };
