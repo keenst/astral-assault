@@ -296,9 +296,7 @@ public class Player : Entity, IInputEventListener
 
     public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
     {
-        Point scale = new((int)GameState.Root.ScaleX, (int)GameState.Root.ScaleY);
-        _cursorPosition.X = e.Position.ToVector2().X / scale.X;
-        _cursorPosition.Y = e.Position.ToVector2().Y / scale.Y;
+        _cursorPosition = e.Position.ToVector2();
     }
 
     public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)

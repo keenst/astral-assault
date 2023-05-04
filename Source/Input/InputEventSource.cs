@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -14,7 +15,7 @@ public static class InputEventSource
     
     public static event EventHandler<MouseButtonEventArgs> 
         MouseButtonEvent, 
-        MouseButtonPressedEvent;
+        MousePressedEvent;
 
     public static event EventHandler<MouseMoveEventArgs>
         MouseMoveEvent;
@@ -28,6 +29,8 @@ public static class InputEventSource
     private static Point _mousePos;
     private static Point _prevMousePos;
 
+    private static Game1 _root;
+
     public enum MouseButtons
     {
         Left,
@@ -37,9 +40,10 @@ public static class InputEventSource
         Side2
     }
 
-    public static void Init()
+    public static void Init(Game1 root)
     {
         UpdateEventSource.UpdateEvent += OnUpdate;
+        _root = root;
     }
 
     private static void OnUpdate(object sender, UpdateEventArgs e)
@@ -81,7 +85,7 @@ public static class InputEventSource
     {
         MouseState mouseState = Mouse.GetState();
 
-        _prevMouseDown = MouseDown;
+        _prevMouseDown = MouseDown.ToList();
         MouseDown.Clear();
 
         ButtonState[] buttonStates = new ButtonState[5];
@@ -98,11 +102,14 @@ public static class InputEventSource
             MouseButtons button = (MouseButtons)i;
             
             MouseDown.Add(button);
-            MouseButtonEvent?.Invoke(null, new MouseButtonEventArgs(button));
+            
+            Point screenPosition = GetScreenPosition(_mousePos);
+            
+            MouseButtonEvent?.Invoke(null, new MouseButtonEventArgs(button, screenPosition));
 
             if (!_prevMouseDown.Contains(button))
             {
-                MouseButtonPressedEvent?.Invoke(null, new MouseButtonEventArgs(button));
+                MousePressedEvent?.Invoke(null, new MouseButtonEventArgs(button, screenPosition));
             }
         }
     }
@@ -112,9 +119,16 @@ public static class InputEventSource
         _prevMousePos = _mousePos;
         _mousePos = Mouse.GetState().Position;
 
-        if (_mousePos != _prevMousePos)
-        {
-            MouseMoveEvent?.Invoke(null, new MouseMoveEventArgs(_mousePos));
-        }
+        if (_mousePos == _prevMousePos) return;
+        
+        Point screenPosition = GetScreenPosition(_mousePos);
+            
+        MouseMoveEvent?.Invoke(null, new MouseMoveEventArgs(screenPosition));
+    }
+
+    private static Point GetScreenPosition(Point position)
+    {
+        Point scale = new((int)_root.ScaleX, (int)_root.ScaleY);
+        return position / scale;
     }
 }

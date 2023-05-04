@@ -7,6 +7,8 @@ public enum LayerDepth
     ThrusterFlame,
     Foreground,
     HUD,
+    Menu,
+    MenuText,
     Crosshair,
     Debug
 }
