@@ -9,86 +9,120 @@ namespace AstralAssault;
 
 public static class TextRenderer
 {
-    private static Texture2D _font;
+    private static Game1 Root;
+    private static SpriteFont f;
+    private static Texture2D m_font;
+    private static List<Rectangle> m_letters;
 
-    private static Dictionary<char, int> _dict;
-
-    public static void Init()
+    public static void Init(Game1 root)
     {
-        _font = AssetManager.Load<Texture2D>("Font");
-        _dict = new Dictionary<char, int>
+        Root = root;
+
+        m_letters = new List<Rectangle>();
+
+        m_font = AssetManager.Load<Texture2D>("AsepriteFont");
+        Color[] fontData = new Color[177 * 793];
+        m_font.GetData(fontData);
+
+        for (int y = 1; y < 793; y += 11)
         {
-            { 'A', 0 },
-            { 'B', 1 },
-            { 'C', 2 },
-            { 'D', 3 },
-            { 'E', 4 },
-            { 'F', 5 },
-            { 'G', 6 },
-            { 'H', 7 },
-            { 'I', 8 },
-            { 'J', 9 },
-            { 'K', 10 },
-            { 'L', 11 },
-            { 'M', 12 },
-            { 'N', 13 },
-            { 'O', 14 },
-            { 'P', 15 },
-            { 'Q', 16 },
-            { 'R', 17 },
-            { 'S', 18 },
-            { 'T', 19 },
-            { 'U', 20 },
-            { 'V', 21 },
-            { 'W', 22 },
-            { 'X', 23 },
-            { 'Y', 24 },
-            { 'Z', 25 },
-            { '0', 26 },
-            { '1', 27 },
-            { '2', 28 },
-            { '3', 29 },
-            { '4', 30 },
-            { '5', 31 },
-            { '6', 32 },
-            { '7', 33 },
-            { '8', 34 },
-            { '9', 35 },
-            { ':', 36 },
-            { ';', 37 },
-            { '.', 38 },
-            { ',', 39 },
-            { '!', 40 },
-            { ' ', 41 }
-        };
+            for (int x = 1; x < 177; x += 11)
+            {
+                int index = (y * 177) + x;
+                int len = 0;
+
+                while (fontData[index] != new Color(0, 255, 0, 255))
+                {
+                    len++;
+                    index++;
+                }
+
+                Rectangle charBounds = new Rectangle(x, y, len, 7);
+
+                m_letters.Add(charBounds);
+            }
+        }
+
+        f = AssetManager.Load<SpriteFont>("fc");
     }
 
-    public static ReadOnlySpan<DrawTask> CreateDrawTasks(
+    public static int Size(this string input)
+    {
+        int size = 0;
+
+        foreach (char c in input)
+        {
+            int index = c - ' ';
+            size += m_letters[index].Width;
+        }
+
+        return size;
+    }
+
+    public static ReadOnlySpan<DrawTask> CreateDrawTasks
+    (
         this ReadOnlySpan<char> input,
         Vector2 position,
         Color color,
-        LayerDepth layerDepth)
+        LayerDepth layerDepth,
+        bool useSpriteFont
+    )
     {
         DrawTask[] drawTasks = new DrawTask[input.Length];
-        byte[] sourceOffsets = new byte[input.Length];
 
-        for (int i = 0; i < input.Length; i++)
+        if (!useSpriteFont)
         {
-            char c = char.ToUpper(input[i]);
-            int index = c - ' ';
-            int x = index % 6;
-            int y = index / 6;
-            sourceOffsets[i] = (byte)(y * 48 + x * 8);
-            drawTasks[i] = new DrawTask
-            (
-                _font,
-                new Rectangle(sourceOffsets[i], 0, 8, 8),
-                new Vector2(position.X + i * 8, position.Y),
-                0,
-                layerDepth,
-                color,
-                Vector2.Zero
-            );
+            int x = 0;
+            int y = 0;
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                int index = input[i] - ' ';
+                drawTasks[i] = new DrawTask
+                (
+                    m_font,
+                    m_letters[index],
+                    new Vector2(position.X + x, position.Y + y),
+                    0,
+                    layerDepth,
+                    color,
+                    Vector2.Zero
+                );
+
+                x += m_letters[index].Width;
+
+                if (input[i] == '\n')
+                {
+                    y += 7;
+                }
+            }
+        }
+        else
+        {
+            int x = 0;
+            int y = 0;
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                int index = input[i] - ' ';
+                drawTasks[i] = new DrawTask
+                (
+                    f.Texture,
+                    f.GetGlyphs()[input[i]].BoundsInTexture,
+                    new Vector2(position.X + x, position.Y + y),
+                    0,
+                    layerDepth,
+                    color,
+                    Vector2.Zero
+                );
+
+                x += m_letters[index].Width;
+
+                if (input[i] == '\n')
+                {
+                    y += 7;
+                }
+            }
         }
 
         return drawTasks;

@@ -77,24 +77,24 @@ public class Player : Entity, IInputEventListener
         int xAxis = 0;
         int yAxis = 0;
 
-        if (e.Keys.Contains(Keys.D))
+        if (Array.IndexOf(e.Keys, Keys.D) >= 0)
         {
             xAxis = 1;
             SpriteRenderer.SetAnimationCondition("Tilt", 1);
         }
-        else if (e.Keys.Contains(Keys.A))
+        else if (Array.IndexOf(e.Keys, Keys.A) >= 0)
         {
             xAxis = -1;
             SpriteRenderer.SetAnimationCondition("Tilt", -1);
         }
         else SpriteRenderer.SetAnimationCondition("Tilt", 0);
 
-        if (e.Keys.Contains(Keys.W))
+        if (Array.IndexOf(e.Keys, Keys.W) >= 0)
         {
             yAxis = 1;
             m_thrusterIsOn = true;
         }
-        else if (e.Keys.Contains(Keys.S)) yAxis = -1;
+        else if (Array.IndexOf(e.Keys, Keys.S) >= 0) yAxis = -1;
 
         HandleMovement(xAxis, yAxis);
     }
@@ -191,20 +191,21 @@ public class Player : Entity, IInputEventListener
     {
         base.OnUpdate(sender, e);
 
-        if (m_powerUps.Any(t => t.Item2 == PowerUps.Haste))
+        bool haste = false;
+
+        foreach (Tuple<long, PowerUps> powerUp in m_powerUps)
         {
-            m_shootSpeed = 100;
-            m_maxSpeed = 150;
-            m_moveSpeed = 400;
-            m_tiltSpeed = 400;
+            if (powerUp.Item2 != PowerUps.Haste) continue;
+
+            haste = true;
+
+            break;
         }
-        else
-        {
-            m_shootSpeed = 200;
-            m_maxSpeed = 100;
-            m_moveSpeed = 200;
-            m_tiltSpeed = 200;
-        }
+
+        m_shootSpeed = haste ? 100 : 200;
+        m_maxSpeed = haste ? 150 : 100;
+        m_moveSpeed = haste ? 400 : 200;
+        m_tiltSpeed = haste ? 400 : 200;
 
         m_delta = e.DeltaTime;
 
@@ -246,11 +247,7 @@ public class Player : Entity, IInputEventListener
     {
         List<DrawTask> drawTasks = new List<DrawTask>();
 
-        if (m_thrusterIsOn) { }
-
         drawTasks.AddRange(base.GetDrawTasks());
-
-        m_thrusterIsOn = false;
 
         for (int i = 0; i < m_powerUps.Count; i++)
         {
@@ -308,7 +305,7 @@ public class Player : Entity, IInputEventListener
             (
                 new Vector2(4, 28 + i * 12),
                 new Color(color),
-                LayerDepth.HUD
+                LayerDepth.HUD, false
             );
 
             drawTasks.AddRange(powerUpTask.ToArray());

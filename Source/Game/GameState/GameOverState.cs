@@ -76,7 +76,7 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
         string scoreText = $"Score: {score}";
         int textX = 240 - $"Score: {Root.Score}".Length * 4;
         ReadOnlySpan<DrawTask> scoreTasks = scoreText.AsSpan().CreateDrawTasks
-            (new Vector2(textX, 150), Color.White, LayerDepth.HUD);
+            (new Vector2(textX, 150), Color.White, LayerDepth.HUD, false);
         drawTasks.AddRange(scoreTasks.ToArray());
 
         if (!m_newHighScore)
@@ -84,7 +84,7 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
             string highScoreText = $"High score: {Root.HighScore}";
             int highScoreX = 240 - highScoreText.Length * 4;
             ReadOnlySpan<DrawTask> highScoreTasks =
-                highScoreText.AsSpan().CreateDrawTasks(new Vector2(highScoreX, 170), Color.White, LayerDepth.HUD);
+                highScoreText.AsSpan().CreateDrawTasks(new Vector2(highScoreX, 170), Color.White, LayerDepth.HUD, false);
             drawTasks.AddRange(highScoreTasks.ToArray());
 
             return drawTasks;
@@ -103,7 +103,7 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
         string newHighScoreText = "New high score!";
         int newHighScoreX = 240 - newHighScoreText.Length * 4;
         ReadOnlySpan<DrawTask> newHighScoreTasks =
-            newHighScoreText.AsSpan().CreateDrawTasks(new Vector2(newHighScoreX, 170), Color.White, LayerDepth.HUD);
+            newHighScoreText.AsSpan().CreateDrawTasks(new Vector2(newHighScoreX, 170), Color.White, LayerDepth.HUD, true);
         drawTasks.AddRange(newHighScoreTasks.ToArray());
 
         return drawTasks;

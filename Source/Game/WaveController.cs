@@ -95,7 +95,7 @@ public class WaveController
 
         string text = $"Wave: {m_currentWave}";
         Color color = Palette.GetColor(Palette.Colors.Grey9);
-        drawTasks.AddRange(text.AsSpan().CreateDrawTasks(new Vector2(4, 16), color, LayerDepth.HUD).ToArray());
+        drawTasks.AddRange(text.AsSpan().CreateDrawTasks(new Vector2(4, 16), color, LayerDepth.HUD, false).ToArray());
 
         return drawTasks;
     }

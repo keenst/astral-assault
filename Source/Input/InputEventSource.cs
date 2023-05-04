@@ -12,8 +12,8 @@ public static class InputEventSource
 {
     public enum MouseButtons { Left, Right, Middle, Side1, Side2 }
 
-    private static List<Keys> m_keysDown = new List<Keys>();
-    private static List<Keys> m_prevKeysDown = new List<Keys>();
+    private static Keys[] m_keysDown;
+    private static Keys[] m_prevKeysDown;
 
     private static readonly List<MouseButtons> MouseDown = new List<MouseButtons>();
     private static List<MouseButtons> m_prevMouseDown = new List<MouseButtons>();
@@ -47,9 +47,9 @@ public static class InputEventSource
     private static void HandleKeyboard()
     {
         m_prevKeysDown = m_keysDown;
-        m_keysDown = Keyboard.GetState().GetPressedKeys().ToList();
+        m_keysDown = Keyboard.GetState().GetPressedKeys();
 
-        if (m_keysDown.Count == 0) m_prevKeysDown.Clear();
+        if (m_keysDown.Length == 0) m_prevKeysDown = new Keys[1] { Keys.End };
 
         List<Keys> keysDown = new List<Keys>();
         List<Keys> keysPressed = new List<Keys>();

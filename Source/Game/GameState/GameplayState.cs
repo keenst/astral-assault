@@ -51,7 +51,7 @@ public class GameplayState : GameState
             string scoreText = $"Score: {Root.Score}";
             Color textColor = Palette.GetColor(Palette.Colors.Grey9);
             ReadOnlySpan<DrawTask> scoreTasks = scoreText.AsSpan().CreateDrawTasks
-                (new Vector2(4, 4), textColor, LayerDepth.HUD);
+                (new Vector2(4, 4), textColor, LayerDepth.HUD, false);
             drawTasks.AddRange(scoreTasks.ToArray());
         }
 
@@ -61,9 +61,9 @@ public class GameplayState : GameState
 
         ReadOnlySpan<DrawTask> multiplierTasks = multiplierText.AsSpan().CreateDrawTasks
         (
-            new Vector2(480 - multiplierText.Length * 8 - 4, 4),
+            new Vector2(480 - multiplierText.Size(), 4),
             new Color(m_multiplierColor),
-            LayerDepth.HUD
+            LayerDepth.HUD, false
         );
         drawTasks.AddRange(multiplierTasks.ToArray());
 

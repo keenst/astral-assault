@@ -8,7 +8,22 @@
 /profile:Reach
 /compress:False
 
+#-------------------------------- References --------------------------------#
+
+
 #---------------------------------- Content ---------------------------------#
+
+#begin Assets/AsepriteFont.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Assets/AsepriteFont.png
 
 #begin Assets/Asteroid1.png
 /importer:TextureImporter
@@ -99,18 +114,6 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Assets/Explosion3.ogg
-
-#begin Assets/Font.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Assets/Font.png
 
 #begin Assets/GameOver.png
 /importer:TextureImporter
@@ -208,18 +211,6 @@
 /processorParam:TextureFormat=Color
 /build:Assets/Player.png
 
-#begin Assets/unitcircleofdoomyaaaZ.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Assets/unitcircleofdoomyaaaZ.png
-
 #begin Assets/Quad.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -285,4 +276,23 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Assets/Shoot3.ogg
+
+#begin Assets/unitcircleofdoomyaaaZ.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Assets/unitcircleofdoomyaaaZ.png
+
+#begin Fonts/fc.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/fc.spritefont
 

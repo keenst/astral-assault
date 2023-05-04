@@ -69,7 +69,7 @@ public class Game1 : Game
         );
 
         AssetManager.Init(this);
-        TextRenderer.Init();
+        TextRenderer.Init(this);
         InputEventSource.Init();
         Palette.Init();
         Jukebox.Init();
@@ -125,7 +125,7 @@ public class Game1 : Game
 
         string fullscreenText = "Press F for fullscreen";
         ReadOnlySpan<DrawTask> fullscreenTextTasks =
-            fullscreenText.AsSpan().CreateDrawTasks(new Vector2(4, 258), Color.White, LayerDepth.HUD);
+            fullscreenText.AsSpan().CreateDrawTasks(new Vector2(4, 258), Color.White, LayerDepth.HUD, false);
         drawTasks.AddRange(fullscreenTextTasks.ToArray());
 
         drawTasks.AddRange(GameStateMachine.GetDrawTasks());
@@ -163,9 +163,9 @@ public class Game1 : Game
             string renderTime = m_renderTime.ToString();
 
             ReadOnlySpan<DrawTask> frameRateTask =
-                frameRate.AsSpan().CreateDrawTasks(Vector2.Zero, Color.Yellow, LayerDepth.Debug);
+                frameRate.AsSpan().CreateDrawTasks(Vector2.Zero, Color.Yellow, LayerDepth.Debug, true);
             ReadOnlySpan<DrawTask> renderTimeTask =
-                renderTime.AsSpan().CreateDrawTasks(new Vector2(0, 9), Color.Yellow, LayerDepth.Debug);
+                renderTime.AsSpan().CreateDrawTasks(new Vector2(0, 9), Color.Yellow, LayerDepth.Debug, false);
 
             drawTasks.AddRange(frameRateTask.ToArray());
             drawTasks.AddRange(renderTimeTask.ToArray());
