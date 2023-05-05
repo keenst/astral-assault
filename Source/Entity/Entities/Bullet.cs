@@ -18,7 +18,7 @@ public class Bullet : Entity
 
         Frame frame = new Frame(new Rectangle(isQuadDamage ? 4 : 0, 0, 4, 4));
 
-        SpriteRenderer = new SpriteRenderer(spriteSheet, frame, LayerDepth.Foreground);
+        SpriteRenderer = new SpriteRenderer(spriteSheet, frame);
 
         Collider = new Collider
         (

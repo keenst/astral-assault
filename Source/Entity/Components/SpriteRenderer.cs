@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using AstralAssault.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -17,7 +18,6 @@ public class SpriteRenderer
         Transition>();
 
     private readonly Animation[] m_animations;
-    private readonly LayerDepth m_layerDepth;
     private readonly Texture2D m_spriteSheet;
 
     public bool Debugging = false;
@@ -34,13 +34,11 @@ public class SpriteRenderer
     public SpriteRenderer(
         Texture2D spriteSheet,
         Animation[] animations,
-        LayerDepth layerDepth,
         Transition[] transitions,
         string[] animationConditions)
     {
         m_animations = animations;
         m_spriteSheet = spriteSheet;
-        m_layerDepth = layerDepth;
 
         if (transitions != null)
         {
@@ -56,15 +54,12 @@ public class SpriteRenderer
 
     public SpriteRenderer(
         Texture2D spriteSheet,
-        Frame frame,
-        LayerDepth layerDepth)
+        Frame frame)
     {
         Animation animation = new Animation(new[] { frame }, frame.HasRotations);
 
         m_animations = new[] { animation };
         m_spriteSheet = spriteSheet;
-        m_layerDepth = layerDepth;
-
         CurrentAnimationIndex = 0;
     }
 
@@ -128,21 +123,33 @@ public class SpriteRenderer
         m_lastFrameUpdate = timeNow;
     }
 
-    public DrawTask CreateDrawTask(Vector2 position, float rotation) =>
-        CurrentAnimation.HasRotation ? DrawRotatable(position, rotation) : DrawStatic(position);
+    public void Draw(Vector2 position, float rotation, bool isCrosshair)
+    {
+        switch (CurrentAnimation.HasRotation)
+        {
+        case true:
+            DrawRotatable(position, rotation, isCrosshair);
 
-    private DrawTask DrawStatic(Vector2 position)
+            break;
+        case false:
+            DrawStatic(position, isCrosshair);
+
+            break;
+        }
+    }
+
+    private void DrawStatic(Vector2 position, bool isCrosshair)
     {
         Rectangle source = CurrentAnimation.Frames[m_currentFrameIndex].Source;
 
-        return new DrawTask(m_spriteSheet, source, position, 0, m_layerDepth);
+        m_spriteSheet.DrawTexture2D(source, position, 0, isCrosshair ? LayerOrdering.Crosshair : LayerOrdering.SpriteSheet);
     }
 
-    private DrawTask DrawRotatable(Vector2 position, float rotation)
+    private void DrawRotatable(Vector2 position, float rotation, bool isCrosshair)
     {
         (float spriteRotation, Rectangle source) = GetRotation(rotation);
 
-        return new DrawTask(m_spriteSheet, source, position, spriteRotation, m_layerDepth);
+        m_spriteSheet.DrawTexture2D(source, position, spriteRotation, isCrosshair ? LayerOrdering.Crosshair : LayerOrdering.SpriteSheet);
     }
 
     private Tuple<float, Rectangle> GetRotation(float rotation)

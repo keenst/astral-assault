@@ -40,7 +40,6 @@ public class MegaHealth : Entity
         (
             spriteSheet,
             new[] { animation },
-            LayerDepth.Foreground,
             null,
             null
         );

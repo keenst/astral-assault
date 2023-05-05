@@ -1,6 +1,8 @@
 ﻿#region
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
+using AstralAssault.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -10,6 +12,9 @@ namespace AstralAssault;
 
 public class Game1 : Game
 {
+    private enum Width { Full = 1920, Half = 960, Quarter = 480 }
+    private enum Height { Full = 1080, Half = 540, Quarter = 270 }
+
     public const int TargetWidth = (int)Width.Quarter;
     public const int TargetHeight = (int)Height.Quarter;
     private const int StatUpdateInterval = 300;
@@ -69,6 +74,7 @@ public class Game1 : Game
         );
 
         AssetManager.Init(this);
+        TextureRenderer.Init(this);
         TextRenderer.Init(this);
         InputEventSource.Init();
         Palette.Init();
@@ -121,31 +127,12 @@ public class Game1 : Game
     {
         // draw sprites to render target
 
-        List<DrawTask> drawTasks = new List<DrawTask>();
+        GraphicsDevice.SetRenderTarget(m_renderTarget);
+        GraphicsDevice.Clear(BackgroundColor);
 
-        string fullscreenText = "Press F for fullscreen";
-        ReadOnlySpan<DrawTask> fullscreenTextTasks =
-            fullscreenText.AsSpan().CreateDrawTasks(new Vector2(4, 258), Color.White, LayerDepth.HUD, false);
-        drawTasks.AddRange(fullscreenTextTasks.ToArray());
+        m_spriteBatch.Begin(SpriteSortMode.BackToFront, samplerState: SamplerState.PointWrap, depthStencilState: DepthStencilState.DepthRead);
 
-        drawTasks.AddRange(GameStateMachine.GetDrawTasks());
-
-        for (int i = 0; i < (drawTasks.Count - 1); i++)
-        {
-            int minIndex = i;
-
-            for (int j = i + 1; j < drawTasks.Count; j++)
-            {
-                if ((int)drawTasks[j].LayerDepth < (int)drawTasks[minIndex].LayerDepth) minIndex = j;
-            }
-
-            if (minIndex != i)
-            {
-                DrawTask temp = drawTasks[i];
-                drawTasks[i] = drawTasks[minIndex];
-                drawTasks[minIndex] = temp;
-            }
-        }
+        GameStateMachine.Draw();
 
         if (ShowDebug)
         {
@@ -162,33 +149,8 @@ public class Game1 : Game
             string frameRate = Math.Round(m_frameRate).ToString();
             string renderTime = m_renderTime.ToString();
 
-            ReadOnlySpan<DrawTask> frameRateTask =
-                frameRate.AsSpan().CreateDrawTasks(Vector2.Zero, Color.Yellow, LayerDepth.Debug, true);
-            ReadOnlySpan<DrawTask> renderTimeTask =
-                renderTime.AsSpan().CreateDrawTasks(new Vector2(0, 9), Color.Yellow, LayerDepth.Debug, false);
-
-            drawTasks.AddRange(frameRateTask.ToArray());
-            drawTasks.AddRange(renderTimeTask.ToArray());
-        }
-
-        GraphicsDevice.SetRenderTarget(m_renderTarget);
-        GraphicsDevice.Clear(BackgroundColor);
-
-        m_spriteBatch.Begin(SpriteSortMode.Immediate, samplerState: SamplerState.PointWrap);
-
-        foreach (DrawTask drawTask in drawTasks)
-        {
-            m_spriteBatch.Draw
-            (
-                drawTask.Texture,
-                drawTask.Destination,
-                drawTask.Source,
-                drawTask.Color,
-                drawTask.Rotation,
-                drawTask.Origin,
-                SpriteEffects.None,
-                0
-            );
+            frameRate.Draw(Vector2.Zero, Color.Yellow, 0f, new Vector2(0, 0), 1f, LayerOrdering.Debug);
+            renderTime.Draw(new Vector2(0, 9), Color.Yellow, 0f, new Vector2(0, 0), 1f, LayerOrdering.Debug);
         }
 
         m_spriteBatch.End();
@@ -211,7 +173,4 @@ public class Game1 : Game
 
         base.Draw(gameTime);
     }
-
-    private enum Width { Full = 1920, Half = 960, Quarter = 480 }
-    private enum Height { Full = 1080, Half = 540, Quarter = 270 }
 }

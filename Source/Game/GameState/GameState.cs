@@ -15,7 +15,7 @@ public abstract class GameState : IUpdateEventListener
 
     public abstract void OnUpdate(object sender, UpdateEventArgs e);
 
-    public abstract List<DrawTask> GetDrawTasks();
+    public abstract void Draw();
     public abstract void Enter();
     public abstract void Exit();
 }

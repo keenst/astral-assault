@@ -1,9 +1,14 @@
 ﻿#region
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+using AstralAssault.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 #endregion
 
 namespace AstralAssault;
@@ -36,56 +41,6 @@ public class GameplayState : GameState
     public Player Player
     {
         get => (Player)Entities.Find(entity => entity is Player);
-    }
-
-    public override List<DrawTask> GetDrawTasks()
-    {
-        List<DrawTask> drawTasks = new List<DrawTask>();
-
-        foreach (Entity entity in Entities) drawTasks.AddRange(entity.GetDrawTasks());
-
-        if (!Root.ShowDebug)
-        {
-            drawTasks.AddRange(WaveController.GetDrawTasks());
-
-            string scoreText = $"Score: {Root.Score}";
-            Color textColor = Palette.GetColor(Palette.Colors.Grey9);
-            ReadOnlySpan<DrawTask> scoreTasks = scoreText.AsSpan().CreateDrawTasks
-                (new Vector2(4, 4), textColor, LayerDepth.HUD, false);
-            drawTasks.AddRange(scoreTasks.ToArray());
-        }
-
-
-        string multiplierText =
-            $"Score multi.: X{Player.Multiplier.ToString("0.0", CultureInfo.GetCultureInfo("en-US"))}";
-
-        ReadOnlySpan<DrawTask> multiplierTasks = multiplierText.AsSpan().CreateDrawTasks
-        (
-            new Vector2(480 - multiplierText.Size(), 4),
-            new Color(m_multiplierColor),
-            LayerDepth.HUD, false
-        );
-        drawTasks.AddRange(multiplierTasks.ToArray());
-
-        if (!Root.ShowDebug) return drawTasks;
-
-        foreach (Collider collider in CollisionSystem.Colliders)
-        {
-            drawTasks.Add
-            (
-                new DrawTask
-                (
-                    circle,
-                    collider.Parent.Position - new Vector2(collider.Radius) / 2,
-                    0,
-                    LayerDepth.Debug,
-                    Palette.GetColor(Palette.Colors.Blue9),
-                    Vector2.Zero
-                )
-            );
-        }
-
-        return drawTasks;
     }
 
     public override void Enter()
@@ -122,5 +77,45 @@ public class GameplayState : GameState
         WaveController.OnUpdate(sender, e);
 
         for (int i = 0; i < Entities.Count; i++) Entities[i].OnUpdate(sender, e);
+    }
+
+    [SuppressMessage("ReSharper.DPA", "DPA0002: Excessive memory allocations in SOH", MessageId = "type: Microsoft.Xna.Framework.Vector2[]; size: 111MB")]
+    public override void Draw()
+    {
+        foreach (Entity entity in Entities) entity.Draw();
+
+        if (!Root.ShowDebug)
+        {
+            WaveController.Draw();
+
+            string scoreText = $"Score: {Root.Score}";
+            Color textColor = Palette.GetColor(Palette.Colors.Grey9);
+            scoreText.Draw
+                (new Vector2(4, 4), textColor, 0f, new Vector2(0, 0), 1f, LayerOrdering.Hud);
+        }
+        else
+        {
+            foreach (Collider collider in CollisionSystem.Colliders)
+            {
+                Root.m_spriteBatch.DrawCircle
+                (
+                    collider.Parent.Position, collider.Radius, 32, Palette.GetColor(Palette.Colors.Blue9), 1f, LayerOrdering.Debug.GetDisplayLayerValue()
+                );
+            }
+        }
+
+
+        string multiplierText =
+            $"Score multi.: X{Player.Multiplier.ToString("0.0", CultureInfo.GetCultureInfo("en-US"))}";
+
+        multiplierText.Draw
+        (
+            new Vector2(480 - multiplierText.Size().X, 4),
+            new Color(m_multiplierColor),
+            0f,
+            new Vector2(0, 0),
+            1f,
+            LayerOrdering.Hud
+        );
     }
 }

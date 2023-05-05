@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using AstralAssault.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -41,7 +43,7 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
         Root.GameStateMachine.ChangeState(new GameplayState(Root));
     }
 
-    public override List<DrawTask> GetDrawTasks()
+    public override void Draw()
     {
         Vector2 textPosition = new Vector2
         (
@@ -55,39 +57,28 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
             (float)Math.Round(Game1.TargetHeight / 2D)
         );
 
-        List<DrawTask> drawTasks = new List<DrawTask>();
-
-        DrawTask gameOverText = new DrawTask
-            (m_gameOverText, textPosition, 0, LayerDepth.HUD);
-
-        drawTasks.Add(gameOverText);
+        m_gameOverText.DrawTexture2D(textPosition, 0, LayerOrdering.Foreground);
 
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
         if ((timeNow - m_timeEntered) > 1000)
         {
-            DrawTask restartPrompt = new DrawTask
-                (m_restartPrompt, promptPosition, 0, LayerDepth.HUD);
-
-            drawTasks.Add(restartPrompt);
+            m_restartPrompt.DrawTexture2D(promptPosition, 0, LayerOrdering.Foreground);
         }
 
         int score = (int)Lerp(0, Root.Score, MathF.Min((timeNow - m_timeEntered) / 800F, 1));
         string scoreText = $"Score: {score}";
         int textX = 240 - $"Score: {Root.Score}".Length * 4;
-        ReadOnlySpan<DrawTask> scoreTasks = scoreText.AsSpan().CreateDrawTasks
-            (new Vector2(textX, 150), Color.White, LayerDepth.HUD, false);
-        drawTasks.AddRange(scoreTasks.ToArray());
+        scoreText.Draw
+            (new Vector2(textX, 150), Color.White, 0f, new Vector2(0, 0), 1f, LayerOrdering.Foreground);
 
         if (!m_newHighScore)
         {
             string highScoreText = $"High score: {Root.HighScore}";
             int highScoreX = 240 - highScoreText.Length * 4;
-            ReadOnlySpan<DrawTask> highScoreTasks =
-                highScoreText.AsSpan().CreateDrawTasks(new Vector2(highScoreX, 170), Color.White, LayerDepth.HUD, false);
-            drawTasks.AddRange(highScoreTasks.ToArray());
+            highScoreText.Draw(new Vector2(highScoreX, 170), Color.White, 0f, new Vector2(0, 0), 1f, LayerOrdering.Foreground);
 
-            return drawTasks;
+            return;
         }
 
         long timeSinceToggle = timeNow - m_lastToggle;
@@ -98,15 +89,11 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
             m_lastToggle = timeNow;
         }
 
-        if (!m_showNewHighScore) return drawTasks;
+        if (!m_showNewHighScore) return;
 
         string newHighScoreText = "New high score!";
         int newHighScoreX = 240 - newHighScoreText.Length * 4;
-        ReadOnlySpan<DrawTask> newHighScoreTasks =
-            newHighScoreText.AsSpan().CreateDrawTasks(new Vector2(newHighScoreX, 170), Color.White, LayerDepth.HUD, true);
-        drawTasks.AddRange(newHighScoreTasks.ToArray());
-
-        return drawTasks;
+        newHighScoreText.Draw(new Vector2(newHighScoreX, 170), Color.White, 0f, new Vector2(0, 0), 1f, LayerOrdering.Foreground);
     }
 
     public override void Enter()

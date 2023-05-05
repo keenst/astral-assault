@@ -40,7 +40,6 @@ public class Quad : Entity
         (
             spriteSheet,
             new[] { animation },
-            LayerDepth.Foreground,
             null,
             null
         );

@@ -21,5 +21,5 @@ public class GameStateMachine
         m_currentState.Enter();
     }
 
-    public List<DrawTask> GetDrawTasks() => m_currentState.GetDrawTasks();
+    public void Draw() => m_currentState.Draw();
 }

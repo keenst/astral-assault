@@ -1,6 +1,8 @@
 ﻿#region
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
+using AstralAssault.Source.Graphics;
 using Microsoft.Xna.Framework;
 #endregion
 
@@ -87,17 +89,13 @@ public class WaveController
         m_waveTextTimer = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
     }
 
-    public List<DrawTask> GetDrawTasks()
+    public void Draw()
     {
-        List<DrawTask> drawTasks = new List<DrawTask>();
-
         //if (!_drawWaveText) return drawTasks;
 
         string text = $"Wave: {m_currentWave}";
         Color color = Palette.GetColor(Palette.Colors.Grey9);
-        drawTasks.AddRange(text.AsSpan().CreateDrawTasks(new Vector2(4, 16), color, LayerDepth.HUD, false).ToArray());
-
-        return drawTasks;
+        text.Draw(new Vector2(4, 16), color, 0f, new Vector2(0, 0), 1f, LayerOrdering.Hud);
     }
 
     public void OnUpdate(object sender, UpdateEventArgs e)

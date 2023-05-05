@@ -40,7 +40,6 @@ public class Haste : Entity
         (
             spriteSheet,
             new[] { animation },
-            LayerDepth.Foreground,
             null,
             null
         );

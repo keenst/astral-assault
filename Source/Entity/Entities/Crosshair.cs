@@ -86,7 +86,6 @@ public class Crosshair : Entity, IMouseEventListener
         (
             spriteSheet,
             new[] { activeAnimation, inactiveAnimation, deactivateAnimation, activateAnimation },
-            LayerDepth.Crosshair,
             transitions,
             new[] { "IsActive" }
         );

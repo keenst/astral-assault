@@ -181,7 +181,6 @@ public class Player : Entity, IInputEventListener
         (
             spriteSheet,
             new[] { idleAnimation, tiltLeftAnimation, tiltRightAnimation },
-            LayerDepth.Foreground,
             transitions,
             new[] { "Tilt" }
         );
@@ -243,11 +242,9 @@ public class Player : Entity, IInputEventListener
         );
     }
 
-    public override List<DrawTask> GetDrawTasks()
+    public override void Draw()
     {
-        List<DrawTask> drawTasks = new List<DrawTask>();
-
-        drawTasks.AddRange(base.GetDrawTasks());
+        base.Draw();
 
         for (int i = 0; i < m_powerUps.Count; i++)
         {
@@ -287,33 +284,29 @@ public class Player : Entity, IInputEventListener
                 var _ => Palette.GetColorVector(Palette.Colors.Black)
             };
 
-            DrawTask lifetimeBackground = new DrawTask
+            m_square.DrawTexture2D
             (
-                m_square, new Rectangle(0, 0, 1, 1), new Rectangle(1, 28 + i * 12, 2, 8), 0, LayerDepth.HUD,
-                new Color(backgroundColor)
+                new Rectangle(0, 0, 1, 1), new Rectangle(1, 28 + i * 12, 2, 8), 0,
+                new Color(backgroundColor), LayerOrdering.Powerups
             );
 
             int barLength = 8 - (int)Math.Floor((timeNow - powerUp.Item1) / (float)PowerUpDuration * 8);
 
-            DrawTask lifetimeBar = new DrawTask
+            m_square.DrawTexture2D
             (
-                m_square, new Rectangle(0, 0, 1, 1), new Rectangle(1, 36 + i * 12 - barLength, 2, barLength), 0,
-                LayerDepth.HUD, new Color(barColor)
+                new Rectangle(0, 0, 1, 1), new Rectangle(1, 36 + i * 12 - barLength, 2, barLength), 0,
+                new Color(barColor), LayerOrdering.Powerups
             );
 
-            ReadOnlySpan<DrawTask> powerUpTask = powerUpName.AsSpan().CreateDrawTasks
+            powerUpName.Draw
             (
                 new Vector2(4, 28 + i * 12),
                 new Color(color),
-                LayerDepth.HUD, false
+                0f,
+                new Vector2(0, 0),
+                1f, LayerOrdering.Powerups
             );
-
-            drawTasks.AddRange(powerUpTask.ToArray());
-            drawTasks.Add(lifetimeBackground);
-            drawTasks.Add(lifetimeBar);
         }
-
-        return drawTasks;
     }
 
     public override void OnCollision(Collider other)
@@ -326,8 +319,14 @@ public class Player : Entity, IInputEventListener
         {
             Jukebox.PlaySound("PickUp");
 
-            if (m_powerUps.Any
-                    (t => t.Item2 == PowerUps.QuadDamage)) m_powerUps.RemoveAll(t => t.Item2 == PowerUps.QuadDamage);
+            for (int i = m_powerUps.Count - 1; i >= 0; i--)
+            {
+                if (m_powerUps[i].Item2 == PowerUps.QuadDamage)
+                {
+                    m_powerUps.RemoveAt(i);
+                }
+            }
+
 
             m_powerUps.Add(new Tuple<long, PowerUps>(timeNow, PowerUps.QuadDamage));
         }
@@ -335,7 +334,13 @@ public class Player : Entity, IInputEventListener
         {
             Jukebox.PlaySound("PickUp");
 
-            if (m_powerUps.Any(t => t.Item2 == PowerUps.Haste)) m_powerUps.RemoveAll(t => t.Item2 == PowerUps.Haste);
+            for (int i = m_powerUps.Count - 1; i >= 0; i--)
+            {
+                if (m_powerUps[i].Item2 == PowerUps.Haste)
+                {
+                    m_powerUps.RemoveAt(i);
+                }
+            }
 
             m_powerUps.Add(new Tuple<long, PowerUps>(timeNow, PowerUps.Haste));
         }

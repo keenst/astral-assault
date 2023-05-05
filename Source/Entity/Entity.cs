@@ -1,7 +1,7 @@
 ﻿#region
 using System;
-using System.Collections.Generic;
 using AstralAssault.Items;
+using AstralAssault.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -113,10 +113,8 @@ public class Entity
         m_highlightAlpha = 0.7F;
     }
 
-    public virtual List<DrawTask> GetDrawTasks()
+    public virtual void Draw()
     {
-        List<DrawTask> drawTasks = new List<DrawTask>();
-
         if (m_isHighlighted)
         {
             const float decayRate = 0.005F;
@@ -133,10 +131,8 @@ public class Entity
             }
         }
 
-        if (IsActor) drawTasks.AddRange(CreateHealthBarDrawTasks());
-        drawTasks.Add(SpriteRenderer.CreateDrawTask(Position, Rotation));
-
-        return drawTasks;
+        if (IsActor) DrawHealthBar();
+        SpriteRenderer.Draw(Position, Rotation, this is Crosshair);
     }
 
     public virtual void Destroy()
@@ -157,7 +153,7 @@ public class Entity
         m_healthBarTexture.SetData(data);
     }
 
-    private List<DrawTask> CreateHealthBarDrawTasks()
+    private void DrawHealthBar()
     {
         const int width = 20;
         const int height = 3;
@@ -177,22 +173,17 @@ public class Entity
 
         Rectangle source = new Rectangle(0, 0, 1, 1);
 
-        DrawTask background = new DrawTask
+        m_healthBarTexture.DrawTexture2D(source, outline, 0, new Color(outlineColor), LayerOrdering.BarOutline);
+
+        m_healthBarTexture.DrawTexture2D
         (
-            m_healthBarTexture, source, outline, 0, LayerDepth.HUD, new Color(outlineColor)
+            source, emptyHealthBar, 0, new Color(emptyColor), LayerOrdering.BarEmpty
         );
 
-        DrawTask empty = new DrawTask
+        m_healthBarTexture.DrawTexture2D
         (
-            m_healthBarTexture, source, emptyHealthBar, 0, LayerDepth.HUD, new Color(emptyColor)
+            source, fullHealthBar, 0, new Color(fullColor), LayerOrdering.BarFull
         );
-
-        DrawTask full = new DrawTask
-        (
-            m_healthBarTexture, source, fullHealthBar, 0, LayerDepth.HUD, new Color(fullColor)
-        );
-
-        return new List<DrawTask> { background, empty, full };
     }
 
     protected enum OutOfBounds { DoNothing, Wrap, Destroy }

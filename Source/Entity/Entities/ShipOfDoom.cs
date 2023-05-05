@@ -1,4 +1,4 @@
-#region
+/*#region
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -6,14 +6,14 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
 
-public class Asteroid : Entity
+public class ShipOfDoom : Entity
 {
     public enum Sizes { Smallest, Small, Medium }
     private readonly float m_rotSpeed;
     private readonly Sizes m_size;
     private bool m_hasExploded;
 
-    public Asteroid(
+    public ShipOfDoom(
         GameplayState gameState,
         Vector2 position,
         float direction,
@@ -185,4 +185,4 @@ public class Asteroid : Entity
 
         Jukebox.PlaySound(soundName, 0.5F);
     }
-}
+}*/
