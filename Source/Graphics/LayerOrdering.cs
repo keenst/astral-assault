@@ -1,8 +1,8 @@
-namespace AstralAssault.Source.Graphics;
+namespace AstralAssault;
 
 public enum LayerOrdering
 {
-    Debug = 1,
+    Debug,
     Hud,
     Crosshair,
     Explosions,
@@ -14,4 +14,3 @@ public enum LayerOrdering
     Foreground,
     Background
 }
-

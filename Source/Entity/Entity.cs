@@ -1,7 +1,6 @@
 ﻿#region
 using System;
 using AstralAssault.Items;
-using AstralAssault.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -18,10 +17,8 @@ public class Entity
     protected float HP;
     protected bool IsActor = false;
 
-    public bool IsFriendly;
-
     private Texture2D m_healthBarTexture;
-    private float m_highlightAlpha;
+    public float m_highlightAlpha;
 
     private bool m_isHighlighted;
     private long m_timeStartedHighlightingMS;
@@ -102,11 +99,11 @@ public class Entity
 
     public virtual void OnCollision(Collider other)
     {
-        if (!IsActor || (other.Parent.IsFriendly == IsFriendly)) return;
-
-        HP = Math.Max(0, HP - other.Parent.ContactDamage);
+        if (Game1.PatternThing(this, other)) return;
 
         if (this is Asteroid && other.Parent is MegaHealth or Haste or Quad) return;
+
+        HP = Math.Max(0, HP - other.Parent.ContactDamage);
 
         m_isHighlighted = true;
         m_timeStartedHighlightingMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
@@ -135,15 +132,15 @@ public class Entity
         SpriteRenderer.Draw(Position, Rotation, this is Crosshair);
     }
 
-    public virtual void Destroy()
-    {
-        GameState.Entities.Remove(this);
-        GameState.CollisionSystem.RemoveCollider(Collider);
-    }
-
     protected virtual void OnDeath()
     {
         Destroy();
+    }
+
+    internal virtual void Destroy()
+    {
+        GameState.Entities.Remove(this);
+        GameState.CollisionSystem.RemoveCollider(Collider);
     }
 
     private void CreateHealthBarTexture()

@@ -61,18 +61,6 @@
 /processorParam:TextureFormat=Color
 /build:Assets/Asteroid3.png
 
-#begin Assets/AsteroidDebris.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Assets/AsteroidDebris.png
-
 #begin Assets/Bullet.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -181,18 +169,6 @@
 /processorParam:Quality=Best
 /build:Assets/MultiplierBroken1.ogg
 
-#begin Assets/Particle.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Assets/Particle.png
-
 #begin Assets/PickUp.ogg
 /importer:OggImporter
 /processor:SoundEffectProcessor
@@ -210,6 +186,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Assets/Player.png
+
+#begin Assets/ShipOfDoom.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Assets/ShipOfDoom.png
 
 #begin Assets/Quad.png
 /importer:TextureImporter
@@ -276,18 +264,6 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Assets/Shoot3.ogg
-
-#begin Assets/unitcircleofdoomyaaaZ.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Assets/unitcircleofdoomyaaaZ.png
 
 #begin Fonts/fc.spritefont
 /importer:FontDescriptionImporter

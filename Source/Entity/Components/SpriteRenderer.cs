@@ -1,8 +1,6 @@
 ﻿#region
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using AstralAssault.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
@@ -18,26 +16,34 @@ public class SpriteRenderer
         Transition>();
 
     private readonly Animation[] m_animations;
+    private readonly Game1 m_root;
     private readonly Texture2D m_spriteSheet;
 
     public bool Debugging = false;
 
     private int[] m_animationQueue;
 
+    private readonly Entity m_baseE;
+
     private int m_currentFrameIndex;
     private int m_indexInQueue;
     private bool m_isTransitioning;
     private long m_lastFrameUpdate;
+    private Texture2D m_spriteSheet2;
     private int m_startAnimationIndex;
     private int m_targetAnimationIndex;
 
     public SpriteRenderer(
+        Entity baseE,
         Texture2D spriteSheet,
         Animation[] animations,
         Transition[] transitions,
-        string[] animationConditions)
+        string[] animationConditions, Game1 root)
     {
+        m_baseE = baseE;
+
         m_animations = animations;
+        m_root = root;
         m_spriteSheet = spriteSheet;
 
         if (transitions != null)
@@ -53,13 +59,17 @@ public class SpriteRenderer
     }
 
     public SpriteRenderer(
+        Entity baseE,
         Texture2D spriteSheet,
-        Frame frame)
+        Frame frame, Game1 root)
     {
+        m_baseE = baseE;
+
         Animation animation = new Animation(new[] { frame }, frame.HasRotations);
 
         m_animations = new[] { animation };
         m_spriteSheet = spriteSheet;
+        m_root = root;
         CurrentAnimationIndex = 0;
     }
 
@@ -72,8 +82,6 @@ public class SpriteRenderer
 
     public void OnUpdate(object sender, UpdateEventArgs e)
     {
-        if (Debugging) Debug.WriteLine(m_currentFrameIndex);
-
         int frameLength = CurrentAnimation.Frames[m_currentFrameIndex].Time;
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
@@ -81,7 +89,6 @@ public class SpriteRenderer
 
         if (transition.HasValue)
         {
-            if (Debugging) Debug.WriteLine("Transitioning");
             m_animationQueue = transition.Value.AnimationPath;
             CurrentAnimationIndex = m_animationQueue[0];
             m_indexInQueue = 0;
@@ -125,31 +132,78 @@ public class SpriteRenderer
 
     public void Draw(Vector2 position, float rotation, bool isCrosshair)
     {
+        if (m_baseE.m_highlightAlpha != 0f)
+        {
+            Color[] data = new Color[m_spriteSheet.Width * m_spriteSheet.Height];
+            m_spriteSheet.GetData(data);
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                if (data[i].A == 0) continue;
+
+                Vector4 hmmm = data[i].ToVector4();
+
+                hmmm.X += m_baseE.m_highlightAlpha;
+                hmmm.Y += m_baseE.m_highlightAlpha;
+                hmmm.Z += m_baseE.m_highlightAlpha;
+                hmmm.W += m_baseE.m_highlightAlpha;
+
+                data[i] = new Color(hmmm);
+            }
+
+            m_spriteSheet2 = new Texture2D(m_root.GraphicsDevice, m_spriteSheet.Width, m_spriteSheet.Height);
+            m_spriteSheet2.SetData(data);
+        }
+
         switch (CurrentAnimation.HasRotation)
         {
         case true:
-            DrawRotatable(position, rotation, isCrosshair);
+            DrawRotatable(position, rotation, isCrosshair, m_baseE.m_highlightAlpha != 0f);
 
             break;
         case false:
-            DrawStatic(position, isCrosshair);
+            DrawStatic(position, isCrosshair, m_baseE.m_highlightAlpha != 0f);
 
             break;
         }
     }
 
-    private void DrawStatic(Vector2 position, bool isCrosshair)
+    private void DrawStatic(Vector2 position, bool isCrosshair, bool highlight)
     {
         Rectangle source = CurrentAnimation.Frames[m_currentFrameIndex].Source;
 
-        m_spriteSheet.DrawTexture2D(source, position, 0, isCrosshair ? LayerOrdering.Crosshair : LayerOrdering.SpriteSheet);
+        switch (highlight)
+        {
+        case true:
+            m_spriteSheet2.DrawTexture2D
+                (source, position, 0, isCrosshair ? LayerOrdering.Crosshair : LayerOrdering.SpriteSheet);
+
+            break;
+        case false:
+            m_spriteSheet.DrawTexture2D
+                (source, position, 0, isCrosshair ? LayerOrdering.Crosshair : LayerOrdering.SpriteSheet);
+
+            break;
+        }
     }
 
-    private void DrawRotatable(Vector2 position, float rotation, bool isCrosshair)
+    private void DrawRotatable(Vector2 position, float rotation, bool isCrosshair, bool highlight)
     {
         (float spriteRotation, Rectangle source) = GetRotation(rotation);
 
-        m_spriteSheet.DrawTexture2D(source, position, spriteRotation, isCrosshair ? LayerOrdering.Crosshair : LayerOrdering.SpriteSheet);
+        switch (highlight)
+        {
+        case true:
+            m_spriteSheet2.DrawTexture2D
+                (source, position, spriteRotation, isCrosshair ? LayerOrdering.Crosshair : LayerOrdering.SpriteSheet);
+
+            break;
+        case false:
+            m_spriteSheet.DrawTexture2D
+                (source, position, spriteRotation, isCrosshair ? LayerOrdering.Crosshair : LayerOrdering.SpriteSheet);
+
+            break;
+        }
     }
 
     private Tuple<float, Rectangle> GetRotation(float rotation)

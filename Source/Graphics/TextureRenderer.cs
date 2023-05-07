@@ -1,8 +1,10 @@
+#region
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+#endregion
 
-namespace AstralAssault.Source.Graphics;
+namespace AstralAssault;
 
 public static class TextureRenderer
 {
@@ -23,7 +25,7 @@ public static class TextureRenderer
         LayerOrdering layer
     )
     {
-        Root.m_spriteBatch.Draw
+        Root.SpriteBatch.Draw
         (
             texture,
             destination,
@@ -51,7 +53,7 @@ public static class TextureRenderer
         LayerOrdering layer
     )
     {
-        Root.m_spriteBatch.Draw
+        Root.SpriteBatch.Draw
         (
             texture,
             new Rectangle
@@ -88,7 +90,7 @@ public static class TextureRenderer
             texture.Height
         );
 
-        Root.m_spriteBatch.Draw
+        Root.SpriteBatch.Draw
         (
             texture,
             new Rectangle
@@ -116,7 +118,7 @@ public static class TextureRenderer
         LayerOrdering layer
     )
     {
-        Root.m_spriteBatch.Draw
+        Root.SpriteBatch.Draw
         (
             texture,
             new Rectangle
@@ -154,7 +156,7 @@ public static class TextureRenderer
             texture.Width,
             texture.Height
         );
-        Root.m_spriteBatch.Draw
+        Root.SpriteBatch.Draw
         (
             texture,
             new Rectangle

@@ -1,8 +1,6 @@
 ﻿#region
 using System;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using AstralAssault.Source.Graphics;
+using AstralAssault.Items;
 using Microsoft.Xna.Framework;
 #endregion
 
@@ -10,22 +8,13 @@ namespace AstralAssault;
 
 public class WaveController
 {
-    private const long WaveTextDuration = 2000;
-    private const long WaveDelay = 5000;
     public readonly GameplayState GameState;
-    private readonly Game1 m_root;
-    private bool levelUppHehe = false;
     private int m_currentWave;
-
-    private bool m_drawWaveText;
-    private long m_waveTextTimer;
-
-    private long m_waveTimer;
+    private bool m_levelUpHehe;
 
     public WaveController(GameplayState gameState, Game1 root)
     {
         GameState = gameState;
-        m_root = root;
 
         StartNextWave();
     }
@@ -36,18 +25,72 @@ public class WaveController
 
         m_currentWave++;
 
-        if (m_currentWave == 6)
-        {
-            levelUppHehe = true;
-        }
+        if (m_currentWave == 5) m_levelUpHehe = true;
 
         int enemiesToSpawn = (int)(m_currentWave * 1.1F);
 
         Random rnd = new Random();
 
-        switch (levelUppHehe)
+        switch (m_levelUpHehe)
         {
         case true:
+            int shipsOfDoomToSpawn = m_currentWave - 4;
+
+            for (int i = 0; i < (enemiesToSpawn - shipsOfDoomToSpawn); i++)
+            {
+                int side = rnd.Next(0, 4);
+
+                int x = side switch
+                {
+                    0 => 0,
+                    1 => Game1.TargetWidth,
+                    2 => rnd.Next(0, Game1.TargetWidth),
+                    3 => rnd.Next(0, Game1.TargetWidth),
+                    var _ => throw new ArgumentOutOfRangeException()
+                };
+
+                int y = side switch
+                {
+                    0 => rnd.Next(0, Game1.TargetHeight),
+                    1 => rnd.Next(0, Game1.TargetHeight),
+                    2 => 0,
+                    3 => Game1.TargetHeight,
+                    var _ => throw new ArgumentOutOfRangeException()
+                };
+
+                Vector2 position = new Vector2(x, y);
+                Asteroid.Sizes size = (Asteroid.Sizes)rnd.Next(0, 3);
+
+                Vector2 gameCenter = new Vector2(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F);
+                float angleToCenter = MathF.Atan2(gameCenter.Y - position.Y, gameCenter.X - position.X);
+                angleToCenter += MathHelper.ToRadians(rnd.Next(-45, 45));
+
+                GameState.Entities.Add(new Asteroid(GameState, position, angleToCenter, size));
+            }
+
+            for (int i = 0; i < shipsOfDoomToSpawn; i++)
+            {
+                int pside = rnd.Next(0, 4);
+                int px = pside switch
+                {
+                    0 => 0,
+                    1 => Game1.TargetWidth,
+                    2 => rnd.Next(0, Game1.TargetWidth),
+                    3 => rnd.Next(0, Game1.TargetWidth),
+                    var _ => throw new ArgumentOutOfRangeException()
+                };
+                int py = pside switch
+                {
+                    0 => rnd.Next(0, Game1.TargetHeight),
+                    1 => rnd.Next(0, Game1.TargetHeight),
+                    2 => 0,
+                    3 => Game1.TargetHeight,
+                    var _ => throw new ArgumentOutOfRangeException()
+                };
+
+                GameState.Entities.Add(new ShipOfDoom(GameState, new Vector2(px, py), 0));
+            }
+
             break;
         case false:
             for (int i = 0; i < enemiesToSpawn; i++)
@@ -84,39 +127,26 @@ public class WaveController
 
             break;
         }
-
-        m_drawWaveText = true;
-        m_waveTextTimer = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-    }
-
-    public void Draw()
-    {
-        //if (!_drawWaveText) return drawTasks;
-
-        string text = $"Wave: {m_currentWave}";
-        Color color = Palette.GetColor(Palette.Colors.Grey9);
-        text.Draw(new Vector2(4, 16), color, 0f, new Vector2(0, 0), 1f, LayerOrdering.Hud);
     }
 
     public void OnUpdate(object sender, UpdateEventArgs e)
     {
-        long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-
-        if (m_drawWaveText && ((timeNow - m_waveTextTimer) > WaveTextDuration)) m_drawWaveText = false;
-
         int enemiesAlive = 0;
 
-        foreach (Entity entity in GameState.Entities)
+        foreach (Entity ez in GameState.Entities)
         {
-            if (entity is Asteroid) enemiesAlive++;
+            if (ez is Quad or Haste or MegaHealth or Crosshair or Player) continue;
+
+            enemiesAlive++;
         }
 
-        if (enemiesAlive == 0)
-        {
-            if ((timeNow - m_waveTimer) < WaveDelay) return;
+        if (enemiesAlive == 0) StartNextWave();
+    }
 
-            StartNextWave();
-            m_waveTimer = timeNow;
-        }
+    public void Draw()
+    {
+        string text = $"Wave: {m_currentWave}";
+        Color color = Palette.GetColor(Palette.Colors.Grey9);
+        text.Draw(new Vector2(4, 16), color, 0f, new Vector2(0, 0), 1f, LayerOrdering.Hud);
     }
 }

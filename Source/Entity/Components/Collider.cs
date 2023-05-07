@@ -5,40 +5,41 @@ using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
 
-public class Collider
+public sealed class Collider
 {
-    public readonly float Mass;
-    public readonly Entity Parent;
-    public bool IsSolid;
-    public int Radius;
-    public float Restitution;
+    private readonly float m_mass;
+    internal readonly Entity Parent;
+    private readonly Rectangle m_rectangle;
+    private readonly bool m_isSolid;
+    internal int Radius;
+    private readonly float m_restitution;
 
-    public Collider(Entity parent, bool isSolid, int mass)
+    internal Collider(Entity parent, bool isSolid, int mass)
     {
         Parent = parent;
-        IsSolid = isSolid;
-        Mass = mass;
-        Restitution = 0;
+        m_isSolid = isSolid;
+        m_mass = mass;
+        m_restitution = 0;
     }
 
-    public Collider(Entity parent)
+    internal Collider(Entity parent)
     {
         Parent = parent;
-        IsSolid = false;
-        Mass = 0f;
-        Restitution = 0;
+        m_isSolid = false;
+        m_mass = 0f;
+        m_restitution = 0;
     }
 
-    public Collider(Entity parent, Rectangle rectangle)
+    internal Collider(Entity parent, Rectangle rectangle)
     {
         Parent = parent;
-        IsSolid = false;
-        Mass = 0f;
+        m_rectangle = rectangle;
+        m_isSolid = false;
+        m_mass = 0f;
     }
 
-    public bool CollidesWith(
-        Collider other,
-        float deltaTime) => MathF.Sqrt
+    internal bool CollidesWith(
+        Collider other) => MathF.Sqrt
     (
         MathF.Pow(other.Parent.Position.X - Parent.Position.X, 2) + MathF.Pow
         (
@@ -46,31 +47,30 @@ public class Collider
         )
     ) <= (Radius + other.Radius);
 
-    public static void ResolveCollision1(Collider a, Collider b)
+    internal static void ResolveCollision1(Collider a, Collider b)
     {
-        if (a.IsSolid && b.IsSolid && (a.Parent.TimeSinceSpawned > 512))
+        if (!a.m_isSolid || !b.m_isSolid || (a.Parent.TimeSinceSpawned <= 512)) return;
+
+        if ((a.m_mass + b.m_mass) == 0f)
         {
-            if ((a.Mass + b.Mass) == 0f)
-            {
-                a.Parent.Velocity = Vector2.Zero;
-                b.Parent.Velocity = Vector2.Zero;
+            a.Parent.Velocity = Vector2.Zero;
+            b.Parent.Velocity = Vector2.Zero;
 
-                return;
-            }
-
-            float invMassA = a.Mass > 0f ? 1 / a.Mass : 0;
-            float invMassB = b.Mass > 0f ? 1 / b.Mass : 0;
-            Vector2 rv = b.Parent.Velocity - a.Parent.Velocity;
-            Vector2 normal = Vector2.Normalize(b.Parent.Position - a.Parent.Position);
-            float velAlongNormal = Vector2.Dot(rv, normal);
-
-            if (velAlongNormal > 0) return;
-
-            float e = MathHelper.Min(a.Restitution, b.Restitution);
-            float j = -(1 + e) * velAlongNormal / (invMassA + invMassB);
-            Vector2 impulse = j * normal;
-            a.Parent.Velocity -= invMassA * impulse;
-            b.Parent.Velocity += invMassB * impulse;
+            return;
         }
+
+        float invMassA = a.m_mass > 0f ? 1 / a.m_mass : 0;
+        float invMassB = b.m_mass > 0f ? 1 / b.m_mass : 0;
+        Vector2 rv = b.Parent.Velocity - a.Parent.Velocity;
+        Vector2 normal = Vector2.Normalize(b.Parent.Position - a.Parent.Position);
+        float velAlongNormal = Vector2.Dot(rv, normal);
+
+        if (velAlongNormal > 0) return;
+
+        float e = MathHelper.Min(a.m_restitution, b.m_restitution);
+        float j = -(1 + e) * velAlongNormal / (invMassA + invMassB);
+        Vector2 impulse = j * normal;
+        a.Parent.Velocity -= invMassA * impulse;
+        b.Parent.Velocity += invMassB * impulse;
     }
 }

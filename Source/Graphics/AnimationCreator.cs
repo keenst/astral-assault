@@ -1,93 +1,81 @@
-﻿using System;
+﻿#region
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+#endregion
 
-namespace AstralAssault.Source.Graphics
+namespace AstralAssault.Source.Graphics;
+
+internal static class AnimationCreator
 {
-    internal static class AnimationCreator
+    public static Animation CreateAnimFromSpriteSheet(
+        int spriteWidth,
+        int spriteHeight,
+        int startFrameIdx,
+        int rowLenghtInFrames,
+        int numFrames,
+        int[] time,
+        bool hasRotation,
+        bool shouldLoop,
+        bool goBackwards,
+        bool reverseDir,
+        int reverseAtIdx
+    )
     {
-        public static Animation CreateAnimFromSpriteSheet(
-            int spriteWidth,
-            int spriteHeight,
-            int startFrameIdx,
-            int rowLenghtInFrames,
-            int numFrames,
-            int[] time,
-            bool hasRotation,
-            bool shouldLoop,
-            bool goBackwards,
-            bool reverseDir,
-            int reverseAtIdx
-        )
+        Animation anim = new Animation();
+
+        anim.HasRotation = hasRotation;
+        anim.IsLooping = shouldLoop;
+
+        List<Frame> frames = new List<Frame>();
+
+        if (!hasRotation)
         {
-            Animation anim = new Animation();
+            int currentFrameIdx = startFrameIdx;
 
-            anim.HasRotation = hasRotation;
-            anim.IsLooping = shouldLoop;
-
-            var frames = new List<Frame>();
-
-            if (!hasRotation)
+            for (int i = 0; i < numFrames; i++)
             {
-                int currentFrameIdx = startFrameIdx;
+                int x = currentFrameIdx % rowLenghtInFrames * spriteWidth;
+                int y = currentFrameIdx / rowLenghtInFrames * spriteHeight;
 
-                for (int i = 0; i < numFrames; i++)
-                {
-                    int x = (currentFrameIdx % rowLenghtInFrames) * spriteWidth;
-                    int y = (currentFrameIdx / rowLenghtInFrames) * spriteHeight;
+                Frame frame = new Frame
+                (
+                    new Rectangle(x, y, spriteWidth, spriteHeight), time.Length > 1
+                        ? time[i]
+                        : time[0]
+                );
 
-                    Frame frame = new Frame
-                    (
-                        new Rectangle(x, y, spriteWidth, spriteHeight), (time.Length > 1)
-                            ? time[i]
-                            : time[0]
-                    );
+                frames.Add(frame);
 
-                    frames.Add(frame);
+                if (reverseDir && (i == reverseAtIdx)) goBackwards = !goBackwards;
 
-                    if (reverseDir && (i == reverseAtIdx))
-                    {
-                        goBackwards = !goBackwards;
-                    }
-
-                    if (goBackwards)
-                    {
-                        currentFrameIdx--;
-                    }
-                    else
-                    {
-                        currentFrameIdx++;
-                    }
-                }
+                if (goBackwards) currentFrameIdx--;
+                else currentFrameIdx++;
             }
-            else
-            {
-                for (int i = 0; i < numFrames; i++)
-                {
-                    int x = ((i + startFrameIdx) % rowLenghtInFrames) * spriteWidth;
-                    int y = ((i + startFrameIdx) / rowLenghtInFrames) * spriteHeight;
-
-                    Frame frame = new Frame
-                    (
-                        new Rectangle(x, y, spriteWidth, spriteHeight),
-                        new Rectangle(x, y + spriteHeight, spriteWidth, spriteHeight),
-                        new Rectangle(x, y + spriteHeight * 2, spriteWidth, spriteHeight),
-                        new Rectangle(x, y + spriteHeight * 3, spriteWidth, spriteHeight),
-                        (time.Length > 1)
-                            ? time[i]
-                            : time[0]
-                    );
-
-                    frames.Add(frame);
-                }
-            }
-
-            anim.Frames = frames.ToArray();
-
-            return anim;
         }
+        else
+        {
+            for (int i = 0; i < numFrames; i++)
+            {
+                int x = (i + startFrameIdx) % rowLenghtInFrames * spriteWidth;
+                int y = (i + startFrameIdx) / rowLenghtInFrames * spriteHeight;
+
+                Frame frame = new Frame
+                (
+                    new Rectangle(x, y, spriteWidth, spriteHeight),
+                    new Rectangle(x, y + spriteHeight, spriteWidth, spriteHeight),
+                    new Rectangle(x, y + spriteHeight * 2, spriteWidth, spriteHeight),
+                    new Rectangle(x, y + spriteHeight * 3, spriteWidth, spriteHeight),
+                    time.Length > 1
+                        ? time[i]
+                        : time[0]
+                );
+
+                frames.Add(frame);
+            }
+        }
+
+        anim.Frames = frames.ToArray();
+
+        return anim;
     }
 }

@@ -10,8 +10,6 @@ public class MegaHealth : Entity
 {
     public MegaHealth(GameplayState gameState, Vector2 position) : base(gameState, position)
     {
-        IsFriendly = true;
-
         Collider = new Collider
             (this, new Rectangle(new Point((int)Position.X - 8, (int)Position.Y - 8), new Point(16, 16)))
             {
@@ -38,10 +36,12 @@ public class MegaHealth : Entity
 
         SpriteRenderer = new SpriteRenderer
         (
+            this,
             spriteSheet,
             new[] { animation },
             null,
-            null
+            null,
+            gameState.Root
         );
     }
 

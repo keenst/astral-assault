@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended.BitmapFonts;
 #endregion
 
 namespace AstralAssault;
@@ -11,7 +10,6 @@ namespace AstralAssault;
 public static class AssetManager
 {
     private static readonly Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
-    private static readonly Dictionary<string, Effect> Effects = new Dictionary<string, Effect>();
     private static readonly Dictionary<string, SoundEffect> SoundEffects = new Dictionary<string, SoundEffect>();
     private static readonly Dictionary<string, SpriteFont> SpriteFonts = new Dictionary<string, SpriteFont>();
     private static Game1 m_root;
@@ -40,11 +38,6 @@ public static class AssetManager
         {
             activeDictionary = SpriteFonts as Dictionary<string, T>;
             activeDirectory = "Fonts";
-        }
-        else if (typeof(T) == typeof(Effect))
-        {
-            activeDictionary = Effects as Dictionary<string, T>;
-            activeDirectory = "Shaders";
         }
         else throw new ArgumentException("T must be Texture2D, SoundEffect, BitmapFont, or Effect");
 

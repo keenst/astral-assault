@@ -1,9 +1,6 @@
 ﻿#region
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using AstralAssault.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -62,9 +59,7 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
         if ((timeNow - m_timeEntered) > 1000)
-        {
             m_restartPrompt.DrawTexture2D(promptPosition, 0, LayerOrdering.Foreground);
-        }
 
         int score = (int)Lerp(0, Root.Score, MathF.Min((timeNow - m_timeEntered) / 800F, 1));
         string scoreText = $"Score: {score}";
@@ -76,7 +71,8 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
         {
             string highScoreText = $"High score: {Root.HighScore}";
             int highScoreX = 240 - highScoreText.Length * 4;
-            highScoreText.Draw(new Vector2(highScoreX, 170), Color.White, 0f, new Vector2(0, 0), 1f, LayerOrdering.Foreground);
+            highScoreText.Draw
+                (new Vector2(highScoreX, 170), Color.White, 0f, new Vector2(0, 0), 1f, LayerOrdering.Foreground);
 
             return;
         }
@@ -93,7 +89,8 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
 
         string newHighScoreText = "New high score!";
         int newHighScoreX = 240 - newHighScoreText.Length * 4;
-        newHighScoreText.Draw(new Vector2(newHighScoreX, 170), Color.White, 0f, new Vector2(0, 0), 1f, LayerOrdering.Foreground);
+        newHighScoreText.Draw
+            (new Vector2(newHighScoreX, 170), Color.White, 0f, new Vector2(0, 0), 1f, LayerOrdering.Foreground);
     }
 
     public override void Enter()

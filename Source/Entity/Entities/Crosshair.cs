@@ -2,7 +2,6 @@
 using AstralAssault.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
 #endregion
 
 namespace AstralAssault;
@@ -84,10 +83,12 @@ public class Crosshair : Entity, IMouseEventListener
 
         SpriteRenderer = new SpriteRenderer
         (
+            this,
             spriteSheet,
             new[] { activeAnimation, inactiveAnimation, deactivateAnimation, activateAnimation },
             transitions,
-            new[] { "IsActive" }
+            new[] { "IsActive" },
+            GameState.Root
         );
 
         OutOfBoundsBehavior = OutOfBounds.DoNothing;
@@ -101,7 +102,7 @@ public class Crosshair : Entity, IMouseEventListener
         Position = (e.Position / scale).ToVector2();
     }
 
-    public override void Destroy()
+    internal override void Destroy()
     {
         InputEventSource.MouseButtonEvent -= OnMouseButtonEvent;
         InputEventSource.MouseMoveEvent -= OnMouseMoveEvent;

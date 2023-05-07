@@ -10,9 +10,9 @@ public class ItemController : IUpdateEventListener
 {
     private readonly GameplayState m_gameState;
     private readonly Random m_rnd = new Random();
+    private readonly int m_spawnInterval = 10000;
     private long m_lastSpawnTimeMS;
     private int m_spawnedThisWave;
-    private readonly int m_spawnInterval = 10000;
 
     public ItemController(GameplayState gameState)
     {

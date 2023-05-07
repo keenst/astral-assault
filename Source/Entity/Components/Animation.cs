@@ -2,11 +2,11 @@
 
 public struct Animation
 {
-    public Frame[] Frames { get; set; }
-    public bool HasRotation { get; set; }
-    public bool IsLooping { get; set; }
+    internal Frame[] Frames { get; set; }
+    internal bool HasRotation { get; set; }
+    internal bool IsLooping { get; set; }
 
-    public Animation(Frame[] frames, bool hasRotation, bool isLooping = false)
+    internal Animation(Frame[] frames, bool hasRotation, bool isLooping = false)
     {
         Frames = frames;
         HasRotation = hasRotation;

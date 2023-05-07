@@ -26,8 +26,7 @@ public class CollisionSystem
 
                 if (!collider.CollidesWith
                     (
-                        other,
-                        e.DeltaTime
+                        other
                     ))
                     continue;
 

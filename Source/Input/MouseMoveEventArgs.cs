@@ -5,12 +5,12 @@ using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
 
-public class MouseMoveEventArgs : EventArgs
+public sealed class MouseMoveEventArgs : EventArgs
 {
-    public MouseMoveEventArgs(Point position)
+    internal MouseMoveEventArgs(Point position)
     {
         Position = position;
     }
 
-    public Point Position { get; }
+    internal Point Position { get; }
 }

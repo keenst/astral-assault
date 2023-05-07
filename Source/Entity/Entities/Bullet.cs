@@ -7,10 +7,14 @@ namespace AstralAssault;
 
 public class Bullet : Entity
 {
-    public Bullet(GameplayState gameState, Vector2 position, float rotation, float speed, bool isQuadDamage)
+    public Entity m_shootBy;
+
+    public Bullet(GameplayState gameState, Vector2 position, float rotation, float speed, bool isQuadDamage,
+        Entity shootBy)
         : base(gameState, position)
     {
         IsQuadDamage = isQuadDamage;
+        m_shootBy = shootBy;
 
         Velocity = Vector2.UnitX.RotateVector(rotation) * speed;
 
@@ -18,7 +22,7 @@ public class Bullet : Entity
 
         Frame frame = new Frame(new Rectangle(isQuadDamage ? 4 : 0, 0, 4, 4));
 
-        SpriteRenderer = new SpriteRenderer(spriteSheet, frame);
+        SpriteRenderer = new SpriteRenderer(this, spriteSheet, frame, GameState.Root);
 
         Collider = new Collider
         (
@@ -33,14 +37,13 @@ public class Bullet : Entity
         OutOfBoundsBehavior = OutOfBounds.Destroy;
 
         ContactDamage = isQuadDamage ? 16 : 4;
-        IsFriendly = true;
     }
 
     public bool IsQuadDamage { get; }
 
     public override void OnCollision(Collider other)
     {
-        if (IsFriendly == other.Parent.IsFriendly) return;
+        if (Game1.PatternThing(this, other)) return;
 
         Destroy();
     }

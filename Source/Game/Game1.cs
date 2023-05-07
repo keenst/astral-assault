@@ -1,8 +1,6 @@
 ﻿#region
 using System;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using AstralAssault.Source.Graphics;
+using AstralAssault.Items;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -12,9 +10,6 @@ namespace AstralAssault;
 
 public class Game1 : Game
 {
-    private enum Width { Full = 1920, Half = 960, Quarter = 480 }
-    private enum Height { Full = 1080, Half = 540, Quarter = 270 }
-
     public const int TargetWidth = (int)Width.Quarter;
     public const int TargetHeight = (int)Height.Quarter;
     private const int StatUpdateInterval = 300;
@@ -31,15 +26,15 @@ public class Game1 : Game
     private KeyboardState m_prevKeyState = Keyboard.GetState();
     private RenderTarget2D m_renderTarget;
     private float m_renderTime;
-
-    // render
-    public SpriteBatch m_spriteBatch;
     public float ScaleX;
     public float ScaleY;
     public int Score;
 
     // debug tools
     public bool ShowDebug;
+
+    // render
+    public SpriteBatch SpriteBatch;
 
     public Game1()
     {
@@ -59,6 +54,29 @@ public class Game1 : Game
         IsFixedTimeStep = false;
 
         ShowDebug = false;
+    }
+
+    public static bool PatternThing(Entity e1, Collider c1)
+    {
+        if (e1 is Bullet || c1.Parent is Bullet)
+        {
+            Entity e = null;
+            Bullet b = null;
+
+            if (e1 is Bullet) b = (Bullet)e1;
+            else if (c1.Parent is Bullet) b = (Bullet)c1.Parent;
+
+            if (e1 is not Bullet) e = e1;
+            else if (c1.Parent is not Bullet) e = c1.Parent;
+
+            switch (b.m_shootBy)
+            {
+            case Player when e is Player or Quad or Haste or MegaHealth:
+            case ShipOfDoom when e is ShipOfDoom or Quad or Haste or MegaHealth or Asteroid: return true;
+            }
+        }
+
+        return e1 is Asteroid && c1.Parent is Asteroid;
     }
 
     protected override void Initialize()
@@ -87,7 +105,7 @@ public class Game1 : Game
 
     protected override void LoadContent()
     {
-        m_spriteBatch = new SpriteBatch(GraphicsDevice);
+        SpriteBatch = new SpriteBatch(GraphicsDevice);
     }
 
     protected override void Update(GameTime gameTime)
@@ -130,7 +148,11 @@ public class Game1 : Game
         GraphicsDevice.SetRenderTarget(m_renderTarget);
         GraphicsDevice.Clear(BackgroundColor);
 
-        m_spriteBatch.Begin(SpriteSortMode.BackToFront, samplerState: SamplerState.PointWrap, depthStencilState: DepthStencilState.DepthRead);
+        SpriteBatch.Begin
+        (
+            SpriteSortMode.BackToFront, samplerState: SamplerState.PointWrap,
+            depthStencilState: DepthStencilState.DepthRead
+        );
 
         GameStateMachine.Draw();
 
@@ -153,24 +175,27 @@ public class Game1 : Game
             renderTime.Draw(new Vector2(0, 9), Color.Yellow, 0f, new Vector2(0, 0), 1f, LayerOrdering.Debug);
         }
 
-        m_spriteBatch.End();
+        SpriteBatch.End();
 
         // draw render target to screen
         GraphicsDevice.SetRenderTarget(null);
 
-        m_spriteBatch.Begin
+        SpriteBatch.Begin
         (
             SpriteSortMode.Immediate, null, SamplerState.PointWrap,
             null, null, null, m_scale
         );
-        m_spriteBatch.Draw
+        SpriteBatch.Draw
         (
             m_renderTarget,
             new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height),
             Color.White
         );
-        m_spriteBatch.End();
+        SpriteBatch.End();
 
         base.Draw(gameTime);
     }
+
+    private enum Width { Full = 1920, Half = 960, Quarter = 480 }
+    private enum Height { Full = 1080, Half = 540, Quarter = 270 }
 }

@@ -1,24 +1,19 @@
 ﻿#region
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using AstralAssault.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Color = Microsoft.Xna.Framework.Color;
 #endregion
 
 namespace AstralAssault;
 
 public static class TextRenderer
 {
-    private static Game1 Root;
-    private static SpriteFont f;
+    private static Game1 m_root;
+    private static SpriteFont m_f;
 
     public static void Init(Game1 root)
     {
-        Root = root;
-        f = AssetManager.Load<SpriteFont>("fc");
+        m_root = root;
+        m_f = AssetManager.Load<SpriteFont>("fc");
     }
 
     public static void Draw
@@ -32,9 +27,9 @@ public static class TextRenderer
         LayerOrdering layer
     )
     {
-        Root.m_spriteBatch.DrawString
+        m_root.SpriteBatch.DrawString
         (
-            f,
+            m_f,
             input,
             position,
             color,
@@ -46,5 +41,5 @@ public static class TextRenderer
         );
     }
 
-    public static Vector2 Size(this string input) => f.MeasureString(input);
+    public static Vector2 Size(this string input) => m_f.MeasureString(input);
 }

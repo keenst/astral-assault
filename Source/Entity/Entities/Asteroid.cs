@@ -81,7 +81,7 @@ public class Asteroid : Entity
             new Rectangle(spriteSize * 3, 0, spriteSize, spriteSize)
         );
 
-        SpriteRenderer = new SpriteRenderer(spriteSheet, frame);
+        SpriteRenderer = new SpriteRenderer(this, spriteSheet, frame, gameState.Root);
 
         Collider = new Collider
         (

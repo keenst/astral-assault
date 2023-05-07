@@ -5,12 +5,12 @@ using Microsoft.Xna.Framework.Input;
 
 namespace AstralAssault;
 
-public class KeyboardEventArgs : EventArgs
+public sealed class KeyboardEventArgs : EventArgs
 {
-    public KeyboardEventArgs(Keys[] keys)
+    internal KeyboardEventArgs(Keys[] keys)
     {
         Keys = keys;
     }
 
-    public Keys[] Keys { get; }
+    internal Keys[] Keys { get; }
 }

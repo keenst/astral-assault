@@ -26,6 +26,8 @@ public class Player : Entity, IInputEventListener
 
     private readonly Texture2D m_square;
 
+    private bool m_barrelRoll;
+
     private Vector2 m_cursorPosition;
     private float m_delta;
     private bool m_isCrosshairActive = true;
@@ -36,7 +38,6 @@ public class Player : Entity, IInputEventListener
     private float m_moveSpeed = 200;
     private Tuple<Vector2, Vector2> m_muzzle = new Tuple<Vector2, Vector2>(Vector2.Zero, Vector2.Zero);
     private int m_shootSpeed = 200;
-    private bool m_thrusterIsOn;
     private float m_tiltSpeed = 200;
     public float Multiplier = 1;
 
@@ -69,7 +70,6 @@ public class Player : Entity, IInputEventListener
         IsActor = true;
         MaxHP = 50;
         HP = MaxHP;
-        IsFriendly = true;
     }
 
     public void OnKeyboardEvent(object sender, KeyboardEventArgs e)
@@ -77,23 +77,23 @@ public class Player : Entity, IInputEventListener
         int xAxis = 0;
         int yAxis = 0;
 
+        m_barrelRoll = false;
+
         if (Array.IndexOf(e.Keys, Keys.D) >= 0)
         {
             xAxis = 1;
             SpriteRenderer.SetAnimationCondition("Tilt", 1);
+            m_barrelRoll = true;
         }
         else if (Array.IndexOf(e.Keys, Keys.A) >= 0)
         {
             xAxis = -1;
             SpriteRenderer.SetAnimationCondition("Tilt", -1);
+            m_barrelRoll = true;
         }
         else SpriteRenderer.SetAnimationCondition("Tilt", 0);
 
-        if (Array.IndexOf(e.Keys, Keys.W) >= 0)
-        {
-            yAxis = 1;
-            m_thrusterIsOn = true;
-        }
+        if (Array.IndexOf(e.Keys, Keys.W) >= 0) yAxis = 1;
         else if (Array.IndexOf(e.Keys, Keys.S) >= 0) yAxis = -1;
 
         HandleMovement(xAxis, yAxis);
@@ -179,10 +179,12 @@ public class Player : Entity, IInputEventListener
 
         SpriteRenderer = new SpriteRenderer
         (
+            this,
             spriteSheet,
             new[] { idleAnimation, tiltLeftAnimation, tiltRightAnimation },
             transitions,
-            new[] { "Tilt" }
+            new[] { "Tilt" },
+            GameState.Root
         );
     }
 
@@ -240,6 +242,84 @@ public class Player : Entity, IInputEventListener
             Position + new Vector2(10, -8).RotateVector(rot),
             Position + new Vector2(8, 10).RotateVector(rot)
         );
+    }
+
+    public override void OnCollision(Collider other)
+    {
+        base.OnCollision(other);
+
+        long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+
+        if (other.Parent is Quad)
+        {
+            Jukebox.PlaySound("PickUp");
+
+            for (int i = m_powerUps.Count - 1; i >= 0; i--)
+                if (m_powerUps[i].Item2 == PowerUps.QuadDamage)
+                    m_powerUps.RemoveAt(i);
+
+
+            m_powerUps.Add(new Tuple<long, PowerUps>(timeNow, PowerUps.QuadDamage));
+        }
+        else if (other.Parent is Haste)
+        {
+            Jukebox.PlaySound("PickUp");
+
+            for (int i = m_powerUps.Count - 1; i >= 0; i--)
+                if (m_powerUps[i].Item2 == PowerUps.Haste)
+                    m_powerUps.RemoveAt(i);
+
+            m_powerUps.Add(new Tuple<long, PowerUps>(timeNow, PowerUps.Haste));
+        }
+        else if (other.Parent is MegaHealth)
+        {
+            Jukebox.PlaySound("PickUp");
+
+            HP = Math.Min(MaxHP, HP + 15);
+        }
+        else if (other.Parent is Asteroid or ShipOfDoom)
+        {
+            if (Multiplier > 1) Jukebox.PlaySound("MultiplierBroken");
+
+            Multiplier = 1;
+
+            Random rnd = new Random();
+
+            string soundName = rnd.Next(3) switch
+            {
+                0 => "Hurt1",
+                1 => "Hurt2",
+                2 => "Hurt3",
+                var _ => throw new ArgumentOutOfRangeException()
+            };
+
+            Jukebox.PlaySound(soundName, 0.5F);
+        }
+    }
+
+    protected override void OnDeath()
+    {
+        Game1 root = GameState.Root;
+
+        Jukebox.PlaySound("GameOver");
+
+        root.GameStateMachine.ChangeState(new GameOverState(root));
+
+        base.OnDeath();
+    }
+
+    internal override void Destroy()
+    {
+        StopListening();
+
+        base.Destroy();
+    }
+
+    private void StopListening()
+    {
+        InputEventSource.KeyboardEvent -= OnKeyboardEvent;
+        InputEventSource.MouseMoveEvent -= OnMouseMoveEvent;
+        InputEventSource.MouseButtonEvent -= OnMouseButtonEvent;
     }
 
     public override void Draw()
@@ -309,92 +389,6 @@ public class Player : Entity, IInputEventListener
         }
     }
 
-    public override void OnCollision(Collider other)
-    {
-        base.OnCollision(other);
-
-        long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-
-        if (other.Parent is Quad)
-        {
-            Jukebox.PlaySound("PickUp");
-
-            for (int i = m_powerUps.Count - 1; i >= 0; i--)
-            {
-                if (m_powerUps[i].Item2 == PowerUps.QuadDamage)
-                {
-                    m_powerUps.RemoveAt(i);
-                }
-            }
-
-
-            m_powerUps.Add(new Tuple<long, PowerUps>(timeNow, PowerUps.QuadDamage));
-        }
-        else if (other.Parent is Haste)
-        {
-            Jukebox.PlaySound("PickUp");
-
-            for (int i = m_powerUps.Count - 1; i >= 0; i--)
-            {
-                if (m_powerUps[i].Item2 == PowerUps.Haste)
-                {
-                    m_powerUps.RemoveAt(i);
-                }
-            }
-
-            m_powerUps.Add(new Tuple<long, PowerUps>(timeNow, PowerUps.Haste));
-        }
-        else if (other.Parent is MegaHealth)
-        {
-            Jukebox.PlaySound("PickUp");
-
-            HP = Math.Min(MaxHP, HP + 30);
-        }
-        else if (other.Parent is Asteroid)
-        {
-            if (Multiplier > 1) Jukebox.PlaySound("MultiplierBroken");
-
-            Multiplier = 1;
-
-            Random rnd = new Random();
-
-            string soundName = rnd.Next(3) switch
-            {
-                0 => "Hurt1",
-                1 => "Hurt2",
-                2 => "Hurt3",
-                var _ => throw new ArgumentOutOfRangeException()
-            };
-
-            Jukebox.PlaySound(soundName, 0.5F);
-        }
-    }
-
-    protected override void OnDeath()
-    {
-        Game1 root = GameState.Root;
-
-        Jukebox.PlaySound("GameOver");
-
-        root.GameStateMachine.ChangeState(new GameOverState(root));
-
-        base.OnDeath();
-    }
-
-    public override void Destroy()
-    {
-        StopListening();
-
-        base.Destroy();
-    }
-
-    private void StopListening()
-    {
-        InputEventSource.KeyboardEvent -= OnKeyboardEvent;
-        InputEventSource.MouseMoveEvent -= OnMouseMoveEvent;
-        InputEventSource.MouseButtonEvent -= OnMouseButtonEvent;
-    }
-
     private void HandleMovement(int xAxis, int yAxis)
     {
         // acceleration and deceleration
@@ -408,7 +402,7 @@ public class Player : Entity, IInputEventListener
         );
 
         // tilting
-        Vector2 right = Vector2.UnitX.RotateVector(Rotation + Pi / 2) * m_tiltSpeed * m_delta;
+        Vector2 right = Vector2.UnitX.RotateVector(Rotation + Pi / 2f) * m_tiltSpeed * m_delta;
 
         Velocity = new Vector2
         (
@@ -459,7 +453,7 @@ public class Player : Entity, IInputEventListener
                 m_lastCannon ? m_muzzle.Item1 : m_muzzle.Item2,
                 rot,
                 BulletSpeed,
-                m_powerUps.Any(t => t.Item2 == PowerUps.QuadDamage)
+                m_powerUps.Any(t => t.Item2 == PowerUps.QuadDamage), this
             )
         );
 

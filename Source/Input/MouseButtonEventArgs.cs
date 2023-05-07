@@ -4,12 +4,12 @@ using System;
 
 namespace AstralAssault;
 
-public class MouseButtonEventArgs : EventArgs
+public sealed class MouseButtonEventArgs : EventArgs
 {
-    public MouseButtonEventArgs(InputEventSource.MouseButtons button)
+    internal MouseButtonEventArgs(InputEventSource.MouseButtons button)
     {
         Button = button;
     }
 
-    public InputEventSource.MouseButtons Button { get; }
+    internal InputEventSource.MouseButtons Button { get; }
 }

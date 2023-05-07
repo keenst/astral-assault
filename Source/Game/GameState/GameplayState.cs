@@ -1,11 +1,7 @@
 ﻿#region
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
-using AstralAssault.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -18,9 +14,9 @@ public class GameplayState : GameState
     private static readonly Vector4 MultiplierBrokenColor = new Vector4(1, 0, 0, 1);
     private static readonly Vector4 MultiplierIncreaseColor = new Vector4(1, 1, 0, 1);
     private static readonly Vector4 MultiplierDefaultColor = new Vector4(1, 1, 1, 1);
-    private readonly Texture2D circle;
     public readonly CollisionSystem CollisionSystem = new CollisionSystem();
     public readonly List<Entity> Entities;
+    private readonly Texture2D m_circle;
     public ItemController ItemController;
     private Vector4 m_multiplierColor = MultiplierDefaultColor;
     private float m_prevMultiplier = 1;
@@ -33,7 +29,7 @@ public class GameplayState : GameState
         ItemController = new ItemController(this);
         WaveController = new WaveController(this, Root);
 
-        circle = AssetManager.Load<Texture2D>("unitcircleofdoomyaaaZ");
+        m_circle = AssetManager.Load<Texture2D>("unitcircleofdoomyaaaZ");
 
         ItemController.StartListening();
     }
@@ -79,7 +75,11 @@ public class GameplayState : GameState
         for (int i = 0; i < Entities.Count; i++) Entities[i].OnUpdate(sender, e);
     }
 
-    [SuppressMessage("ReSharper.DPA", "DPA0002: Excessive memory allocations in SOH", MessageId = "type: Microsoft.Xna.Framework.Vector2[]; size: 111MB")]
+    [SuppressMessage
+    (
+        "ReSharper.DPA", "DPA0002: Excessive memory allocations in SOH",
+        MessageId = "type: Microsoft.Xna.Framework.Vector2[]; size: 111MB"
+    )]
     public override void Draw()
     {
         foreach (Entity entity in Entities) entity.Draw();
@@ -97,9 +97,10 @@ public class GameplayState : GameState
         {
             foreach (Collider collider in CollisionSystem.Colliders)
             {
-                Root.m_spriteBatch.DrawCircle
+                Root.SpriteBatch.DrawCircle
                 (
-                    collider.Parent.Position, collider.Radius, 32, Palette.GetColor(Palette.Colors.Blue9), 1f, LayerOrdering.Debug.GetDisplayLayerValue()
+                    collider.Parent.Position, collider.Radius, 32, Palette.GetColor(Palette.Colors.Blue9), 1f,
+                    LayerOrdering.Debug.GetDisplayLayerValue()
                 );
             }
         }

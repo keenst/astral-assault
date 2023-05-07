@@ -8,9 +8,9 @@ using Microsoft.Xna.Framework.Input;
 
 namespace AstralAssault;
 
-public static class InputEventSource
+internal static class InputEventSource
 {
-    public enum MouseButtons { Left, Right, Middle, Side1, Side2 }
+    public enum MouseButtons { Left }
 
     private static Keys[] m_keysDown;
     private static Keys[] m_prevKeysDown;
@@ -49,7 +49,7 @@ public static class InputEventSource
         m_prevKeysDown = m_keysDown;
         m_keysDown = Keyboard.GetState().GetPressedKeys();
 
-        if (m_keysDown.Length == 0) m_prevKeysDown = new Keys[1] { Keys.End };
+        if (m_keysDown.Length == 0) m_prevKeysDown = new[] { Keys.End };
 
         List<Keys> keysDown = new List<Keys>();
         List<Keys> keysPressed = new List<Keys>();
