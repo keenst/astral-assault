@@ -122,9 +122,9 @@ public class Asteroid : Entity
         base.OnDeath();
     }
 
-    public override void Update(UpdateEventArgs e)
+    public override void OnUpdate(object sender, UpdateEventArgs e)
     {
-        base.Update(e);
+        base.OnUpdate(sender, e);
         
         Rotation += _rotSpeed * e.DeltaTime;
         if (Rotation > Math.PI) Rotation = (float)-Math.PI;

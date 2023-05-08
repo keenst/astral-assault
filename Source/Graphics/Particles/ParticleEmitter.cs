@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
 
-public class ParticleEmitter
+public class ParticleEmitter : IUpdateEventListener
 {
     private readonly Texture2D _spriteSheet;
     private readonly Rectangle[] _textureSources;
@@ -54,9 +54,11 @@ public class ParticleEmitter
         {
             throw new ArgumentException();
         }
+        
+        UpdateEventSource.UpdateEvent += OnUpdate;
     }
     
-    public void Update()
+    public void OnUpdate(object sender, UpdateEventArgs e)
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
@@ -100,6 +102,11 @@ public class ParticleEmitter
         _particlesSpawned = 0;
         _isSpawning = true;
     }
+    
+    public void StopListening()
+    {
+        UpdateEventSource.UpdateEvent -= OnUpdate;
+    }
 
     public void StopSpawning()
     {
@@ -110,6 +117,11 @@ public class ParticleEmitter
     {
         _position = position;
         _rotation = rotation;
+    }
+
+    public void SetPosition(Vector2 position)
+    {
+        _position = position;
     }
 
     public List<DrawTask> CreateDrawTasks()

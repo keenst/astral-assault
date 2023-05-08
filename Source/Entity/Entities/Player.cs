@@ -5,14 +5,13 @@ using System.Numerics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace AstralAssault;
 
-public class Player : Entity
+public class Player : Entity, IInputEventListener
 {
-    private Point _cursorPosition;
+    private Vector2 _cursorPosition;
     private Tuple<Vector2, Vector2> _muzzle = new(Vector2.Zero, Vector2.Zero);
     private bool _lastCannon;
     private bool _isCrosshairActive = true;
@@ -35,7 +34,9 @@ public class Player : Entity
         Rotation = Pi / 2;
 
         InitSpriteRenderer();
-
+        
+        StartListening();
+        
         Collider = new Collider(
             this, 
             new Rectangle(
@@ -170,6 +171,21 @@ public class Player : Entity
         return drawTasks;
     }
 
+    private void StartListening()
+    {
+        InputEventSource.KeyboardEvent += OnKeyboardEvent;
+        InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
+        InputEventSource.MouseButtonEvent += OnMouseButtonEvent;
+    }
+    
+    private void StopListening()
+    {
+        InputEventSource.KeyboardEvent -= OnKeyboardEvent;
+        InputEventSource.MouseMoveEvent -= OnMouseMoveEvent;
+        InputEventSource.MouseButtonEvent -= OnMouseButtonEvent;
+        _particleEmitter.StopListening();
+    }
+
     private void HandleMovement(int xAxis, int yAxis)
     {
         // acceleration and deceleration
@@ -229,6 +245,13 @@ public class Player : Entity
         _lastCannon = !_lastCannon;
     }
 
+    public override void Destroy()
+    {
+        StopListening();
+        
+        base.Destroy();
+    }
+    
     protected override void OnDeath()
     {
         Game1 root = GameState.Root;
@@ -238,17 +261,17 @@ public class Player : Entity
         base.OnDeath();
     }
 
-    private void HandleKeyboardInputs(Keys[] keys)
+    public void OnKeyboardEvent(object sender, KeyboardEventArgs e)
     {
         int xAxis = 0;
         int yAxis = 0;
 
-        if (keys.Contains(Keys.D))
+        if (e.Keys.Contains(Keys.D))
         {
             xAxis = 1;
             SpriteRenderer.SetAnimationCondition("Tilt", 1);
         }
-        else if (keys.Contains(Keys.A))
+        else if (e.Keys.Contains(Keys.A))
         {
             xAxis = -1;
             SpriteRenderer.SetAnimationCondition("Tilt", -1);
@@ -258,12 +281,12 @@ public class Player : Entity
             SpriteRenderer.SetAnimationCondition("Tilt", 0);
         }
 
-        if (keys.Contains(Keys.W))
+        if (e.Keys.Contains(Keys.W))
         {
             yAxis = 1;
             _thrusterIsOn = true;
         }
-        else if (keys.Contains(Keys.S))
+        else if (e.Keys.Contains(Keys.S))
         {
             yAxis = -1;
         }
@@ -271,48 +294,50 @@ public class Player : Entity
         HandleMovement(xAxis, yAxis);
     }
 
-    private void HandleMouse(Point mousePosition, MouseButton[] mouseButtonsDown)
+    public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
     {
-        _cursorPosition = mousePosition;
-        
-        if (mouseButtonsDown.Contains(MouseButton.Left))
+        _cursorPosition = e.Position.ToVector2();
+    }
+
+    public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)
+    {
+        if (e.Button == InputEventSource.MouseButtons.Left)
         {
             HandleFiring();
         }
     }
 
-    public override void Update(UpdateEventArgs e)
+    public override void OnUpdate(object sender, UpdateEventArgs e)
     {
-        base.Update(e);
+        base.OnUpdate(sender, e);
+        
         _delta = e.DeltaTime;
-        
-        float distance = Vector2.Distance(Position, _cursorPosition.ToVector2());
+
+        // check range to cursor
+        float distance = Vector2.Distance(Position, _cursorPosition);
         _isCrosshairActive = distance >= 12;
-        
-        ApplyFriction();
-        RotatePlayerToCursor();
-        
-        UpdateMuzzlePositions();
-        UpdateParticleEmitterPosition();
-        
-        HandleKeyboardInputs(e.KeysDown);
-        HandleMouse(e.MousePosition, e.MouseButtonsDown);
-        
-        _particleEmitter.Update();
-    }
 
-    private void RotatePlayerToCursor()
-    {
-        if (!_isCrosshairActive) return;
-        
-        float xDiff = _cursorPosition.X - Position.X;
-        float yDiff = _cursorPosition.Y - Position.Y;
+        // rotate player
+        if (_isCrosshairActive)
+        {
+            float xDiff = _cursorPosition.X - Position.X;
+            float yDiff = _cursorPosition.Y - Position.Y;
 
-        Rotation = (float)Math.Atan2(yDiff, xDiff);
-    }
+            Rotation = (float)Math.Atan2(yDiff, xDiff);
+        }
 
-    private void UpdateMuzzlePositions()
-    {
+        // apply friction
+        float sign = Math.Sign(Velocity.Length());
+
+        if (sign != 0)
+        {
+            float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
+            
+            Velocity -= 
+                new Vector2((float)Math.Cos(direction), (float)Math.Sin(direction)) * Friction * _delta * sign;
+        }
+
+        // rotate the points for the cannon muzzles
         Vector2 muzzle1;
         Vector2 muzzle2;
         
@@ -338,10 +363,7 @@ public class Player : Entity
         }
 
         _muzzle = new Tuple<Vector2, Vector2>(muzzle1, muzzle2);
-    }
 
-    private void UpdateParticleEmitterPosition()
-    {
         float emitterRotation = (Rotation + Pi) % (2 * Pi);
         Vector2 emitterPosition = new(11, 0);
 
@@ -355,16 +377,5 @@ public class Player : Entity
         }
         
         _particleEmitter.SetTransform(emitterPosition, emitterRotation);
-    }
-
-    private void ApplyFriction()
-    {
-        float sign = Math.Sign(Velocity.Length());
-
-        if (sign == 0) return;
-        
-        float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
-            
-        Velocity -= new Vector2((float)Math.Cos(direction), (float)Math.Sin(direction)) * Friction * _delta * sign;
     }
 }

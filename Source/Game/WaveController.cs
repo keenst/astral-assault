@@ -5,9 +5,10 @@ using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
 
-public class WaveController
+public class WaveController : IUpdateEventListener
 {
-    private readonly GameplayState _gameState;
+    public readonly GameplayState GameState;
+    private readonly Game1 _root;
     private readonly DebrisController _debrisController;
     private int _currentWave;
 
@@ -18,10 +19,13 @@ public class WaveController
     private long _waveTimer;
     private const long WaveDelay = 5000;
     
-    public WaveController(GameplayState gameState)
+    public WaveController(GameplayState gameState, Game1 root)
     {
-        _gameState = gameState;
+        GameState = gameState;
+        _root = root;
 
+        UpdateEventSource.UpdateEvent += OnUpdate;
+        
         _debrisController = new DebrisController(gameState);
         
         StartNextWave();
@@ -63,7 +67,7 @@ public class WaveController
             float angleToCenter = MathF.Atan2(gameCenter.Y - position.Y, gameCenter.X - position.X);
             angleToCenter += MathHelper.ToRadians(rnd.Next(-45, 45));
             
-            _gameState.Entities.Add(new Asteroid(_gameState, position, angleToCenter, size, _debrisController));
+            GameState.Entities.Add(new Asteroid(GameState, position, angleToCenter, size, _debrisController));
         }
 
         _drawWaveText = true;
@@ -82,7 +86,7 @@ public class WaveController
         return drawTasks;
     }
 
-    public void Update()
+    public void OnUpdate(object sender, UpdateEventArgs e)
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         if (_drawWaveText && timeNow - _waveTextTimer > WaveTextDuration)
@@ -90,7 +94,7 @@ public class WaveController
             _drawWaveText = false;
         }
 
-        int enemiesAlive = _gameState.Entities.Count(x => x is Asteroid);
+        int enemiesAlive = GameState.Entities.Count(x => x is Asteroid);
         if (enemiesAlive == 0)
         {
             if (timeNow - _waveTimer < WaveDelay) return;
@@ -98,7 +102,10 @@ public class WaveController
             StartNextWave();
             _waveTimer = timeNow;
         }
+    }
 
-        _debrisController.Update();
+    public void StopListening()
+    {
+        UpdateEventSource.UpdateEvent -= OnUpdate;
     }
 }

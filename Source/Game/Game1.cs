@@ -26,7 +26,7 @@ public class Game1 : Game
     }
     
     public GameStateMachine GameStateMachine;
-
+    
     // render
     private SpriteBatch _spriteBatch;
     private RenderTarget2D _renderTarget;
@@ -48,9 +48,7 @@ public class Game1 : Game
     private long _lastStatUpdate;
     private const int StatUpdateInterval = 300;
     private KeyboardState _prevKeyState = Keyboard.GetState();
-    
-    private InputManager _inputManager;
-    
+
     public Game1()
     {
         // set up game class
@@ -83,10 +81,10 @@ public class Game1 : Game
 
         AssetManager.Init(this);
         TextRenderer.Init();
+        InputEventSource.Init(this);
         Palette.Init();
         
         GameStateMachine = new GameStateMachine(new MainMenuState(this));
-        _inputManager = new InputManager(this);
 
         base.Initialize();
     }
@@ -103,22 +101,7 @@ public class Game1 : Game
 
         _prevKeyState = Keyboard.GetState();
 
-        _inputManager.GetInputs(
-            out Keys[] keysDown, 
-            out Keys[] keysPressed, 
-            out MouseButton[] mouseButtonsDown, 
-            out MouseButton[] mouseButtonsPressed, 
-            out Point mousePosition);
-        
-        UpdateEventArgs updateEventArgs = new(
-            (float)gameTime.ElapsedGameTime.TotalSeconds,
-            keysDown,
-            keysPressed,
-            mouseButtonsDown,
-            mouseButtonsPressed,
-            mousePosition);
-        
-        GameStateMachine.CurrentState.Update(updateEventArgs);
+        UpdateEventSource.Update(gameTime);
 
         base.Update(gameTime);
     }

@@ -1,12 +1,14 @@
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MouseButtons = AstralAssault.InputEventSource.MouseButtons;
 
 namespace AstralAssault.Source.Menu;
 
-public class MenuController
+public class MenuController : IMouseMoveEventListener, IMousePressedEventListener
 {
+    public Game1 Root { get; }
+    
     private bool _isMenuOpen;
     private Menu _menu;
     private IMenuItem _prevHoveredMenuItem;
@@ -15,18 +17,17 @@ public class MenuController
     public MenuController(Menu menu, GameState gameState)
     {
         _menu = menu;
-        Game1 root = gameState.Root;
+        Root = gameState.Root;
 
-        _buttonTexture = new Texture2D(root.GraphicsDevice, 1, 1);
+        _buttonTexture = new Texture2D(Root.GraphicsDevice, 1, 1);
         _buttonTexture.SetData(new[] { Color.White });
         
         Open();
     }
     
-    public void Update(UpdateEventArgs e)
+    private void OnUpdate(object sender, UpdateEventArgs e)
     {
-        HandleMouseButtons(e.MouseButtonsPressed, e.MousePosition);
-        HandleMousePosition(e.MousePosition);
+        
     }
     
     public List<DrawTask> GetDrawTasks()
@@ -41,14 +42,21 @@ public class MenuController
 
     public void Open()
     {
+        StartListening();
         _isMenuOpen = true;
     }
     
     public void Close()
     {
+        StopListening();
         _isMenuOpen = false;
     }
 
+    public void Destroy()
+    {
+        StopListening();
+    }
+    
     private IMenuItem GetCollidingMenuItem(int x, int y)
     {
         foreach (IMenuItem menuItem in _menu.MenuItems)
@@ -63,17 +71,31 @@ public class MenuController
         return null;
     }
 
-    private void HandleMouseButtons(MouseButton[] mouseButtonsPressed, Point mousePosition)
+    private void StartListening()
     {
-        if (!mouseButtonsPressed.Contains(MouseButton.Left)) return;
+        UpdateEventSource.UpdateEvent += OnUpdate;
+        InputEventSource.MousePressedEvent += OnMousePressedEvent;
+        InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
+    }
+
+    private void StopListening()
+    {
+        UpdateEventSource.UpdateEvent -= OnUpdate;
+        InputEventSource.MousePressedEvent -= OnMousePressedEvent;
+        InputEventSource.MouseMoveEvent -= OnMouseMoveEvent;
+    }
+
+    public void OnMousePressedEvent(object sender, MouseButtonEventArgs e)
+    {
+        if (e.Button != MouseButtons.Left) return;
         
-        IMenuItem clickedMenuItem = GetCollidingMenuItem(mousePosition.X, mousePosition.Y);
+        IMenuItem clickedMenuItem = GetCollidingMenuItem(e.Position.X, e.Position.Y);
         clickedMenuItem?.ClickAction.Invoke(_menu);
     }
 
-    private void HandleMousePosition(Point mousePosition)
+    public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
     {
-        IMenuItem hoveredMenuItem = GetCollidingMenuItem(mousePosition.X, mousePosition.Y);
+        IMenuItem hoveredMenuItem = GetCollidingMenuItem(e.Position.X, e.Position.Y);
         
         if (hoveredMenuItem == null)
         {

@@ -42,11 +42,6 @@ public class DebrisController
             LayerDepth.Debris);
     }
     
-    public void Update()
-    {
-        _particleEmitter.Update();
-    }
-    
     public void SpawnDebris(Vector2 position, int asteroidSize)
     {
         int amount = _rnd.Next(4, (1 + asteroidSize) * 4);

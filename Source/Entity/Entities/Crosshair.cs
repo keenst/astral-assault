@@ -3,10 +3,13 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
 
-public class Crosshair : Entity
+public class Crosshair : Entity, IMouseEventListener
 {
     public Crosshair(GameplayState gameState) : base(gameState, new Vector2(0, 0))
     {
+        InputEventSource.MouseButtonEvent += OnMouseButtonEvent;
+        InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
+
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Crosshair");
 
         Frame activeFrame   = new(new Rectangle(0,  0, 16, 16));
@@ -48,7 +51,15 @@ public class Crosshair : Entity
         OutOfBoundsBehavior = OutOfBounds.DoNothing;
     }
 
-    public override void Update(UpdateEventArgs e)
+    public override void Destroy()
+    {
+        InputEventSource.MouseButtonEvent -= OnMouseButtonEvent;
+        InputEventSource.MouseMoveEvent -= OnMouseMoveEvent;
+        
+        base.Destroy();
+    }
+    
+    public override void OnUpdate(object sender, UpdateEventArgs e)
     {
         if (GameState.Player == null) return;
         
@@ -56,7 +67,15 @@ public class Crosshair : Entity
         float distance = Vector2.Distance(playerPosition, Position);
 
         SpriteRenderer.SetAnimationCondition("IsActive", distance < 12 ? 0 : 1);
+    }
+
+    public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)
+    {
         
-        Position = e.MousePosition.ToVector2();
+    }
+
+    public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
+    {
+        Position = e.Position.ToVector2();
     }
 }
