@@ -42,9 +42,9 @@ public class DebrisController
             LayerDepth.Debris);
     }
     
-    public void Update()
+    public void Update(float deltaTime)
     {
-        _particleEmitter.Update();
+        _particleEmitter.Update(deltaTime);
     }
     
     public void SpawnDebris(Vector2 position, int asteroidSize)

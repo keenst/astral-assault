@@ -55,8 +55,8 @@ public class ParticleEmitter
             throw new ArgumentException();
         }
     }
-    
-    public void Update()
+
+    public void Update(float deltaTime)
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
@@ -91,6 +91,8 @@ public class ParticleEmitter
         foreach (Particle particle in _particles.Where(particle => particle.IsActive))
         {
             HandleParticleProperties(particle);
+            particle.Position += particle.Velocity;
+            particle.TimeAlive += deltaTime * 1000;
         }
     }
 
@@ -130,18 +132,16 @@ public class ParticleEmitter
         return drawTasks;
     }
 
-    private void ActivateParticle(int textureIndex, Vector2 startingPosition, Vector2 velocity)
+    private void ActivateParticle(int textureIndex, Vector2 position, Vector2 velocity)
     {
-        long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-
         if (_particles.All(p => p.IsActive))
         {
-            _particles.Add(new Particle(textureIndex, startingPosition, velocity, timeNow));
+            _particles.Add(new Particle(textureIndex, position, velocity));
             return;
         }
         
         int inactiveParticleIndex = _particles.FindIndex(p => !p.IsActive);
-        _particles[inactiveParticleIndex].Set(textureIndex, startingPosition, velocity, timeNow);
+        _particles[inactiveParticleIndex].Set(textureIndex, position, velocity);
     }
 
     private void HandleParticleProperties(Particle particle)
@@ -166,8 +166,7 @@ public class ParticleEmitter
         {
             case CauseOfDeathProperty.CausesOfDeath.LifeSpan:
             {
-                long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-                if (timeNow - particle.TimeSpawned > property.LifeSpan)
+                if (particle.TimeAlive > property.LifeSpan)
                 {
                     particle.Deactivate();
                 }
@@ -191,10 +190,7 @@ public class ParticleEmitter
     
     private static void HandleColorChangeProperty(Particle particle, ColorChangeProperty property)
     {
-        long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        float timeSinceSpawned = timeNow - particle.TimeSpawned;
-
-        int colorIndex = (int)(timeSinceSpawned / property.TimeBetweenColorsMS);
+        int colorIndex = (int)(particle.TimeAlive / property.TimeBetweenColorsMS);
         
         if (colorIndex >= property.Colors.Length) return;
         
@@ -203,10 +199,7 @@ public class ParticleEmitter
 
     private static void HandleSpriteChangeProperty(Particle particle, SpriteChangeProperty property)
     {
-        long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        float timeSinceSpawned = timeNow - particle.TimeSpawned;
-
-        int spriteIndex = (int)(timeSinceSpawned / property.TimeBetweenChangesMS);
+        int spriteIndex = (int)(particle.TimeAlive / property.TimeBetweenChangesMS);
         
         if (spriteIndex >= property.EndIndex) return;
         

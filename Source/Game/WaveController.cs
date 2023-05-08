@@ -82,7 +82,7 @@ public class WaveController
         return drawTasks;
     }
 
-    public void Update()
+    public void Update(float deltaTime)
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         if (_drawWaveText && timeNow - _waveTextTimer > WaveTextDuration)
@@ -99,6 +99,6 @@ public class WaveController
             _waveTimer = timeNow;
         }
 
-        _debrisController.Update();
+        _debrisController.Update(deltaTime);
     }
 }

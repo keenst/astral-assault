@@ -7,31 +7,28 @@ namespace AstralAssault;
 
 public class Particle
 {
-    private Vector2 _startingPosition;
-    private Vector2 _velocity;
-    public EffectContainer EffectContainer = new();
+    public readonly EffectContainer EffectContainer = new();
 
+    public Vector2 Velocity { get; private set; }
     public int TextureIndex { get; set; }
-    public long TimeSpawned { get; private set; }
+    public float TimeAlive { get; set; }
     public bool IsActive { get; private set; }
-    public Vector2 Position => 
-        _startingPosition + _velocity * (DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - TimeSpawned);
+    public Vector2 Position { get; set; }
     
-    public Particle(int textureIndex, Vector2 startingPosition, Vector2 velocity, long timeSpawned)
+    public Particle(int textureIndex, Vector2 position, Vector2 velocity)
     {
         TextureIndex = textureIndex;
-        _startingPosition = startingPosition;
-        _velocity = velocity;
-        TimeSpawned = timeSpawned;
+        Position = position;
+        Velocity = velocity;
         IsActive = true;
     }
 
-    public void Set(int textureIndex, Vector2 startingPosition, Vector2 velocity, long timeSpawned)
+    public void Set(int textureIndex, Vector2 position, Vector2 velocity)
     {
         TextureIndex = textureIndex;
-        _startingPosition = startingPosition;
-        _velocity = velocity;
-        TimeSpawned = timeSpawned;
+        Position = position;
+        Velocity = velocity;
+        TimeAlive = 0;
         IsActive = true;
     }
 

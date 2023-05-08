@@ -18,7 +18,7 @@ public class GameplayState : GameState
     public Player Player => (Player) Entities.Find(entity => entity is Player);
     
     private readonly MenuController _pauseMenuController;
-    private bool _isPaused;
+    public bool IsPaused { get; private set; }
 
     public GameplayState(Game1 root) : base(root)
     {
@@ -75,7 +75,7 @@ public class GameplayState : GameState
 
     public override void Update(UpdateEventArgs e)
     {
-        if (!_isPaused)
+        if (!IsPaused)
         {
             List<Entity> entitiesToUpdate = new(Entities);
             while (entitiesToUpdate.Count > 0)
@@ -85,7 +85,7 @@ public class GameplayState : GameState
             }
             
             CollisionSystem.Update(e);
-            _waveController.Update();
+            _waveController.Update(e.DeltaTime);
         }
 
         HandleKeyboardInputs(e.KeysPressed);   
@@ -106,9 +106,9 @@ public class GameplayState : GameState
     {
         if (!keys.Contains(Keys.Escape)) return;
         
-        _isPaused = !_isPaused;
+        IsPaused = !IsPaused;
         
-        if (_isPaused) _pauseMenuController.Open();
+        if (IsPaused) _pauseMenuController.Open();
         else _pauseMenuController.Close();
     }
 }

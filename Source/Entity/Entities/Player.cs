@@ -298,7 +298,7 @@ public class Player : Entity
         HandleKeyboardInputs(e.KeysDown);
         HandleMouse(e.MousePosition, e.MouseButtonsDown);
         
-        _particleEmitter.Update();
+        _particleEmitter.Update(e.DeltaTime);
     }
 
     private void RotatePlayerToCursor()
