@@ -9,14 +9,14 @@ public class GameplayState : GameState
 {
     public readonly List<Entity> Entities;
     public readonly CollisionSystem CollisionSystem = new();
-    public WaveController WaveController;
+    private readonly WaveController _waveController;
     
     public Player Player => (Player) Entities.Find(entity => entity is Player);
 
     public GameplayState(Game1 root) : base(root)
     {
         Entities = new List<Entity>();
-        WaveController = new WaveController(this, Root);
+        _waveController = new WaveController(this);
     }
 
     public override List<DrawTask> GetDrawTasks()
@@ -28,7 +28,7 @@ public class GameplayState : GameState
             drawTasks.AddRange(entity.GetDrawTasks());
         }
 
-        drawTasks.AddRange(WaveController.GetDrawTasks());
+        drawTasks.AddRange(_waveController.GetDrawTasks());
 
         if (!Root.ShowDebug) return drawTasks;
         
@@ -57,6 +57,19 @@ public class GameplayState : GameState
         return drawTasks;
     }
 
+    public override void Update(UpdateEventArgs e)
+    {
+        List<Entity> entitiesToUpdate = new(Entities);
+        while (entitiesToUpdate.Count > 0)
+        {
+            entitiesToUpdate[0].Update(e);
+            entitiesToUpdate.RemoveAt(0);
+        }
+        
+        CollisionSystem.Update(e);
+        _waveController.Update();
+    }
+
     public override void Enter()
     {
         Entities.Add(new Player(this, new Vector2(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F)));
@@ -65,7 +78,6 @@ public class GameplayState : GameState
 
     public override void Exit()
     {
-        WaveController.StopListening();
         while (Entities.Count > 0) Entities[0].Destroy();
     }
 }

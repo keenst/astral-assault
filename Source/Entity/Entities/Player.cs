@@ -5,13 +5,14 @@ using System.Numerics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace AstralAssault;
 
-public class Player : Entity, IInputEventListener
+public class Player : Entity
 {
-    private Vector2 _cursorPosition;
+    private Point _cursorPosition;
     private Tuple<Vector2, Vector2> _muzzle = new(Vector2.Zero, Vector2.Zero);
     private bool _lastCannon;
     private bool _isCrosshairActive = true;
@@ -34,9 +35,7 @@ public class Player : Entity, IInputEventListener
         Rotation = Pi / 2;
 
         InitSpriteRenderer();
-        
-        StartListening();
-        
+
         Collider = new Collider(
             this, 
             new Rectangle(
@@ -171,21 +170,6 @@ public class Player : Entity, IInputEventListener
         return drawTasks;
     }
 
-    private void StartListening()
-    {
-        InputEventSource.KeyboardEvent += OnKeyboardEvent;
-        InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
-        InputEventSource.MouseButtonEvent += OnMouseButtonEvent;
-    }
-    
-    private void StopListening()
-    {
-        InputEventSource.KeyboardEvent -= OnKeyboardEvent;
-        InputEventSource.MouseMoveEvent -= OnMouseMoveEvent;
-        InputEventSource.MouseButtonEvent -= OnMouseButtonEvent;
-        _particleEmitter.StopListening();
-    }
-
     private void HandleMovement(int xAxis, int yAxis)
     {
         // acceleration and deceleration
@@ -245,13 +229,6 @@ public class Player : Entity, IInputEventListener
         _lastCannon = !_lastCannon;
     }
 
-    public override void Destroy()
-    {
-        StopListening();
-        
-        base.Destroy();
-    }
-    
     protected override void OnDeath()
     {
         Game1 root = GameState.Root;
@@ -261,17 +238,17 @@ public class Player : Entity, IInputEventListener
         base.OnDeath();
     }
 
-    public void OnKeyboardEvent(object sender, KeyboardEventArgs e)
+    private void HandleKeyboardInputs(Keys[] keys)
     {
         int xAxis = 0;
         int yAxis = 0;
 
-        if (e.Keys.Contains(Keys.D))
+        if (keys.Contains(Keys.D))
         {
             xAxis = 1;
             SpriteRenderer.SetAnimationCondition("Tilt", 1);
         }
-        else if (e.Keys.Contains(Keys.A))
+        else if (keys.Contains(Keys.A))
         {
             xAxis = -1;
             SpriteRenderer.SetAnimationCondition("Tilt", -1);
@@ -281,12 +258,12 @@ public class Player : Entity, IInputEventListener
             SpriteRenderer.SetAnimationCondition("Tilt", 0);
         }
 
-        if (e.Keys.Contains(Keys.W))
+        if (keys.Contains(Keys.W))
         {
             yAxis = 1;
             _thrusterIsOn = true;
         }
-        else if (e.Keys.Contains(Keys.S))
+        else if (keys.Contains(Keys.S))
         {
             yAxis = -1;
         }
@@ -294,50 +271,48 @@ public class Player : Entity, IInputEventListener
         HandleMovement(xAxis, yAxis);
     }
 
-    public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
+    private void HandleMouse(Point mousePosition, MouseButton[] mouseButtonsDown)
     {
-        _cursorPosition = e.Position.ToVector2();
-    }
-
-    public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)
-    {
-        if (e.Button == InputEventSource.MouseButtons.Left)
+        _cursorPosition = mousePosition;
+        
+        if (mouseButtonsDown.Contains(MouseButton.Left))
         {
             HandleFiring();
         }
     }
 
-    public override void OnUpdate(object sender, UpdateEventArgs e)
+    public override void Update(UpdateEventArgs e)
     {
-        base.OnUpdate(sender, e);
-        
+        base.Update(e);
         _delta = e.DeltaTime;
-
-        // check range to cursor
-        float distance = Vector2.Distance(Position, _cursorPosition);
+        
+        float distance = Vector2.Distance(Position, _cursorPosition.ToVector2());
         _isCrosshairActive = distance >= 12;
+        
+        ApplyFriction();
+        RotatePlayerToCursor();
+        
+        UpdateMuzzlePositions();
+        UpdateParticleEmitterPosition();
+        
+        HandleKeyboardInputs(e.KeysDown);
+        HandleMouse(e.MousePosition, e.MouseButtonsDown);
+        
+        _particleEmitter.Update();
+    }
 
-        // rotate player
-        if (_isCrosshairActive)
-        {
-            float xDiff = _cursorPosition.X - Position.X;
-            float yDiff = _cursorPosition.Y - Position.Y;
+    private void RotatePlayerToCursor()
+    {
+        if (!_isCrosshairActive) return;
+        
+        float xDiff = _cursorPosition.X - Position.X;
+        float yDiff = _cursorPosition.Y - Position.Y;
 
-            Rotation = (float)Math.Atan2(yDiff, xDiff);
-        }
+        Rotation = (float)Math.Atan2(yDiff, xDiff);
+    }
 
-        // apply friction
-        float sign = Math.Sign(Velocity.Length());
-
-        if (sign != 0)
-        {
-            float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
-            
-            Velocity -= 
-                new Vector2((float)Math.Cos(direction), (float)Math.Sin(direction)) * Friction * _delta * sign;
-        }
-
-        // rotate the points for the cannon muzzles
+    private void UpdateMuzzlePositions()
+    {
         Vector2 muzzle1;
         Vector2 muzzle2;
         
@@ -363,7 +338,10 @@ public class Player : Entity, IInputEventListener
         }
 
         _muzzle = new Tuple<Vector2, Vector2>(muzzle1, muzzle2);
+    }
 
+    private void UpdateParticleEmitterPosition()
+    {
         float emitterRotation = (Rotation + Pi) % (2 * Pi);
         Vector2 emitterPosition = new(11, 0);
 
@@ -377,5 +355,16 @@ public class Player : Entity, IInputEventListener
         }
         
         _particleEmitter.SetTransform(emitterPosition, emitterRotation);
+    }
+
+    private void ApplyFriction()
+    {
+        float sign = Math.Sign(Velocity.Length());
+
+        if (sign == 0) return;
+        
+        float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
+            
+        Velocity -= new Vector2((float)Math.Cos(direction), (float)Math.Sin(direction)) * Friction * _delta * sign;
     }
 }
