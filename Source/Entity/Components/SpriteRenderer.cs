@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
 
-public class SpriteRenderer : IUpdateEventListener
+public class SpriteRenderer
 {
     public readonly EffectContainer EffectContainer = new();
 
@@ -47,8 +47,7 @@ public class SpriteRenderer : IUpdateEventListener
         }
         
         if (animationConditions != null) InitAnimationConditions(animationConditions);
-
-        UpdateEventSource.UpdateEvent += OnUpdate;
+        
         CurrentAnimationIndex = 0;
     }
 
@@ -68,7 +67,7 @@ public class SpriteRenderer : IUpdateEventListener
         CurrentAnimationIndex = 0;
     }
 
-    public void OnUpdate(object sender, UpdateEventArgs e)
+    public void Update(UpdateEventArgs e)
     {
         int frameLength = CurrentAnimation.Frames[_currentFrameIndex].Time;
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;

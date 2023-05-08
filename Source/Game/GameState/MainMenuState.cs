@@ -7,10 +7,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
 
-public class MainMenuState : GameState, IMouseMoveEventListener
+public class MainMenuState : GameState
 {
     private readonly MenuController _menuController;
-    private Texture2D _cursorTexture;
+    private readonly Texture2D _cursorTexture;
     private Point _cursorPos;
     
     public MainMenuState(Game1 root) : base(root)
@@ -47,17 +47,17 @@ public class MainMenuState : GameState, IMouseMoveEventListener
 
     public override void Enter()
     {
-        InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
+        
     }
 
     public override void Exit()
     {
-        InputEventSource.MouseMoveEvent -= OnMouseMoveEvent;
-        _menuController.Destroy();
+        
     }
 
-    public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
+    public override void Update(UpdateEventArgs e)
     {
-        _cursorPos = e.Position;
+        _cursorPos = e.MousePosition;
+        _menuController.Update(e);
     }
 }

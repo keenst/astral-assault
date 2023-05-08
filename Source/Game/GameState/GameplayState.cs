@@ -13,7 +13,7 @@ public class GameplayState : GameState, IKeyboardPressedEventListener
 {
     public readonly List<Entity> Entities;
     public readonly CollisionSystem CollisionSystem = new();
-    public WaveController WaveController;
+    private readonly WaveController _waveController;
     
     public Player Player => (Player) Entities.Find(entity => entity is Player);
     
@@ -23,7 +23,8 @@ public class GameplayState : GameState, IKeyboardPressedEventListener
     public GameplayState(Game1 root) : base(root)
     {
         Entities = new List<Entity>();
-        WaveController = new WaveController(this, Root);
+        
+        _waveController = new WaveController(this);
         
         string path = Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName;
         string json = File.ReadAllText(path + "/Content/Menus/Pause.json");
@@ -42,7 +43,7 @@ public class GameplayState : GameState, IKeyboardPressedEventListener
             drawTasks.AddRange(entity.GetDrawTasks());
         }
 
-        drawTasks.AddRange(WaveController.GetDrawTasks());
+        drawTasks.AddRange(_waveController.GetDrawTasks());
         drawTasks.AddRange(_pauseMenuController.GetDrawTasks());
         
         if (!Root.ShowDebug) return drawTasks;
@@ -72,6 +73,19 @@ public class GameplayState : GameState, IKeyboardPressedEventListener
         return drawTasks;
     }
 
+    public override void Update(UpdateEventArgs e)
+    {
+        List<Entity> entitiesToUpdate = new(Entities);
+        while (entitiesToUpdate.Count > 0)
+        {
+            entitiesToUpdate[0].Update(e);
+            entitiesToUpdate.RemoveAt(0);
+        }
+        
+        CollisionSystem.Update(e);
+        _waveController.Update();
+    }
+
     public override void Enter()
     {
         InputEventSource.KeyboardPressedEvent += OnKeyboardPressedEvent;
@@ -82,9 +96,6 @@ public class GameplayState : GameState, IKeyboardPressedEventListener
 
     public override void Exit()
     {
-        InputEventSource.KeyboardPressedEvent -= OnKeyboardPressedEvent;
-        
-        WaveController.StopListening();
         while (Entities.Count > 0) Entities[0].Destroy();
     }
 
