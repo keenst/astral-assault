@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
@@ -8,7 +7,7 @@ using Vector4 = Microsoft.Xna.Framework.Vector4;
 
 namespace AstralAssault;
 
-public class Entity : IUpdateEventListener
+public class Entity
 {
     public Vector2 Position;
     public Vector2 Velocity;
@@ -45,13 +44,11 @@ public class Entity : IUpdateEventListener
         GameState = gameState;
         Position = position;
         _timeSpawned = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        
-        UpdateEventSource.UpdateEvent += OnUpdate;
-        
+
         CreateHealthBarTexture();
     }
     
-    public virtual void OnUpdate(object sender, UpdateEventArgs e)
+    public virtual void Update(UpdateEventArgs e)
     {
         if (IsActor && HP <= 0)
         {
@@ -61,49 +58,10 @@ public class Entity : IUpdateEventListener
 
         Position += Velocity * e.DeltaTime;
         Collider?.SetPosition(Position.ToPoint());
-
-        switch (OutOfBoundsBehavior)
-        {
-            case OutOfBounds.DoNothing:
-            {
-                break;
-            }
-            
-            case OutOfBounds.Destroy:
-            {
-                if (Position.X is < 0 or > Game1.TargetWidth ||
-                    Position.Y is < 0 or > Game1.TargetHeight)
-                {
-                    Destroy();
-                }
-
-                break;
-            }
-            
-            case OutOfBounds.Wrap:
-            {
-                Position.X = Position.X switch
-                {
-                    < 0 => Game1.TargetWidth,
-                    > Game1.TargetWidth => 0,
-                    _ => Position.X
-                };
-
-                Position.Y = Position.Y switch
-                {
-                    < 0 => Game1.TargetHeight,
-                    > Game1.TargetHeight => 0,
-                    _ => Position.Y
-                };
-                
-                break;
-            }
-            
-            default:
-            {
-                throw new ArgumentOutOfRangeException();
-            }
-        }
+        
+        HandleOutOfBounds();
+        
+        SpriteRenderer?.Update(e);
     }
 
     public virtual void OnCollision(Collider other)
@@ -150,12 +108,10 @@ public class Entity : IUpdateEventListener
         return drawTasks;
     }
 
-    public virtual void Destroy()
+    public void Destroy()
     {
         GameState.Entities.Remove(this);
         GameState.CollisionSystem.RemoveCollider(Collider);
-        
-        UpdateEventSource.UpdateEvent -= OnUpdate;
     }
 
     protected virtual void OnDeath()
@@ -218,5 +174,51 @@ public class Entity : IUpdateEventListener
             Color.LimeGreen);
         
         return new List<DrawTask> { background, empty, full };
+    }
+
+    private void HandleOutOfBounds()
+    {
+        switch (OutOfBoundsBehavior)
+        {
+            case OutOfBounds.DoNothing:
+            {
+                break;
+            }
+            
+            case OutOfBounds.Destroy:
+            {
+                if (Position.X is < 0 or > Game1.TargetWidth ||
+                    Position.Y is < 0 or > Game1.TargetHeight)
+                {
+                    Destroy();
+                }
+
+                break;
+            }
+            
+            case OutOfBounds.Wrap:
+            {
+                Position.X = Position.X switch
+                {
+                    < 0 => Game1.TargetWidth,
+                    > Game1.TargetWidth => 0,
+                    _ => Position.X
+                };
+
+                Position.Y = Position.Y switch
+                {
+                    < 0 => Game1.TargetHeight,
+                    > Game1.TargetHeight => 0,
+                    _ => Position.Y
+                };
+                
+                break;
+            }
+            
+            default:
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+        }
     }
 }
