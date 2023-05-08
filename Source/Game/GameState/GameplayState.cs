@@ -75,16 +75,19 @@ public class GameplayState : GameState
 
     public override void Update(UpdateEventArgs e)
     {
-        List<Entity> entitiesToUpdate = new(Entities);
-        while (entitiesToUpdate.Count > 0)
+        if (!_isPaused)
         {
-            entitiesToUpdate[0].Update(e);
-            entitiesToUpdate.RemoveAt(0);
+            List<Entity> entitiesToUpdate = new(Entities);
+            while (entitiesToUpdate.Count > 0)
+            {
+                entitiesToUpdate[0].Update(e);
+                entitiesToUpdate.RemoveAt(0);
+            }
+            
+            CollisionSystem.Update(e);
+            _waveController.Update();
         }
-        
-        CollisionSystem.Update(e);
-        _waveController.Update();
-        
+
         HandleKeyboardInputs(e.KeysPressed);   
     }
 
