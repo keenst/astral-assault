@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
 
-public class Bullet : Entity
+public sealed class Bullet : Entity
 {
     public Entity m_shootBy;
 

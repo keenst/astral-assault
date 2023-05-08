@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
 
-public class ShipOfDoom : Entity
+public sealed class ShipOfDoom : Entity
 {
     private readonly float m_rotSpeed;
     private bool m_lastCannon;

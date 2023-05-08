@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
 
-public class Crosshair : Entity, IMouseEventListener
+public sealed class Crosshair : Entity, IMouseEventListener
 {
     public Crosshair(GameplayState gameState) : base(gameState, new Vector2(0, 0))
     {

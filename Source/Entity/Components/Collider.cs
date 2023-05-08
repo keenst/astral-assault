@@ -9,7 +9,6 @@ public sealed class Collider
 {
     private readonly float m_mass;
     internal readonly Entity Parent;
-    private readonly Rectangle m_rectangle;
     private readonly bool m_isSolid;
     internal int Radius;
     private readonly float m_restitution;
@@ -28,14 +27,6 @@ public sealed class Collider
         m_isSolid = false;
         m_mass = 0f;
         m_restitution = 0;
-    }
-
-    internal Collider(Entity parent, Rectangle rectangle)
-    {
-        Parent = parent;
-        m_rectangle = rectangle;
-        m_isSolid = false;
-        m_mass = 0f;
     }
 
     internal bool CollidesWith(

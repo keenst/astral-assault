@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
 
-public class Asteroid : Entity
+public sealed class Asteroid : Entity
 {
     public enum Sizes { Smallest, Small, Medium }
     private readonly float m_rotSpeed;
@@ -50,7 +50,7 @@ public class Asteroid : Entity
         case Sizes.Small:
             spriteSheet = AssetManager.Load<Texture2D>("Asteroid2");
             spriteSize = 24;
-            colliderSize = 12;
+            colliderSize = 9;
             MaxHP = 24;
             HP = MaxHP;
             ContactDamage = 7;
@@ -61,7 +61,7 @@ public class Asteroid : Entity
         case Sizes.Medium:
             spriteSheet = AssetManager.Load<Texture2D>("Asteroid3");
             spriteSize = 32;
-            colliderSize = 20;
+            colliderSize = 12;
             MaxHP = 36;
             HP = MaxHP;
             ContactDamage = 12;

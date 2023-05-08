@@ -8,8 +8,11 @@ using Microsoft.Xna.Framework.Input;
 
 namespace AstralAssault;
 
-public class Game1 : Game
+public sealed class Game1 : Game
 {
+    private enum Width { Full = 1920, Half = 960, Quarter = 480 }
+    private enum Height { Full = 1080, Half = 540, Quarter = 270 }
+
     public const int TargetWidth = (int)Width.Quarter;
     public const int TargetHeight = (int)Height.Quarter;
     private const int StatUpdateInterval = 300;
@@ -98,7 +101,7 @@ public class Game1 : Game
         Palette.Init();
         Jukebox.Init();
 
-        GameStateMachine = new GameStateMachine(new GameplayState(this));
+        GameStateMachine = new GameStateMachine(new GameOverState(this));
 
         base.Initialize();
     }
@@ -144,7 +147,6 @@ public class Game1 : Game
     protected override void Draw(GameTime gameTime)
     {
         // draw sprites to render target
-
         GraphicsDevice.SetRenderTarget(m_renderTarget);
         GraphicsDevice.Clear(BackgroundColor);
 
@@ -172,7 +174,7 @@ public class Game1 : Game
             string renderTime = m_renderTime.ToString();
 
             frameRate.Draw(Vector2.Zero, Color.Yellow, 0f, new Vector2(0, 0), 1f, LayerOrdering.Debug);
-            renderTime.Draw(new Vector2(0, 9), Color.Yellow, 0f, new Vector2(0, 0), 1f, LayerOrdering.Debug);
+            renderTime.Draw(new Vector2(0, frameRate.Size().Y), Color.Yellow, 0f, new Vector2(0, 0), 1f, LayerOrdering.Debug);
         }
 
         SpriteBatch.End();
@@ -195,7 +197,4 @@ public class Game1 : Game
 
         base.Draw(gameTime);
     }
-
-    private enum Width { Full = 1920, Half = 960, Quarter = 480 }
-    private enum Height { Full = 1080, Half = 540, Quarter = 270 }
 }

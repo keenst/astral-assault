@@ -9,14 +9,13 @@ using MonoGame.Extended;
 
 namespace AstralAssault;
 
-public class GameplayState : GameState
+public sealed class GameplayState : GameState
 {
     private static readonly Vector4 MultiplierBrokenColor = new Vector4(1, 0, 0, 1);
     private static readonly Vector4 MultiplierIncreaseColor = new Vector4(1, 1, 0, 1);
     private static readonly Vector4 MultiplierDefaultColor = new Vector4(1, 1, 1, 1);
     public readonly CollisionSystem CollisionSystem = new CollisionSystem();
     public readonly List<Entity> Entities;
-    private readonly Texture2D m_circle;
     public ItemController ItemController;
     private Vector4 m_multiplierColor = MultiplierDefaultColor;
     private float m_prevMultiplier = 1;
@@ -29,7 +28,7 @@ public class GameplayState : GameState
         ItemController = new ItemController(this);
         WaveController = new WaveController(this, Root);
 
-        m_circle = AssetManager.Load<Texture2D>("unitcircleofdoomyaaaZ");
+        AssetManager.Load<Texture2D>("unitcircleofdoomyaaaZ");
 
         ItemController.StartListening();
     }
@@ -75,11 +74,6 @@ public class GameplayState : GameState
         for (int i = 0; i < Entities.Count; i++) Entities[i].OnUpdate(sender, e);
     }
 
-    [SuppressMessage
-    (
-        "ReSharper.DPA", "DPA0002: Excessive memory allocations in SOH",
-        MessageId = "type: Microsoft.Xna.Framework.Vector2[]; size: 111MB"
-    )]
     public override void Draw()
     {
         foreach (Entity entity in Entities) entity.Draw();
@@ -90,8 +84,7 @@ public class GameplayState : GameState
 
             string scoreText = $"Score: {Root.Score}";
             Color textColor = Palette.GetColor(Palette.Colors.Grey9);
-            scoreText.Draw
-                (new Vector2(4, 4), textColor, 0f, new Vector2(0, 0), 1f, LayerOrdering.Hud);
+            scoreText.Draw(Vector2.Zero, textColor, 0f, new Vector2(0, 0), 1f, LayerOrdering.Hud);
         }
         else
         {
@@ -111,7 +104,7 @@ public class GameplayState : GameState
 
         multiplierText.Draw
         (
-            new Vector2(480 - multiplierText.Size().X, 4),
+            new Vector2(480 - multiplierText.Size().X, 0),
             new Color(m_multiplierColor),
             0f,
             new Vector2(0, 0),

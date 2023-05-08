@@ -11,9 +11,9 @@ using Microsoft.Xna.Framework.Input;
 
 namespace AstralAssault;
 
-public enum PowerUps { QuadDamage, Haste }
+internal enum PowerUps { QuadDamage, Haste }
 
-public class Player : Entity, IInputEventListener
+public sealed class Player : Entity, IInputEventListener
 {
     private const float Friction = 30;
     private const float Pi = 3.14F;
@@ -26,8 +26,6 @@ public class Player : Entity, IInputEventListener
 
     private readonly Texture2D m_square;
 
-    private bool m_barrelRoll;
-
     private Vector2 m_cursorPosition;
     private float m_delta;
     private bool m_isCrosshairActive = true;
@@ -39,7 +37,7 @@ public class Player : Entity, IInputEventListener
     private Tuple<Vector2, Vector2> m_muzzle = new Tuple<Vector2, Vector2>(Vector2.Zero, Vector2.Zero);
     private int m_shootSpeed = 200;
     private float m_tiltSpeed = 200;
-    public float Multiplier = 1;
+    internal float Multiplier = 1;
 
     public Player(GameplayState gameState, Vector2 position) : base(gameState, position)
     {
@@ -77,19 +75,15 @@ public class Player : Entity, IInputEventListener
         int xAxis = 0;
         int yAxis = 0;
 
-        m_barrelRoll = false;
-
         if (Array.IndexOf(e.Keys, Keys.D) >= 0)
         {
             xAxis = 1;
             SpriteRenderer.SetAnimationCondition("Tilt", 1);
-            m_barrelRoll = true;
         }
         else if (Array.IndexOf(e.Keys, Keys.A) >= 0)
         {
             xAxis = -1;
             SpriteRenderer.SetAnimationCondition("Tilt", -1);
-            m_barrelRoll = true;
         }
         else SpriteRenderer.SetAnimationCondition("Tilt", 0);
 
@@ -255,8 +249,10 @@ public class Player : Entity, IInputEventListener
             Jukebox.PlaySound("PickUp");
 
             for (int i = m_powerUps.Count - 1; i >= 0; i--)
+            {
                 if (m_powerUps[i].Item2 == PowerUps.QuadDamage)
                     m_powerUps.RemoveAt(i);
+            }
 
 
             m_powerUps.Add(new Tuple<long, PowerUps>(timeNow, PowerUps.QuadDamage));
@@ -366,25 +362,33 @@ public class Player : Entity, IInputEventListener
 
             m_square.DrawTexture2D
             (
-                new Rectangle(0, 0, 1, 1), new Rectangle(1, 28 + i * 12, 2, 8), 0,
-                new Color(backgroundColor), LayerOrdering.Powerups
+                new Rectangle(0, 0, 1, 1),
+                new Rectangle(0, 28 + i * 12, 2, 8),
+                0,
+                new Color(backgroundColor),
+                LayerOrdering.Powerups
             );
 
+            //int barLength = (int)((timeNow - powerUp.Item1) / (float)PowerUpDuration * 2);
             int barLength = 8 - (int)Math.Floor((timeNow - powerUp.Item1) / (float)PowerUpDuration * 8);
 
             m_square.DrawTexture2D
             (
-                new Rectangle(0, 0, 1, 1), new Rectangle(1, 36 + i * 12 - barLength, 2, barLength), 0,
-                new Color(barColor), LayerOrdering.Powerups
+                new Rectangle(0, 0, 1, 1),
+                new Rectangle(0, 36 + i * 12 - barLength, 2, barLength),
+                0,
+                new Color(barColor),
+                LayerOrdering.Powerups
             );
 
             powerUpName.Draw
             (
                 new Vector2(4, 28 + i * 12),
-                new Color(color),
+                Palette.GetColor(Palette.Colors.Grey9),
                 0f,
                 new Vector2(0, 0),
-                1f, LayerOrdering.Powerups
+                1f,
+                LayerOrdering.Powerups
             );
         }
     }

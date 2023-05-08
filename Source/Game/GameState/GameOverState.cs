@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace AstralAssault;
 
-public class GameOverState : GameState, IKeyboardPressedEventListener
+internal sealed class GameOverState : GameState, IKeyboardPressedEventListener
 {
     private readonly bool m_newHighScore;
     private readonly long m_timeEntered;
@@ -54,23 +54,21 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
             (float)Math.Round(Game1.TargetHeight / 2D)
         );
 
-        m_gameOverText.DrawTexture2D(textPosition, 0, LayerOrdering.Foreground);
+        m_gameOverText.DrawTexture2D(textPosition, 0f, LayerOrdering.Foreground);
 
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-
-        if ((timeNow - m_timeEntered) > 1000)
-            m_restartPrompt.DrawTexture2D(promptPosition, 0, LayerOrdering.Foreground);
+        if ((timeNow - m_timeEntered) > 1000) m_restartPrompt.DrawTexture2D(promptPosition, 0, LayerOrdering.Foreground);
 
         int score = (int)Lerp(0, Root.Score, MathF.Min((timeNow - m_timeEntered) / 800F, 1));
         string scoreText = $"Score: {score}";
-        int textX = 240 - $"Score: {Root.Score}".Length * 4;
+        int textX = (int)(textPosition.X - scoreText.Size().X / 2f);
         scoreText.Draw
             (new Vector2(textX, 150), Color.White, 0f, new Vector2(0, 0), 1f, LayerOrdering.Foreground);
 
         if (!m_newHighScore)
         {
             string highScoreText = $"High score: {Root.HighScore}";
-            int highScoreX = 240 - highScoreText.Length * 4;
+            int highScoreX = (int)(textPosition.X - highScoreText.Size().X / 2f);
             highScoreText.Draw
                 (new Vector2(highScoreX, 170), Color.White, 0f, new Vector2(0, 0), 1f, LayerOrdering.Foreground);
 
@@ -87,10 +85,9 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
 
         if (!m_showNewHighScore) return;
 
-        string newHighScoreText = "New high score!";
-        int newHighScoreX = 240 - newHighScoreText.Length * 4;
-        newHighScoreText.Draw
-            (new Vector2(newHighScoreX, 170), Color.White, 0f, new Vector2(0, 0), 1f, LayerOrdering.Foreground);
+        const string newHighScoreText = "New high score!";
+        int newHighScoreX = (int)(textPosition.X - newHighScoreText.Size().X / 2f);
+        newHighScoreText.Draw(new Vector2(newHighScoreX, 170), Color.White, 0f, new Vector2(0, 0), 1f, LayerOrdering.Foreground);
     }
 
     public override void Enter()
@@ -104,7 +101,7 @@ public class GameOverState : GameState, IKeyboardPressedEventListener
         InputEventSource.KeyboardPressedEvent -= OnKeyboardPressedEvent;
     }
 
-    private float Lerp(float firstFloat, float secondFloat, float by) => firstFloat * (1 - by) + secondFloat * by;
+    private static float Lerp(float firstFloat, float secondFloat, float by) => firstFloat * (1 - by) + secondFloat * by;
 
     public override void OnUpdate(object sender, UpdateEventArgs e) { }
 }

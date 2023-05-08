@@ -4,7 +4,7 @@ using System;
 
 namespace AstralAssault;
 
-public readonly struct Transition
+internal readonly struct Transition
 {
     public string ConditionName { get; }
     public float ConditionThreshold { get; }

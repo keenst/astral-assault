@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
 
-public class SpriteRenderer
+public sealed class SpriteRenderer
 {
     private const float Pi = 3.14F;
     private readonly Dictionary<string, float> m_animationConditions = new Dictionary<string, float>();
@@ -18,8 +18,6 @@ public class SpriteRenderer
     private readonly Animation[] m_animations;
     private readonly Game1 m_root;
     private readonly Texture2D m_spriteSheet;
-
-    public bool Debugging = false;
 
     private int[] m_animationQueue;
 
@@ -33,7 +31,7 @@ public class SpriteRenderer
     private int m_startAnimationIndex;
     private int m_targetAnimationIndex;
 
-    public SpriteRenderer(
+    internal SpriteRenderer(
         Entity baseE,
         Texture2D spriteSheet,
         Animation[] animations,
@@ -58,7 +56,7 @@ public class SpriteRenderer
         CurrentAnimationIndex = 0;
     }
 
-    public SpriteRenderer(
+    internal SpriteRenderer(
         Entity baseE,
         Texture2D spriteSheet,
         Frame frame, Game1 root)
@@ -80,7 +78,7 @@ public class SpriteRenderer
         get => m_animations[CurrentAnimationIndex];
     }
 
-    public void OnUpdate(object sender, UpdateEventArgs e)
+    internal void OnUpdate(object sender, UpdateEventArgs e)
     {
         int frameLength = CurrentAnimation.Frames[m_currentFrameIndex].Time;
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
@@ -130,7 +128,7 @@ public class SpriteRenderer
         m_lastFrameUpdate = timeNow;
     }
 
-    public void Draw(Vector2 position, float rotation, bool isCrosshair)
+    internal void Draw(Vector2 position, float rotation, bool isCrosshair)
     {
         if (m_baseE.m_highlightAlpha != 0f)
         {
@@ -251,7 +249,7 @@ public class SpriteRenderer
         return null;
     }
 
-    public void SetAnimationCondition(string name, float value)
+    internal void SetAnimationCondition(string name, float value)
     {
         if (!m_animationConditions.ContainsKey(name))
             throw new ArgumentException($"Animation condition '{name}' does not exist");

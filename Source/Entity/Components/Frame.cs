@@ -5,19 +5,19 @@ using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
 
-public struct Frame
+public readonly struct Frame
 {
-    public Rectangle[] Rotations { get; } = new Rectangle[4];
-    public Rectangle Source { get; }
+    internal Rectangle[] Rotations { get; } = new Rectangle[4];
+    internal Rectangle Source { get; }
 
-    public bool HasRotations
+    internal bool HasRotations
     {
         get => Rotations[0] != Rectangle.Empty;
     }
 
-    public int Time { get; }
+    internal int Time { get; }
 
-    public Frame(Rectangle e, Rectangle see, Rectangle se, Rectangle sse, int time = 0)
+    internal Frame(Rectangle e, Rectangle see, Rectangle se, Rectangle sse, int time = 0)
     {
         Rotations[0] = e;
         Rotations[1] = see;
@@ -29,7 +29,7 @@ public struct Frame
         Time = time;
     }
 
-    public Frame(Rectangle source, int time = 0)
+    internal Frame(Rectangle source, int time = 0)
     {
         Array.Fill(Rotations, Rectangle.Empty);
 

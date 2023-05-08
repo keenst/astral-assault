@@ -1,6 +1,6 @@
 ﻿namespace AstralAssault;
 
-public class GameStateMachine
+public sealed class GameStateMachine
 {
     private GameState m_currentState;
 

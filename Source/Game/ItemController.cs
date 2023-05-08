@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
 
-public class ItemController : IUpdateEventListener
+public sealed class ItemController : IUpdateEventListener
 {
     private readonly GameplayState m_gameState;
     private readonly Random m_rnd = new Random();
@@ -71,6 +71,21 @@ public class ItemController : IUpdateEventListener
             2 => new MegaHealth(m_gameState, position),
             var _ => throw new ArgumentOutOfRangeException()
         };
+
+        bool powerupExistsInWorld = m_gameState.Entities.IndexOf(item) == -1;
+
+        while (!powerupExistsInWorld)
+        {
+            item = m_rnd.Next(3) switch
+            {
+                0 => new Quad(m_gameState, position),
+                1 => new Haste(m_gameState, position),
+                2 => new MegaHealth(m_gameState, position),
+                var _ => throw new ArgumentOutOfRangeException()
+            };
+
+            powerupExistsInWorld = m_gameState.Entities.IndexOf(item) == -1;
+        }
 
         m_gameState.Entities.Add(item);
     }

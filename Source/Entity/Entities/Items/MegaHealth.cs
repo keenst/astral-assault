@@ -6,12 +6,12 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault.Items;
 
-public class MegaHealth : Entity
+internal sealed class MegaHealth : Entity
 {
     public MegaHealth(GameplayState gameState, Vector2 position) : base(gameState, position)
     {
         Collider = new Collider
-            (this, new Rectangle(new Point((int)Position.X - 8, (int)Position.Y - 8), new Point(16, 16)))
+            (this)
             {
                 Radius = 3
             };

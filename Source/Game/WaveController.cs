@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
 
-public class WaveController
+public sealed class WaveController
 {
     public readonly GameplayState GameState;
     private int m_currentWave;
@@ -147,6 +147,6 @@ public class WaveController
     {
         string text = $"Wave: {m_currentWave}";
         Color color = Palette.GetColor(Palette.Colors.Grey9);
-        text.Draw(new Vector2(4, 16), color, 0f, new Vector2(0, 0), 1f, LayerOrdering.Hud);
+        text.Draw(new Vector2(0, text.Size().Y), color, 0f, new Vector2(0, 0), 1f, LayerOrdering.Hud);
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
 
-public class UpdateEventArgs : EventArgs
+public sealed class UpdateEventArgs : EventArgs
 {
     public UpdateEventArgs(float deltaTime, GameTime gt)
     {

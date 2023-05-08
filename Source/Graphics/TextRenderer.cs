@@ -1,6 +1,9 @@
 ﻿#region
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended.BitmapFonts;
+using MonoGame.Extended.TextureAtlases;
 #endregion
 
 namespace AstralAssault;
@@ -8,12 +11,50 @@ namespace AstralAssault;
 public static class TextRenderer
 {
     private static Game1 m_root;
-    private static SpriteFont m_f;
+    private static BitmapFont m_bitmapFont;
 
     public static void Init(Game1 root)
     {
         m_root = root;
-        m_f = AssetManager.Load<SpriteFont>("fc");
+
+        List<BitmapFontRegion> bitmapFontRegions = new List<BitmapFontRegion>();
+
+        var pixelFont = new Color[177 * 793];
+        var fontThing = AssetManager.Load<Texture2D>("AsepriteFont");
+        fontThing.GetData(pixelFont);
+
+        int charIdx = 0;
+
+        for (int y = 1; y < 793; y += 11)
+        {
+            for (int x = 1; x < 177; x += 11)
+            {
+                int index = (y * 177) + x;
+                int len = 0;
+
+                while (pixelFont[index] != new Color(0, 255, 0, 255))
+                {
+                    len++;
+                    index++;
+                }
+
+                bitmapFontRegions.Add
+                (
+                    new BitmapFontRegion
+                    (
+                        new TextureRegion2D(fontThing, x, y, len, 7),
+                        ' ' + charIdx,
+                        0,
+                        0,
+                        len
+                    )
+                );
+
+                charIdx++;
+            }
+        }
+
+        m_bitmapFont = new BitmapFont("teeest", bitmapFontRegions, 7);
     }
 
     public static void Draw
@@ -29,7 +70,7 @@ public static class TextRenderer
     {
         m_root.SpriteBatch.DrawString
         (
-            m_f,
+            m_bitmapFont,
             input,
             position,
             color,
@@ -41,5 +82,5 @@ public static class TextRenderer
         );
     }
 
-    public static Vector2 Size(this string input) => m_f.MeasureString(input);
+    public static Vector2 Size(this string input) => m_bitmapFont.MeasureString(input);
 }

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace AstralAssault;
 
-public class CollisionSystem
+public sealed class CollisionSystem
 {
     private List<Tuple<Collider, Collider>> m_lastCollisions = new List<Tuple<Collider, Collider>>();
     public List<Collider> Colliders { get; } = new List<Collider>();
