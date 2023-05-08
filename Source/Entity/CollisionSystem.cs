@@ -1,9 +1,11 @@
 ﻿#region
 using System;
 using System.Collections.Generic;
+using TheGameOfDoomHmmm.Source.Entity.Components;
+using TheGameOfDoomHmmm.Source.Game;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm.Source.Entity.Entities;
 
 public sealed class CollisionSystem
 {

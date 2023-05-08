@@ -1,22 +1,20 @@
 #region
-using AstralAssault.Source.Graphics;
+using TheGameOfDoomHmmm.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TheGameOfDoomHmmm.Source.Entity.Components;
+using TheGameOfDoomHmmm.Source.Game;
+using TheGameOfDoomHmmm.Source.Game.GameState;
 #endregion
 
-namespace AstralAssault.Items;
+namespace TheGameOfDoomHmmm.Source.Entity.Entities.Items;
 
-internal sealed class Haste : Entity
+internal sealed class Haste : PowerUpBase
 {
-    public Haste(GameplayState gameState, Vector2 position) : base(gameState, position)
-    {
-        Collider = new Collider
-            (this)
-            {
-                Radius = 3
-            };
-        GameState.CollisionSystem.AddCollider(Collider);
+    public Haste(GameplayState gameState, Vector2 position) : base(gameState, position) { }
 
+    public override void InitAnimations()
+    {
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Haste");
 
         Animation animation = AnimationCreator.CreateAnimFromSpriteSheet
@@ -41,12 +39,7 @@ internal sealed class Haste : Entity
             new[] { animation },
             null,
             null,
-            gameState.Root
+            GameState.Root
         );
-    }
-
-    public override void OnCollision(Collider other)
-    {
-        if (other.Parent is Player) Destroy();
     }
 }

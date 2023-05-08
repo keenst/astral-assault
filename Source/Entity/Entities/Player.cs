@@ -2,14 +2,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AstralAssault.Items;
-using AstralAssault.Source.Graphics;
+using TheGameOfDoomHmmm.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using TheGameOfDoomHmmm.Source.Entity.Components;
+using TheGameOfDoomHmmm.Source.Entity.Entities.Items;
+using TheGameOfDoomHmmm.Source.Game;
+using TheGameOfDoomHmmm.Source.Game.GameState;
+using TheGameOfDoomHmmm.Source.Input;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm.Source.Entity.Entities;
 
 internal enum PowerUps { QuadDamage, Haste }
 

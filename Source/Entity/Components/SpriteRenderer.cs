@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TheGameOfDoomHmmm.Source.Game;
+using TheGameOfDoomHmmm.Source.Graphics;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm.Source.Entity.Components;
 
 public sealed class SpriteRenderer
 {
@@ -21,7 +23,7 @@ public sealed class SpriteRenderer
 
     private int[] m_animationQueue;
 
-    private readonly Entity m_baseE;
+    private readonly Entities.Entity m_baseE;
 
     private int m_currentFrameIndex;
     private int m_indexInQueue;
@@ -32,7 +34,7 @@ public sealed class SpriteRenderer
     private int m_targetAnimationIndex;
 
     internal SpriteRenderer(
-        Entity baseE,
+        Entities.Entity baseE,
         Texture2D spriteSheet,
         Animation[] animations,
         Transition[] transitions,
@@ -51,13 +53,11 @@ public sealed class SpriteRenderer
         }
 
         if (animationConditions != null) InitAnimationConditions(animationConditions);
-
-        UpdateEventSource.UpdateEvent += OnUpdate;
         CurrentAnimationIndex = 0;
     }
 
     internal SpriteRenderer(
-        Entity baseE,
+        Entities.Entity baseE,
         Texture2D spriteSheet,
         Frame frame, Game1 root)
     {
@@ -78,7 +78,7 @@ public sealed class SpriteRenderer
         get => m_animations[CurrentAnimationIndex];
     }
 
-    internal void OnUpdate(object sender, UpdateEventArgs e)
+    internal void OnUpdate(UpdateEventArgs e)
     {
         int frameLength = CurrentAnimation.Frames[m_currentFrameIndex].Time;
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;

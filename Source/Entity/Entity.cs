@@ -1,11 +1,15 @@
 ﻿#region
 using System;
-using AstralAssault.Items;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TheGameOfDoomHmmm.Source.Entity.Components;
+using TheGameOfDoomHmmm.Source.Entity.Entities.Items;
+using TheGameOfDoomHmmm.Source.Game;
+using TheGameOfDoomHmmm.Source.Game.GameState;
+using TheGameOfDoomHmmm.Source.Graphics;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm.Source.Entity.Entities;
 
 public class Entity
 {
@@ -45,7 +49,7 @@ public class Entity
 
     public virtual void OnUpdate(object sender, UpdateEventArgs e)
     {
-        SpriteRenderer.OnUpdate(sender, e);
+        SpriteRenderer.OnUpdate(e);
 
         if (IsActor && (HP <= 0))
         {

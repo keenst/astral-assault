@@ -4,9 +4,11 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using TheGameOfDoomHmmm.Source.Graphics;
+using TheGameOfDoomHmmm.Source.Input;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm.Source.Game.GameState;
 
 internal sealed class GameOverState : GameState, IKeyboardPressedEventListener
 {

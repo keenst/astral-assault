@@ -4,9 +4,10 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.BitmapFonts;
 using MonoGame.Extended.TextureAtlases;
+using TheGameOfDoomHmmm.Source.Game;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm.Source.Graphics;
 
 public static class TextRenderer
 {

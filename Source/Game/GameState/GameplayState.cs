@@ -1,13 +1,15 @@
 ﻿#region
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
+using TheGameOfDoomHmmm.Source.Entity.Components;
+using TheGameOfDoomHmmm.Source.Entity.Entities;
+using TheGameOfDoomHmmm.Source.Graphics;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm.Source.Game.GameState;
 
 public sealed class GameplayState : GameState
 {
@@ -15,7 +17,7 @@ public sealed class GameplayState : GameState
     private static readonly Vector4 MultiplierIncreaseColor = new Vector4(1, 1, 0, 1);
     private static readonly Vector4 MultiplierDefaultColor = new Vector4(1, 1, 1, 1);
     public readonly CollisionSystem CollisionSystem = new CollisionSystem();
-    public readonly List<Entity> Entities;
+    public readonly List<Entity.Entities.Entity> Entities;
     public ItemController ItemController;
     private Vector4 m_multiplierColor = MultiplierDefaultColor;
     private float m_prevMultiplier = 1;
@@ -24,11 +26,9 @@ public sealed class GameplayState : GameState
 
     public GameplayState(Game1 root) : base(root)
     {
-        Entities = new List<Entity>();
+        Entities = new List<Entity.Entities.Entity>();
         ItemController = new ItemController(this);
         WaveController = new WaveController(this, Root);
-
-        AssetManager.Load<Texture2D>("unitcircleofdoomyaaaZ");
 
         ItemController.StartListening();
     }
@@ -76,7 +76,7 @@ public sealed class GameplayState : GameState
 
     public override void Draw()
     {
-        foreach (Entity entity in Entities) entity.Draw();
+        foreach (Entity.Entities.Entity entity in Entities) entity.Draw();
 
         if (!Root.ShowDebug)
         {

@@ -1,10 +1,11 @@
 #region
 using System;
-using AstralAssault.Items;
 using Microsoft.Xna.Framework;
+using TheGameOfDoomHmmm.Source.Entity.Entities.Items;
+using TheGameOfDoomHmmm.Source.Game.GameState;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm.Source.Game;
 
 public sealed class ItemController : IUpdateEventListener
 {
@@ -64,7 +65,7 @@ public sealed class ItemController : IUpdateEventListener
             isTooCloseToPlayer = false;
         } while (isTooCloseToPlayer);
 
-        Entity item = m_rnd.Next(3) switch
+        Entity.Entities.Entity item = m_rnd.Next(3) switch
         {
             0 => new Quad(m_gameState, position),
             1 => new Haste(m_gameState, position),

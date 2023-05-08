@@ -3,17 +3,17 @@ using System;
 using Microsoft.Xna.Framework;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm.Source.Entity.Components;
 
 public sealed class Collider
 {
     private readonly float m_mass;
-    internal readonly Entity Parent;
+    internal readonly Entities.Entity Parent;
     private readonly bool m_isSolid;
     internal int Radius;
     private readonly float m_restitution;
 
-    internal Collider(Entity parent, bool isSolid, int mass)
+    internal Collider(Entities.Entity parent, bool isSolid, int mass)
     {
         Parent = parent;
         m_isSolid = isSolid;
@@ -21,7 +21,7 @@ public sealed class Collider
         m_restitution = 0;
     }
 
-    internal Collider(Entity parent)
+    internal Collider(Entities.Entity parent)
     {
         Parent = parent;
         m_isSolid = false;

@@ -2,7 +2,7 @@
 using System;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm.Source.Entity.Components;
 
 internal readonly struct Transition
 {

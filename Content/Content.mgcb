@@ -264,11 +264,3 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Assets/Shoot3.ogg
-
-#begin Fonts/fc.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:Fonts/fc.spritefont
-

@@ -1,10 +1,13 @@
 ﻿#region
 using System;
-using AstralAssault.Items;
 using Microsoft.Xna.Framework;
+using TheGameOfDoomHmmm.Source.Entity.Entities;
+using TheGameOfDoomHmmm.Source.Entity.Entities.Items;
+using TheGameOfDoomHmmm.Source.Game.GameState;
+using TheGameOfDoomHmmm.Source.Graphics;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm.Source.Game;
 
 public sealed class WaveController
 {
@@ -133,7 +136,7 @@ public sealed class WaveController
     {
         int enemiesAlive = 0;
 
-        foreach (Entity ez in GameState.Entities)
+        foreach (Entity.Entities.Entity ez in GameState.Entities)
         {
             if (ez is Quad or Haste or MegaHealth or Crosshair or Player) continue;
 

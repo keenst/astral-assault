@@ -1,9 +1,10 @@
 ﻿#region
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using TheGameOfDoomHmmm.Source.Entity.Components;
 #endregion
 
-namespace AstralAssault.Source.Graphics;
+namespace TheGameOfDoomHmmm.Source.Graphics;
 
 internal static class AnimationCreator
 {

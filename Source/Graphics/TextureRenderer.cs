@@ -2,9 +2,10 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TheGameOfDoomHmmm.Source.Game;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm.Source.Graphics;
 
 public static class TextureRenderer
 {

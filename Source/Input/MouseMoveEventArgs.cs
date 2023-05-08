@@ -3,7 +3,7 @@ using System;
 using Microsoft.Xna.Framework;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm.Source.Input;
 
 public sealed class MouseMoveEventArgs : EventArgs
 {

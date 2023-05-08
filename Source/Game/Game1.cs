@@ -1,14 +1,19 @@
 ﻿#region
 using System;
-using AstralAssault.Items;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using TheGameOfDoomHmmm.Source.Entity.Components;
+using TheGameOfDoomHmmm.Source.Entity.Entities;
+using TheGameOfDoomHmmm.Source.Entity.Entities.Items;
+using TheGameOfDoomHmmm.Source.Game.GameState;
+using TheGameOfDoomHmmm.Source.Graphics;
+using TheGameOfDoomHmmm.Source.Input;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm.Source.Game;
 
-public sealed class Game1 : Game
+public sealed class Game1 : Microsoft.Xna.Framework.Game
 {
     private enum Width { Full = 1920, Half = 960, Quarter = 480 }
     private enum Height { Full = 1080, Half = 540, Quarter = 270 }
@@ -59,24 +64,49 @@ public sealed class Game1 : Game
         ShowDebug = false;
     }
 
-    public static bool PatternThing(Entity e1, Collider c1)
+    public static bool PatternThing(Entity.Entities.Entity e1, Collider c1)
     {
         if (e1 is Bullet || c1.Parent is Bullet)
         {
-            Entity e = null;
-            Bullet b = null;
+            Entity.Entities.Entity e;
+            Bullet b;
 
-            if (e1 is Bullet) b = (Bullet)e1;
-            else if (c1.Parent is Bullet) b = (Bullet)c1.Parent;
-
-            if (e1 is not Bullet) e = e1;
-            else if (c1.Parent is not Bullet) e = c1.Parent;
+            if (e1 is Bullet)
+            {
+                e = c1.Parent;
+                b = (Bullet)e1;
+            }
+            else
+            {
+                e = e1;
+                b = (Bullet)c1.Parent;
+            }
 
             switch (b.m_shootBy)
             {
             case Player when e is Player or Quad or Haste or MegaHealth:
             case ShipOfDoom when e is ShipOfDoom or Quad or Haste or MegaHealth or Asteroid: return true;
             }
+        }
+
+        if (e1 is Player || c1.Parent is Player)
+        {
+            Player p;
+            Entity.Entities.Entity otherEnt;
+
+            if (e1 is Player)
+            {
+                p = (Player)e1;
+                otherEnt = c1.Parent;
+            }
+            else
+            {
+                p = (Player)c1.Parent;
+                otherEnt = e1;
+            }
+
+
+            if (otherEnt is PowerUpBase) return true;
         }
 
         return e1 is Asteroid && c1.Parent is Asteroid;

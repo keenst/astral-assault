@@ -1,10 +1,14 @@
 ﻿#region
-using AstralAssault.Source.Graphics;
+using TheGameOfDoomHmmm.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TheGameOfDoomHmmm.Source.Entity.Components;
+using TheGameOfDoomHmmm.Source.Game;
+using TheGameOfDoomHmmm.Source.Game.GameState;
+using TheGameOfDoomHmmm.Source.Input;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm.Source.Entity.Entities;
 
 public sealed class Crosshair : Entity, IMouseEventListener
 {

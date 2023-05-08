@@ -6,7 +6,7 @@ using System.IO;
 using Microsoft.Xna.Framework;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm.Source.Graphics;
 
 public static class Palette
 {

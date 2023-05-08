@@ -1,4 +1,4 @@
-﻿namespace AstralAssault;
+﻿namespace TheGameOfDoomHmmm.Source.Game;
 
 public interface IUpdateEventListener
 {

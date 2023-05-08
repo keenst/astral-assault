@@ -3,7 +3,7 @@ using System;
 using Microsoft.Xna.Framework.Input;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm.Source.Input;
 
 public sealed class KeyboardEventArgs : EventArgs
 {

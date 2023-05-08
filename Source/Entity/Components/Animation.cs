@@ -1,4 +1,4 @@
-﻿namespace AstralAssault.Source.Entity.Comp;
+﻿namespace TheGameOfDoomHmmm.Source.Entity.Components;
 
 public struct Animation
 {

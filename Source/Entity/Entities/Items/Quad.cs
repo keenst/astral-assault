@@ -1,22 +1,19 @@
 #region
-using AstralAssault.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TheGameOfDoomHmmm.Source.Graphics;
+using TheGameOfDoomHmmm.Source.Entity.Components;
+using TheGameOfDoomHmmm.Source.Game;
+using TheGameOfDoomHmmm.Source.Game.GameState;
 #endregion
 
-namespace AstralAssault.Items;
+namespace TheGameOfDoomHmmm.Source.Entity.Entities.Items;
 
-internal sealed class Quad : Entity
+internal sealed class Quad : PowerUpBase
 {
-    public Quad(GameplayState gameState, Vector2 position) : base(gameState, position)
+    public Quad(GameplayState gameState, Vector2 position) : base(gameState, position) { }
+    public override void InitAnimations()
     {
-        Collider =
-            new Collider(this)
-            {
-                Radius = 3
-            };
-        GameState.CollisionSystem.AddCollider(Collider);
-
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Quad");
 
         Animation animation = AnimationCreator.CreateAnimFromSpriteSheet
@@ -41,12 +38,7 @@ internal sealed class Quad : Entity
             new[] { animation },
             null,
             null,
-            gameState.Root
+            GameState.Root
         );
-    }
-
-    public override void OnCollision(Collider other)
-    {
-        if (other.Parent is Player) Destroy();
     }
 }

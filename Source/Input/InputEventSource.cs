@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using TheGameOfDoomHmmm.Source.Game;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm.Source.Input;
 
 internal static class InputEventSource
 {

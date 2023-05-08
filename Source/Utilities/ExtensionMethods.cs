@@ -1,9 +1,10 @@
 ﻿#region
 using System;
 using Microsoft.Xna.Framework;
+using TheGameOfDoomHmmm.Source.Graphics;
 #endregion
 
-namespace AstralAssault;
+namespace TheGameOfDoomHmmm;
 
 internal static class ExtensionMethods
 {
