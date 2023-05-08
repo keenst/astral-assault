@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace AstralAssault;
 
-public class GameplayState : GameState, IKeyboardPressedEventListener
+public class GameplayState : GameState
 {
     public readonly List<Entity> Entities;
     public readonly CollisionSystem CollisionSystem = new();
@@ -84,12 +84,12 @@ public class GameplayState : GameState, IKeyboardPressedEventListener
         
         CollisionSystem.Update(e);
         _waveController.Update();
+        
+        HandleKeyboardInputs(e.KeysPressed);   
     }
 
     public override void Enter()
     {
-        InputEventSource.KeyboardPressedEvent += OnKeyboardPressedEvent;
-        
         Entities.Add(new Player(this, new Vector2(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F)));
         Entities.Add(new Crosshair(this));
     }
@@ -99,9 +99,9 @@ public class GameplayState : GameState, IKeyboardPressedEventListener
         while (Entities.Count > 0) Entities[0].Destroy();
     }
 
-    public void OnKeyboardPressedEvent(object sender, KeyboardEventArgs e)
+    private void HandleKeyboardInputs(Keys[] keys)
     {
-        if (e.Keys.All(key => key != Keys.Escape)) return;
+        if (!keys.Contains(Keys.Escape)) return;
         
         _isPaused = !_isPaused;
         
