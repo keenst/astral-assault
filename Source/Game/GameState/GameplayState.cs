@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using AstralAssault.Background;
 using AstralAssault.Source.Menu;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -14,6 +15,7 @@ public class GameplayState : GameState
     public readonly List<Entity> Entities;
     public readonly CollisionSystem CollisionSystem = new();
     private readonly WaveController _waveController;
+    private readonly BackgroundRenderer _backgroundRenderer = new();
     
     public Player Player => (Player) Entities.Find(entity => entity is Player);
     
@@ -45,6 +47,7 @@ public class GameplayState : GameState
 
         drawTasks.AddRange(_waveController.GetDrawTasks());
         drawTasks.AddRange(_pauseMenuController.GetDrawTasks());
+        drawTasks.AddRange(_backgroundRenderer.GetDrawTasks());
         
         if (!Root.ShowDebug) return drawTasks;
         
@@ -86,9 +89,10 @@ public class GameplayState : GameState
             
             CollisionSystem.Update(e);
             _waveController.Update(e.DeltaTime);
+            _backgroundRenderer.Update(e.DeltaTime);
         }
 
-        HandleKeyboardInputs(e.KeysPressed);   
+        HandleKeyboardInputs(e.KeysPressed);
     }
 
     public override void Enter()
