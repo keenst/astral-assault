@@ -7,8 +7,17 @@ namespace AstralAssault.Background;
 
 public class BackgroundRenderer
 {
+    private enum Side
+    {
+        Top,
+        Right,
+        Bottom,
+        Left
+    }
+    
     private const int ScreenWidth = Game1.TargetWidth;
     private const int ScreenHeight = Game1.TargetHeight;
+    private const int MaxNebulae = 10;
 
     private readonly Vector2 _parallaxOffset;
     private readonly Texture2D _nebulaTexture;
@@ -26,6 +35,11 @@ public class BackgroundRenderer
         _parallaxOffset = new Vector2(xOffset, yOffset);
         _parallaxOffset.Normalize();
         _parallaxOffset *= 3;
+        
+        for (int i = 0; i < MaxNebulae; i++)
+        {
+            SpawnInitialNebula();
+        }
     }
 
     public List<DrawTask> GetDrawTasks()
@@ -62,41 +76,163 @@ public class BackgroundRenderer
             break;
         }
         
-        if (_nebulae.Count < 2)
+        if (_nebulae.Count < MaxNebulae)
         {
-            int[] sides = new int[2];
-
-            if (_parallaxOffset.X > 0)
-            {
-                sides[0] = 3;
-            }
-            else
-            {
-                sides[0] = 2;
-            }
-
-            if (_parallaxOffset.Y > 0)
-            {
-                sides[1] = 0;
-            }
-            else
-            {
-                sides[1] = 3;
-            }
-
-            int side = sides[_rnd.Next(2)];
-
-            int minY;
-            int maxY;
-            int minX;
-            int maxX;
-            
-            Point position = new(_rnd.Next(minX, maxX), _rnd.Next(minY, maxY));
-
-            _nebulae.Add(new Nebula(GetVirtualPosition(position)));
+            SpawnNebula();
         }
     }
+
+    private Side[] GetSpawnSides()
+    {
+        Side[] sides = new Side[2];
+
+        if (_parallaxOffset.X > 0)
+        {
+            sides[0] = Side.Right;
+        }
+        else
+        {
+            sides[0] = Side.Left;
+        }
+
+        if (_parallaxOffset.Y > 0)
+        {
+            sides[1] = Side.Bottom;
+        }
+        else
+        {
+            sides[1] = Side.Top;
+        }
+
+        return sides;
+    }
     
+    private Point GetSpawnPosition(Side side)
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            int x;
+            int y;
+
+            switch (side)
+            {
+                case Side.Top:
+                    x = _rnd.Next(0, ScreenWidth);
+                    y = -31;
+                    break;
+                case Side.Right:
+                    x = ScreenWidth + 31;
+                    y = _rnd.Next(0, ScreenHeight);
+                    break;
+                case Side.Bottom:
+                    x = _rnd.Next(0, ScreenWidth);
+                    y = ScreenHeight + 31;
+                    break;
+                case Side.Left:
+                    x = -31;
+                    y = _rnd.Next(0, ScreenHeight);
+                    break;
+                default:
+                    x = 0;
+                    y = 0;
+                    break;
+            }
+
+            Point position = new(x, y);
+
+            if (CanSpawnNebulaOnPoint(position))
+            {
+                return position;
+            }
+        }
+
+        return new Point(0, 0);
+    }
+
+    private void GetSideRanges(Side side, out int minX, out int maxX, out int minY, out int maxY)
+    {
+        switch (side)
+        {
+            case Side.Top:
+                minX = -31;
+                maxX = ScreenWidth + 31;
+                minY = -31;
+                maxY = -31;
+                break;
+            case Side.Right:
+                minX = ScreenWidth + 31;
+                maxX = ScreenWidth + 31;
+                minY = -31;
+                maxY = ScreenHeight + 31;
+                break;
+            case Side.Bottom:
+                minX = -31;
+                maxX = ScreenWidth + 31;
+                minY = ScreenHeight + 31;
+                maxY = ScreenHeight + 31;
+                break;
+            case Side.Left:
+                minX = -31;
+                maxX = -31;
+                minY = -31;
+                maxY = ScreenHeight + 31;
+                break;
+            default:
+                minX = 0;
+                maxX = 0;
+                minY = 0;
+                maxY = 0;
+                break;
+        }
+    }
+
+    private void SpawnNebula()
+    {
+        Side[] sides = GetSpawnSides();
+        Side side = sides[_rnd.Next(2)];
+        Point position = GetSpawnPosition(side);
+
+        _nebulae.Add(new Nebula(GetVirtualPosition(position)));
+    }
+
+    private void SpawnInitialNebula()
+    {
+        int x;
+        int y;
+        
+        bool positionIsTaken;
+        do
+        {
+            positionIsTaken = false;
+            
+            x = _rnd.Next(ScreenWidth);
+            y = _rnd.Next(ScreenHeight);
+
+            if (!CanSpawnNebulaOnPoint(new Point(x, y)))
+            {
+                positionIsTaken = true;
+            }
+        } while (positionIsTaken);
+        
+        _nebulae.Add(new Nebula(new Point(x, y)));
+    }
+
+    private bool CanSpawnNebulaOnPoint(Point position)
+    {
+        Point virtualPosition = GetVirtualPosition(new Point(position.X, position.Y));
+        Rectangle checkRange = new(virtualPosition.X - 64, virtualPosition.Y - 64, 128, 128);
+
+        foreach (Nebula nebula in _nebulae)
+        {
+            if (nebula.Rectangle.Intersects(checkRange))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private Point GetScreenPosition(Point position)
     {
         int x = position.X - (int)_currentOffset.X;
