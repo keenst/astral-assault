@@ -1,6 +1,6 @@
 ﻿namespace TheGameOfDoomHmmm.Source.Game;
 
-public interface IUpdateEventListener
+internal interface IUpdateEventListener
 {
     void OnUpdate(object sender, UpdateEventArgs e);
 }

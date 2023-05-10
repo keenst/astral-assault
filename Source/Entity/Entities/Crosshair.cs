@@ -10,7 +10,7 @@ using TheGameOfDoomHmmm.Source.Input;
 
 namespace TheGameOfDoomHmmm.Source.Entity.Entities;
 
-public sealed class Crosshair : Entity, IMouseEventListener
+internal sealed class Crosshair : Entity, IMouseEventListener
 {
     public Crosshair(GameplayState gameState) : base(gameState, new Vector2(0, 0))
     {
@@ -114,7 +114,7 @@ public sealed class Crosshair : Entity, IMouseEventListener
         base.Destroy();
     }
 
-    public override void OnUpdate(object sender, UpdateEventArgs e)
+    internal override void OnUpdate(UpdateEventArgs e)
     {
         if (GameState.Player == null) return;
 

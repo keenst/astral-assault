@@ -12,7 +12,8 @@ namespace TheGameOfDoomHmmm.Source.Entity.Entities.Items;
 internal sealed class Quad : PowerUpBase
 {
     public Quad(GameplayState gameState, Vector2 position) : base(gameState, position) { }
-    public override void InitAnimations()
+
+    protected override void InitAnimations()
     {
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Quad");
 

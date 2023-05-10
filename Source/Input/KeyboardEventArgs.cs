@@ -7,10 +7,10 @@ namespace TheGameOfDoomHmmm.Source.Input;
 
 public sealed class KeyboardEventArgs : EventArgs
 {
-    internal KeyboardEventArgs(Keys[] keys)
+    public KeyboardEventArgs(Keys[] keys)
     {
         Keys = keys;
     }
 
-    internal Keys[] Keys { get; }
+    public Keys[] Keys { get; }
 }

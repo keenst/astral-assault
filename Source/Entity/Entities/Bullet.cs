@@ -8,16 +8,15 @@ using TheGameOfDoomHmmm.Source.Game.GameState;
 
 namespace TheGameOfDoomHmmm.Source.Entity.Entities;
 
-public sealed class Bullet : Entity
+internal sealed class Bullet : Entity
 {
-    public Entity m_shootBy;
+    public readonly Entity ShootBy;
 
     public Bullet(GameplayState gameState, Vector2 position, float rotation, float speed, bool isQuadDamage,
         Entity shootBy)
         : base(gameState, position)
     {
-        IsQuadDamage = isQuadDamage;
-        m_shootBy = shootBy;
+        ShootBy = shootBy;
 
         Velocity = Vector2.UnitX.RotateVector(rotation) * speed;
 
@@ -42,18 +41,16 @@ public sealed class Bullet : Entity
         ContactDamage = isQuadDamage ? 16 : 4;
     }
 
-    public bool IsQuadDamage { get; }
-
-    public override void OnCollision(Collider other)
+    internal override void OnCollision(Collider other)
     {
         if (Game1.PatternThing(this, other)) return;
 
         Destroy();
     }
 
-    public override void OnUpdate(object sender, UpdateEventArgs e)
+    internal override void OnUpdate(UpdateEventArgs e)
     {
-        base.OnUpdate(sender, e);
+        base.OnUpdate(e);
 
         if (Position.X is > Game1.TargetWidth or < 0 ||
             Position.Y is > Game1.TargetHeight or < 0) Destroy();

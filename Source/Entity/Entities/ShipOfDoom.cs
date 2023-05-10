@@ -10,9 +10,8 @@ using TheGameOfDoomHmmm.Source.Game.GameState;
 
 namespace TheGameOfDoomHmmm.Source.Entity.Entities;
 
-public sealed class ShipOfDoom : Entity
+internal sealed class ShipOfDoom : Entity
 {
-    private readonly float m_rotSpeed;
     private bool m_lastCannon;
     private long m_lastTimeFired;
     private Tuple<Vector2, Vector2> m_muzzle = new Tuple<Vector2, Vector2>(Vector2.Zero, Vector2.Zero);
@@ -25,7 +24,6 @@ public sealed class ShipOfDoom : Entity
         : base(gameState, position)
     {
         Random rnd = new Random();
-        m_rotSpeed = rnd.Next(5, 20) / 10F;
         int speed = rnd.Next(30, 100);
 
         Velocity = Vector2.UnitX.RotateVector(direction) * speed;
@@ -122,9 +120,9 @@ public sealed class ShipOfDoom : Entity
         );
     }
 
-    public override void OnUpdate(object sender, UpdateEventArgs e)
+    internal override void OnUpdate(UpdateEventArgs e)
     {
-        base.OnUpdate(sender, e);
+        base.OnUpdate(e);
 
         Vector2 diff = GameState.Player.Position - Position;
 
@@ -175,7 +173,7 @@ public sealed class ShipOfDoom : Entity
         m_lastCannon = !m_lastCannon;
     }
 
-    public override void OnCollision(Collider other)
+    internal override void OnCollision(Collider other)
     {
         base.OnCollision(other);
 

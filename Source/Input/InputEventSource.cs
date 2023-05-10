@@ -9,7 +9,7 @@ using TheGameOfDoomHmmm.Source.Game;
 
 namespace TheGameOfDoomHmmm.Source.Input;
 
-internal static class InputEventSource
+public static class InputEventSource
 {
     public enum MouseButtons { Left }
 

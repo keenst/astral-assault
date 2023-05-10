@@ -7,11 +7,11 @@ using TheGameOfDoomHmmm.Source.Game.GameState;
 
 namespace TheGameOfDoomHmmm.Source.Game;
 
-public sealed class ItemController : IUpdateEventListener
+internal sealed class ItemController : IUpdateEventListener
 {
     private readonly GameplayState m_gameState;
     private readonly Random m_rnd = new Random();
-    private readonly int m_spawnInterval = 10000;
+    private const int SpawnInterval = 10000;
     private long m_lastSpawnTimeMS;
     private int m_spawnedThisWave;
 
@@ -24,7 +24,7 @@ public sealed class ItemController : IUpdateEventListener
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-        if ((timeNow - m_lastSpawnTimeMS) <= m_spawnInterval) return;
+        if ((timeNow - m_lastSpawnTimeMS) <= SpawnInterval) return;
 
         m_lastSpawnTimeMS = timeNow;
         SpawnItem();

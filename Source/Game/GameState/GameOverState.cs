@@ -42,7 +42,7 @@ internal sealed class GameOverState : GameState, IKeyboardPressedEventListener
         Root.GameStateMachine.ChangeState(new GameplayState(Root));
     }
 
-    public override void Draw()
+    internal override void Draw()
     {
         Vector2 textPosition = new Vector2
         (
@@ -92,13 +92,13 @@ internal sealed class GameOverState : GameState, IKeyboardPressedEventListener
         newHighScoreText.Draw(new Vector2(newHighScoreX, 170), Color.White, 0f, new Vector2(0, 0), 1f, LayerOrdering.Foreground);
     }
 
-    public override void Enter()
+    internal override void Enter()
     {
         m_gameOverText = AssetManager.Load<Texture2D>("GameOver");
         m_restartPrompt = AssetManager.Load<Texture2D>("Restart");
     }
 
-    public override void Exit()
+    internal override void Exit()
     {
         InputEventSource.KeyboardPressedEvent -= OnKeyboardPressedEvent;
     }

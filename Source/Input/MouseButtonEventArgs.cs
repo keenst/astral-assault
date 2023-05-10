@@ -6,10 +6,10 @@ namespace TheGameOfDoomHmmm.Source.Input;
 
 public sealed class MouseButtonEventArgs : EventArgs
 {
-    internal MouseButtonEventArgs(InputEventSource.MouseButtons button)
+    public MouseButtonEventArgs(InputEventSource.MouseButtons button)
     {
         Button = button;
     }
 
-    internal InputEventSource.MouseButtons Button { get; }
+    public InputEventSource.MouseButtons Button { get; }
 }

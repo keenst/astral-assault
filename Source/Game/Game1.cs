@@ -18,8 +18,8 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private enum Width { Full = 1920, Half = 960, Quarter = 480 }
     private enum Height { Full = 1080, Half = 540, Quarter = 270 }
 
-    public const int TargetWidth = (int)Width.Quarter;
-    public const int TargetHeight = (int)Height.Quarter;
+    internal const int TargetWidth = (int)Width.Quarter;
+    internal const int TargetHeight = (int)Height.Quarter;
     private const int StatUpdateInterval = 300;
 
     // display
@@ -27,24 +27,24 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private readonly GraphicsDeviceManager m_graphics;
     private readonly Matrix m_scale;
 
-    public GameStateMachine GameStateMachine;
-    public int HighScore;
+    internal GameStateMachine GameStateMachine;
+    internal int HighScore;
     private float m_frameRate;
     private long m_lastStatUpdate;
     private KeyboardState m_prevKeyState = Keyboard.GetState();
     private RenderTarget2D m_renderTarget;
     private float m_renderTime;
-    public float ScaleX;
-    public float ScaleY;
-    public int Score;
+    internal readonly float ScaleX;
+    internal readonly float ScaleY;
+    internal int Score;
 
     // debug tools
-    public bool ShowDebug;
+    internal bool ShowDebug;
 
     // render
-    public SpriteBatch SpriteBatch;
+    internal SpriteBatch SpriteBatch;
 
-    public Game1()
+    internal Game1()
     {
         // set up game class
         m_graphics = new GraphicsDeviceManager(this);
@@ -64,17 +64,17 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         ShowDebug = false;
     }
 
-    public static bool PatternThing(Entity.Entities.Entity e1, Collider c1)
+    internal static bool PatternThing(Entity.Entities.Entity e1, Collider c1)
     {
         if (e1 is Bullet || c1.Parent is Bullet)
         {
             Entity.Entities.Entity e;
             Bullet b;
 
-            if (e1 is Bullet)
+            if (e1 is Bullet bullet)
             {
                 e = c1.Parent;
-                b = (Bullet)e1;
+                b = bullet;
             }
             else
             {
@@ -82,34 +82,18 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
                 b = (Bullet)c1.Parent;
             }
 
-            switch (b.m_shootBy)
+            switch (b.ShootBy)
             {
             case Player when e is Player or Quad or Haste or MegaHealth:
             case ShipOfDoom when e is ShipOfDoom or Quad or Haste or MegaHealth or Asteroid: return true;
             }
         }
 
-        if (e1 is Player || c1.Parent is Player)
-        {
-            Player p;
-            Entity.Entities.Entity otherEnt;
+        if (e1 is not Player && c1.Parent is not Player) return e1 is Asteroid && c1.Parent is Asteroid;
 
-            if (e1 is Player)
-            {
-                p = (Player)e1;
-                otherEnt = c1.Parent;
-            }
-            else
-            {
-                p = (Player)c1.Parent;
-                otherEnt = e1;
-            }
+        Entity.Entities.Entity otherEnt = e1 is Player ? c1.Parent : e1;
 
-
-            if (otherEnt is PowerUpBase) return true;
-        }
-
-        return e1 is Asteroid && c1.Parent is Asteroid;
+        return otherEnt is PowerUpBase;
     }
 
     protected override void Initialize()

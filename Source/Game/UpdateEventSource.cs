@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 namespace TheGameOfDoomHmmm.Source.Game;
 
-public static class UpdateEventSource
+internal static class UpdateEventSource
 {
     public static event EventHandler<UpdateEventArgs> UpdateEvent;
 

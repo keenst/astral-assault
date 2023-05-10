@@ -13,7 +13,7 @@ internal sealed class MegaHealth : PowerUpBase
 {
     public MegaHealth(GameplayState gameState, Vector2 position) : base(gameState, position) { }
 
-    public override void InitAnimations()
+    protected override void InitAnimations()
     {
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("MegaHealth");
 

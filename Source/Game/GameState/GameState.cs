@@ -2,16 +2,16 @@
 
 public abstract class GameState : IUpdateEventListener
 {
-    public readonly Game1 Root;
+    internal readonly Game1 Root;
 
-    public GameState(Game1 root)
+    protected GameState(Game1 root)
     {
         Root = root;
     }
 
     public abstract void OnUpdate(object sender, UpdateEventArgs e);
 
-    public abstract void Draw();
-    public abstract void Enter();
-    public abstract void Exit();
+    internal abstract void Draw();
+    internal abstract void Enter();
+    internal abstract void Exit();
 }
