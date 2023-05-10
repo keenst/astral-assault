@@ -7,8 +7,8 @@ namespace TheGameOfDoomHmmm.Source.Game;
 
 internal static class Jukebox
 {
-    private static readonly Dictionary<string, SoundEffect> SoundEffects = new Dictionary<string, SoundEffect>();
     private const float MasterVolume = 0.5F;
+    private static readonly Dictionary<string, SoundEffect> SoundEffects = new Dictionary<string, SoundEffect>();
 
     public static void Init()
     {

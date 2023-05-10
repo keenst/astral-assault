@@ -18,11 +18,11 @@ public class Entity
     private readonly long m_timeSpawned;
     protected Collider Collider;
     protected float ContactDamage;
+    internal float HighlightAlpha;
     protected float HP;
     protected bool IsActor = false;
 
     private Texture2D m_healthBarTexture;
-    internal float HighlightAlpha;
 
     private bool m_isHighlighted;
     private long m_timeStartedHighlightingMS;

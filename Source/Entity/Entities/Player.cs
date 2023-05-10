@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TheGameOfDoomHmmm.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -10,6 +9,7 @@ using TheGameOfDoomHmmm.Source.Entity.Components;
 using TheGameOfDoomHmmm.Source.Entity.Entities.Items;
 using TheGameOfDoomHmmm.Source.Game;
 using TheGameOfDoomHmmm.Source.Game.GameState;
+using TheGameOfDoomHmmm.Source.Graphics;
 using TheGameOfDoomHmmm.Source.Input;
 #endregion
 

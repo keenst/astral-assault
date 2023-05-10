@@ -59,7 +59,8 @@ internal sealed class GameOverState : GameState, IKeyboardPressedEventListener
         m_gameOverText.DrawTexture2D(textPosition, 0f, LayerOrdering.Foreground);
 
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        if ((timeNow - m_timeEntered) > 1000) m_restartPrompt.DrawTexture2D(promptPosition, 0, LayerOrdering.Foreground);
+        if ((timeNow - m_timeEntered) > 1000)
+            m_restartPrompt.DrawTexture2D(promptPosition, 0, LayerOrdering.Foreground);
 
         int score = (int)Lerp(0, Root.Score, MathF.Min((timeNow - m_timeEntered) / 800F, 1));
         string scoreText = $"Score: {score}";
@@ -89,7 +90,8 @@ internal sealed class GameOverState : GameState, IKeyboardPressedEventListener
 
         const string newHighScoreText = "New high score!";
         int newHighScoreX = (int)(textPosition.X - newHighScoreText.Size().X / 2f);
-        newHighScoreText.Draw(new Vector2(newHighScoreX, 170), Color.White, 0f, new Vector2(0, 0), 1f, LayerOrdering.Foreground);
+        newHighScoreText.Draw
+            (new Vector2(newHighScoreX, 170), Color.White, 0f, new Vector2(0, 0), 1f, LayerOrdering.Foreground);
     }
 
     internal override void Enter()
@@ -103,7 +105,8 @@ internal sealed class GameOverState : GameState, IKeyboardPressedEventListener
         InputEventSource.KeyboardPressedEvent -= OnKeyboardPressedEvent;
     }
 
-    private static float Lerp(float firstFloat, float secondFloat, float by) => firstFloat * (1 - by) + secondFloat * by;
+    private static float Lerp(float firstFloat, float secondFloat, float by) =>
+        firstFloat * (1 - by) + secondFloat * by;
 
     public override void OnUpdate(object sender, UpdateEventArgs e) { }
 }

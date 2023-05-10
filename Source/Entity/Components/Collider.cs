@@ -7,11 +7,11 @@ namespace TheGameOfDoomHmmm.Source.Entity.Components;
 
 public sealed class Collider
 {
-    private readonly float m_mass;
-    internal readonly Entities.Entity Parent;
     private readonly bool m_isSolid;
-    internal int Radius;
+    private readonly float m_mass;
     private readonly float m_restitution;
+    internal readonly Entities.Entity Parent;
+    internal int Radius;
 
     internal Collider(Entities.Entity parent, bool isSolid, int mass)
     {

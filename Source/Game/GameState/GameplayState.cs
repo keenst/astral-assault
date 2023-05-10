@@ -18,9 +18,9 @@ public sealed class GameplayState : GameState
     internal readonly CollisionSystem CollisionSystem = new CollisionSystem();
     internal readonly List<Entity.Entities.Entity> Entities;
     internal readonly ItemController ItemController;
+    private readonly WaveController m_waveController;
     private Vector4 m_multiplierColor = MultiplierDefaultColor;
     private float m_prevMultiplier = 1;
-    private readonly WaveController m_waveController;
 
 
     internal GameplayState(Game1 root) : base(root)

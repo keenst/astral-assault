@@ -1,11 +1,11 @@
 #region
 using System;
-using TheGameOfDoomHmmm.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TheGameOfDoomHmmm.Source.Entity.Components;
 using TheGameOfDoomHmmm.Source.Game;
 using TheGameOfDoomHmmm.Source.Game.GameState;
+using TheGameOfDoomHmmm.Source.Graphics;
 #endregion
 
 namespace TheGameOfDoomHmmm.Source.Entity.Entities;

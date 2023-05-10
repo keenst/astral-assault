@@ -15,9 +15,6 @@ namespace TheGameOfDoomHmmm.Source.Game;
 
 public sealed class Game1 : Microsoft.Xna.Framework.Game
 {
-    private enum Width { Full = 1920, Half = 960, Quarter = 480 }
-    private enum Height { Full = 1080, Half = 540, Quarter = 270 }
-
     internal const int TargetWidth = (int)Width.Quarter;
     internal const int TargetHeight = (int)Height.Quarter;
     private const int StatUpdateInterval = 300;
@@ -26,6 +23,8 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private static readonly Color BackgroundColor = new Color(28, 23, 41);
     private readonly GraphicsDeviceManager m_graphics;
     private readonly Matrix m_scale;
+    internal readonly float ScaleX;
+    internal readonly float ScaleY;
 
     internal GameStateMachine GameStateMachine;
     internal int HighScore;
@@ -34,8 +33,6 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     private KeyboardState m_prevKeyState = Keyboard.GetState();
     private RenderTarget2D m_renderTarget;
     private float m_renderTime;
-    internal readonly float ScaleX;
-    internal readonly float ScaleY;
     internal int Score;
 
     // debug tools
@@ -188,7 +185,8 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             string renderTime = m_renderTime.ToString();
 
             frameRate.Draw(Vector2.Zero, Color.Yellow, 0f, new Vector2(0, 0), 1f, LayerOrdering.Debug);
-            renderTime.Draw(new Vector2(0, frameRate.Size().Y), Color.Yellow, 0f, new Vector2(0, 0), 1f, LayerOrdering.Debug);
+            renderTime.Draw
+                (new Vector2(0, frameRate.Size().Y), Color.Yellow, 0f, new Vector2(0, 0), 1f, LayerOrdering.Debug);
         }
 
         SpriteBatch.End();
@@ -211,4 +209,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
 
         base.Draw(gameTime);
     }
+
+    private enum Width { Full = 1920, Half = 960, Quarter = 480 }
+    private enum Height { Full = 1080, Half = 540, Quarter = 270 }
 }

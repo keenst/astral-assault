@@ -18,12 +18,12 @@ public sealed class SpriteRenderer
         Transition>();
 
     private readonly Animation[] m_animations;
+
+    private readonly Entities.Entity m_baseE;
     private readonly Game1 m_root;
     private readonly Texture2D m_spriteSheet;
 
     private int[] m_animationQueue;
-
-    private readonly Entities.Entity m_baseE;
 
     private int m_currentFrameIndex;
     private int m_indexInQueue;

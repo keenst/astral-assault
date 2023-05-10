@@ -1,6 +1,8 @@
+#region
 using Microsoft.Xna.Framework;
 using TheGameOfDoomHmmm.Source.Entity.Components;
 using TheGameOfDoomHmmm.Source.Game.GameState;
+#endregion
 
 namespace TheGameOfDoomHmmm.Source.Entity.Entities.Items;
 

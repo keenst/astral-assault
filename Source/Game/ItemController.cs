@@ -9,9 +9,9 @@ namespace TheGameOfDoomHmmm.Source.Game;
 
 internal sealed class ItemController : IUpdateEventListener
 {
+    private const int SpawnInterval = 10000;
     private readonly GameplayState m_gameState;
     private readonly Random m_rnd = new Random();
-    private const int SpawnInterval = 10000;
     private long m_lastSpawnTimeMS;
     private int m_spawnedThisWave;
 
