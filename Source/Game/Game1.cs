@@ -131,7 +131,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
         Palette.Init();
         Jukebox.Init();
 
-        GameStateMachine = new GameStateMachine(new GameOverState(this));
+        GameStateMachine = new GameStateMachine(new GameplayState(this));
 
         base.Initialize();
     }

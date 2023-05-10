@@ -126,14 +126,23 @@ public sealed class ShipOfDoom : Entity
     {
         base.OnUpdate(sender, e);
 
-        Vector2 distanceToPlayer = GameState.Player.Position - Position;
-        Vector2 dir = Vector2.Normalize(distanceToPlayer);
+        Vector2 diff = GameState.Player.Position - Position;
 
-        float angle = MathF.Atan2(distanceToPlayer.Y, distanceToPlayer.X);
-
-        Velocity = dir * 35;
-
+        float angle = MathF.Atan2(diff.Y, diff.X);
         Rotation = angle;
+
+        Velocity += Vector2.UnitX.RotateVector(angle) * 0.1f;
+
+        // apply friction
+        float sign = Math.Sign(Velocity.Length());
+
+        if (sign != 0)
+        {
+            float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
+
+            Velocity -=
+                Vector2.UnitX.RotateVector(direction) * 0.3f * e.DeltaTime * sign;
+        }
 
         // rotate the points for the cannon muzzles
         float rot = MathF.PI / 8 * (float)Math.Round(Rotation / (MathF.PI / 8));
