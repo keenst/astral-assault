@@ -54,6 +54,8 @@ public sealed class SpriteRenderer
 
         if (animationConditions != null) InitAnimationConditions(animationConditions);
         CurrentAnimationIndex = 0;
+
+        UpdateEventSource.UpdateEvent += OnUpdate;
     }
 
     internal SpriteRenderer(
@@ -69,6 +71,8 @@ public sealed class SpriteRenderer
         m_spriteSheet = spriteSheet;
         m_root = root;
         CurrentAnimationIndex = 0;
+
+        UpdateEventSource.UpdateEvent += OnUpdate;
     }
 
     private int CurrentAnimationIndex { get; set; }
@@ -78,7 +82,7 @@ public sealed class SpriteRenderer
         get => m_animations[CurrentAnimationIndex];
     }
 
-    internal void OnUpdate(UpdateEventArgs e)
+    internal void OnUpdate(object sender, UpdateEventArgs e)
     {
         int frameLength = CurrentAnimation.Frames[m_currentFrameIndex].Time;
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
@@ -126,6 +130,11 @@ public sealed class SpriteRenderer
         }
 
         m_lastFrameUpdate = timeNow;
+    }
+
+    public void Destroy()
+    {
+        UpdateEventSource.UpdateEvent -= OnUpdate;
     }
 
     internal void Draw(Vector2 position, float rotation, bool isCrosshair)

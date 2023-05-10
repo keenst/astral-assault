@@ -73,9 +73,9 @@ public sealed class ItemController : IUpdateEventListener
             var _ => throw new ArgumentOutOfRangeException()
         };
 
-        bool powerupExistsInWorld = m_gameState.Entities.IndexOf(item) == -1;
+        bool powerupExistsInWorld = m_gameState.Entities.IndexOf(item) != -1;
 
-        while (!powerupExistsInWorld)
+        while (powerupExistsInWorld)
         {
             item = m_rnd.Next(3) switch
             {
@@ -85,7 +85,7 @@ public sealed class ItemController : IUpdateEventListener
                 var _ => throw new ArgumentOutOfRangeException()
             };
 
-            powerupExistsInWorld = m_gameState.Entities.IndexOf(item) == -1;
+            powerupExistsInWorld = m_gameState.Entities.IndexOf(item) != -1;
         }
 
         m_gameState.Entities.Add(item);

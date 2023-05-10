@@ -49,8 +49,6 @@ public class Entity
 
     public virtual void OnUpdate(object sender, UpdateEventArgs e)
     {
-        SpriteRenderer.OnUpdate(e);
-
         if (IsActor && (HP <= 0))
         {
             OnDeath();
@@ -145,6 +143,7 @@ public class Entity
     {
         GameState.Entities.Remove(this);
         GameState.CollisionSystem.RemoveCollider(Collider);
+        SpriteRenderer.Destroy();
     }
 
     private void CreateHealthBarTexture()
