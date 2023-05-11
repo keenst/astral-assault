@@ -5,10 +5,10 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace TheGameOfDoomHmmm.Source.Game;
 
-public static class Jukebox
+internal static class Jukebox
 {
+    private const float MasterVolume = 0.5F;
     private static readonly Dictionary<string, SoundEffect> SoundEffects = new Dictionary<string, SoundEffect>();
-    private static float m_masterVolume = 0.5F;
 
     public static void Init()
     {
@@ -34,11 +34,6 @@ public static class Jukebox
     {
         if (!SoundEffects.ContainsKey(name)) throw new KeyNotFoundException($"SoundEffect {name} not found");
 
-        SoundEffects[name].Play(volume * m_masterVolume, 0, 0);
-    }
-
-    public static void SetMasterVolume(float volume)
-    {
-        m_masterVolume = volume;
+        SoundEffects[name].Play(volume * MasterVolume, 0, 0);
     }
 }

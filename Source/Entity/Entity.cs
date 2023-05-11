@@ -18,20 +18,20 @@ public class Entity
     private readonly long m_timeSpawned;
     protected Collider Collider;
     protected float ContactDamage;
+    internal float HighlightAlpha;
     protected float HP;
     protected bool IsActor = false;
 
     private Texture2D m_healthBarTexture;
-    public float m_highlightAlpha;
 
     private bool m_isHighlighted;
     private long m_timeStartedHighlightingMS;
     protected float MaxHP;
     protected OutOfBounds OutOfBoundsBehavior = OutOfBounds.Wrap;
-    public Vector2 Position;
+    internal Vector2 Position;
     protected float Rotation;
     protected SpriteRenderer SpriteRenderer;
-    public Vector2 Velocity;
+    internal Vector2 Velocity;
 
     protected Entity(GameplayState gameState, Vector2 position)
     {
@@ -42,12 +42,12 @@ public class Entity
         if (this is not Bullet) CreateHealthBarTexture();
     }
 
-    public long TimeSinceSpawned
+    internal long TimeSinceSpawned
     {
         get => DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - m_timeSpawned;
     }
 
-    public virtual void OnUpdate(object sender, UpdateEventArgs e)
+    internal virtual void OnUpdate(UpdateEventArgs e)
     {
         if (IsActor && (HP <= 0))
         {
@@ -99,7 +99,7 @@ public class Entity
         }
     }
 
-    public virtual void OnCollision(Collider other)
+    internal virtual void OnCollision(Collider other)
     {
         if (Game1.PatternThing(this, other)) return;
 
@@ -109,10 +109,10 @@ public class Entity
 
         m_isHighlighted = true;
         m_timeStartedHighlightingMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        m_highlightAlpha = 0.7F;
+        HighlightAlpha = 0.7F;
     }
 
-    public virtual void Draw()
+    internal virtual void Draw()
     {
         if (m_isHighlighted)
         {
@@ -121,12 +121,12 @@ public class Entity
             long timeNowMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             float timeSinceStartedS = (timeNowMS - m_timeStartedHighlightingMS) / 1000F;
 
-            m_highlightAlpha = 0.7F * MathF.Pow(decayRate, timeSinceStartedS);
+            HighlightAlpha = 0.7F * MathF.Pow(decayRate, timeSinceStartedS);
 
-            if (m_highlightAlpha <= 0.01)
+            if (HighlightAlpha <= 0.01)
             {
                 m_isHighlighted = false;
-                m_highlightAlpha = 0;
+                HighlightAlpha = 0;
             }
         }
 

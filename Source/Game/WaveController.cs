@@ -9,22 +9,22 @@ using TheGameOfDoomHmmm.Source.Graphics;
 
 namespace TheGameOfDoomHmmm.Source.Game;
 
-public sealed class WaveController
+internal sealed class WaveController
 {
-    public readonly GameplayState GameState;
+    private readonly GameplayState m_gameState;
     private int m_currentWave;
     private bool m_levelUpHehe;
 
-    public WaveController(GameplayState gameState, Game1 root)
+    public WaveController(GameplayState gameState)
     {
-        GameState = gameState;
+        m_gameState = gameState;
 
         StartNextWave();
     }
 
-    public void StartNextWave()
+    private void StartNextWave()
     {
-        GameState.ItemController.NewWave();
+        m_gameState.ItemController.NewWave();
 
         m_currentWave++;
 
@@ -68,7 +68,7 @@ public sealed class WaveController
                 float angleToCenter = MathF.Atan2(gameCenter.Y - position.Y, gameCenter.X - position.X);
                 angleToCenter += MathHelper.ToRadians(rnd.Next(-45, 45));
 
-                GameState.Entities.Add(new Asteroid(GameState, position, angleToCenter, size));
+                m_gameState.Entities.Add(new Asteroid(m_gameState, position, angleToCenter, size));
             }
 
             for (int i = 0; i < shipsOfDoomToSpawn; i++)
@@ -91,7 +91,7 @@ public sealed class WaveController
                     var _ => throw new ArgumentOutOfRangeException()
                 };
 
-                GameState.Entities.Add(new ShipOfDoom(GameState, new Vector2(px, py), 0));
+                m_gameState.Entities.Add(new ShipOfDoom(m_gameState, new Vector2(px, py), 0));
             }
 
             break;
@@ -125,18 +125,18 @@ public sealed class WaveController
                 float angleToCenter = MathF.Atan2(gameCenter.Y - position.Y, gameCenter.X - position.X);
                 angleToCenter += MathHelper.ToRadians(rnd.Next(-45, 45));
 
-                GameState.Entities.Add(new Asteroid(GameState, position, angleToCenter, size));
+                m_gameState.Entities.Add(new Asteroid(m_gameState, position, angleToCenter, size));
             }
 
             break;
         }
     }
 
-    public void OnUpdate(object sender, UpdateEventArgs e)
+    public void OnUpdate()
     {
         int enemiesAlive = 0;
 
-        foreach (Entity.Entities.Entity ez in GameState.Entities)
+        foreach (Entity.Entities.Entity ez in m_gameState.Entities)
         {
             if (ez is Quad or Haste or MegaHealth or Crosshair or Player) continue;
 

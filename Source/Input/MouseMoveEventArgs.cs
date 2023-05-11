@@ -7,10 +7,10 @@ namespace TheGameOfDoomHmmm.Source.Input;
 
 public sealed class MouseMoveEventArgs : EventArgs
 {
-    internal MouseMoveEventArgs(Point position)
+    public MouseMoveEventArgs(Point position)
     {
         Position = position;
     }
 
-    internal Point Position { get; }
+    public Point Position { get; }
 }

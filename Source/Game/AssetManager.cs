@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TheGameOfDoomHmmm.Source.Game;
 
-public static class AssetManager
+internal static class AssetManager
 {
     private static readonly Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
     private static readonly Dictionary<string, SoundEffect> SoundEffects = new Dictionary<string, SoundEffect>();
@@ -41,8 +41,8 @@ public static class AssetManager
         }
         else throw new ArgumentException("T must be Texture2D, SoundEffect, BitmapFont, or Effect");
 
-        if (activeDictionary.ContainsKey(path))
-            return activeDictionary[path];
+        if (activeDictionary.TryGetValue(path, out T load))
+            return load;
 
         T asset = m_root.Content.Load<T>($"{activeDirectory}/{path}");
 

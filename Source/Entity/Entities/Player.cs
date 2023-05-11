@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TheGameOfDoomHmmm.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -10,6 +9,7 @@ using TheGameOfDoomHmmm.Source.Entity.Components;
 using TheGameOfDoomHmmm.Source.Entity.Entities.Items;
 using TheGameOfDoomHmmm.Source.Game;
 using TheGameOfDoomHmmm.Source.Game.GameState;
+using TheGameOfDoomHmmm.Source.Graphics;
 using TheGameOfDoomHmmm.Source.Input;
 #endregion
 
@@ -43,7 +43,7 @@ public sealed class Player : Entity, IInputEventListener
     private float m_tiltSpeed = 200;
     internal float Multiplier = 1;
 
-    public Player(GameplayState gameState, Vector2 position) : base(gameState, position)
+    internal Player(GameplayState gameState, Vector2 position) : base(gameState, position)
     {
         m_square = new Texture2D(GameState.Root.GraphicsDevice, 1, 1);
         m_square.SetData(new[] { Color.White });
@@ -191,9 +191,9 @@ public sealed class Player : Entity, IInputEventListener
         );
     }
 
-    public override void OnUpdate(object sender, UpdateEventArgs e)
+    internal override void OnUpdate(UpdateEventArgs e)
     {
-        base.OnUpdate(sender, e);
+        base.OnUpdate(e);
 
         bool haste = false;
 
@@ -247,13 +247,15 @@ public sealed class Player : Entity, IInputEventListener
         );
     }
 
-    public override void OnCollision(Collider other)
+    internal override void OnCollision(Collider other)
     {
         base.OnCollision(other);
 
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
 
-        if (other.Parent is Quad)
+        switch (other.Parent)
+        {
+        case Quad:
         {
             Jukebox.PlaySound("PickUp");
 
@@ -265,24 +267,30 @@ public sealed class Player : Entity, IInputEventListener
 
 
             m_powerUps.Add(new Tuple<long, PowerUps>(timeNow, PowerUps.QuadDamage));
+
+            break;
         }
-        else if (other.Parent is Haste)
+        case Haste:
         {
             Jukebox.PlaySound("PickUp");
 
             for (int i = m_powerUps.Count - 1; i >= 0; i--)
+            {
                 if (m_powerUps[i].Item2 == PowerUps.Haste)
                     m_powerUps.RemoveAt(i);
+            }
 
             m_powerUps.Add(new Tuple<long, PowerUps>(timeNow, PowerUps.Haste));
+
+            break;
         }
-        else if (other.Parent is MegaHealth)
-        {
+        case MegaHealth:
             Jukebox.PlaySound("PickUp");
 
             HP = Math.Min(MaxHP, HP + 15);
-        }
-        else if (other.Parent is Asteroid or ShipOfDoom)
+
+            break;
+        case Asteroid or ShipOfDoom:
         {
             if (Multiplier > 1) Jukebox.PlaySound("MultiplierBroken");
 
@@ -299,6 +307,9 @@ public sealed class Player : Entity, IInputEventListener
             };
 
             Jukebox.PlaySound(soundName, 0.5F);
+
+            break;
+        }
         }
     }
 
@@ -327,7 +338,7 @@ public sealed class Player : Entity, IInputEventListener
         InputEventSource.MouseButtonEvent -= OnMouseButtonEvent;
     }
 
-    public override void Draw()
+    internal override void Draw()
     {
         base.Draw();
 
@@ -393,7 +404,7 @@ public sealed class Player : Entity, IInputEventListener
             powerUpName.Draw
             (
                 new Vector2(4, 28 + i * 12),
-                Palette.GetColor(Palette.Colors.Grey9),
+                new Color(color),
                 0f,
                 new Vector2(0, 0),
                 1f,
@@ -445,7 +456,7 @@ public sealed class Player : Entity, IInputEventListener
 
         Random rnd = new Random();
         string soundName =
-            (m_powerUps.Any(t => t.Item2 is PowerUps.QuadDamage) ? "Quad" : "") +
+            (m_powerUps.Any(static t => t.Item2 is PowerUps.QuadDamage) ? "Quad" : "") +
             "Shoot" +
             rnd.Next(1, 4);
 
@@ -466,7 +477,7 @@ public sealed class Player : Entity, IInputEventListener
                 m_lastCannon ? m_muzzle.Item1 : m_muzzle.Item2,
                 rot,
                 BulletSpeed,
-                m_powerUps.Any(t => t.Item2 == PowerUps.QuadDamage), this
+                m_powerUps.Any(static t => t.Item2 == PowerUps.QuadDamage), this
             )
         );
 

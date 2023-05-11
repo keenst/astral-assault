@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using TheGameOfDoomHmmm.Source.Entity.Components;
-using TheGameOfDoomHmmm.Source.Game;
 #endregion
 
 namespace TheGameOfDoomHmmm.Source.Entity.Entities;
@@ -10,9 +9,9 @@ namespace TheGameOfDoomHmmm.Source.Entity.Entities;
 public sealed class CollisionSystem
 {
     private List<Tuple<Collider, Collider>> m_lastCollisions = new List<Tuple<Collider, Collider>>();
-    public List<Collider> Colliders { get; } = new List<Collider>();
+    internal List<Collider> Colliders { get; } = new List<Collider>();
 
-    public void OnUpdate(object sender, UpdateEventArgs e)
+    internal void OnUpdate()
     {
         List<Tuple<Collider, Collider>> currentCollisions = new List<Tuple<Collider, Collider>>();
 
@@ -47,12 +46,12 @@ public sealed class CollisionSystem
         m_lastCollisions = currentCollisions;
     }
 
-    public void AddCollider(Collider collider)
+    internal void AddCollider(Collider collider)
     {
         Colliders.Add(collider);
     }
 
-    public void RemoveCollider(Collider collider)
+    internal void RemoveCollider(Collider collider)
     {
         Colliders.Remove(collider);
     }

@@ -1,16 +1,16 @@
 ﻿#region
-using TheGameOfDoomHmmm.Source.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TheGameOfDoomHmmm.Source.Entity.Components;
 using TheGameOfDoomHmmm.Source.Game;
 using TheGameOfDoomHmmm.Source.Game.GameState;
+using TheGameOfDoomHmmm.Source.Graphics;
 using TheGameOfDoomHmmm.Source.Input;
 #endregion
 
 namespace TheGameOfDoomHmmm.Source.Entity.Entities;
 
-public sealed class Crosshair : Entity, IMouseEventListener
+internal sealed class Crosshair : Entity, IMouseEventListener
 {
     public Crosshair(GameplayState gameState) : base(gameState, new Vector2(0, 0))
     {
@@ -114,7 +114,7 @@ public sealed class Crosshair : Entity, IMouseEventListener
         base.Destroy();
     }
 
-    public override void OnUpdate(object sender, UpdateEventArgs e)
+    internal override void OnUpdate(UpdateEventArgs e)
     {
         if (GameState.Player == null) return;
 

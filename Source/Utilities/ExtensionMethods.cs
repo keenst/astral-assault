@@ -6,9 +6,9 @@ using TheGameOfDoomHmmm.Source.Graphics;
 
 namespace TheGameOfDoomHmmm;
 
-internal static class ExtensionMethods
+public static class ExtensionMethods
 {
-    internal static Vector2 RotateVector(this Vector2 inVector, float rotation) =>
+    public static Vector2 RotateVector(this Vector2 inVector, float rotation) =>
         Vector2.Transform(inVector, Matrix.CreateRotationZ(rotation));
 
     public static int Mod(this int x, int y) => (Math.Abs(x * y) + x) % y;

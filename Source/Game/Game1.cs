@@ -31,7 +31,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
     public int HighScore;
     private float m_frameRate;
     private long m_lastStatUpdate;
-    public KeyboardState PrevKeyState = Keyboard.GetState();
+    private KeyboardState m_prevKeyState = Keyboard.GetState();
     private RenderTarget2D m_renderTarget;
     private float m_renderTime;
     public float ScaleX;
@@ -147,9 +147,9 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
-        if (Keyboard.GetState().IsKeyDown(Keys.F2) && !PrevKeyState.IsKeyDown(Keys.F3)) ShowDebug = !ShowDebug;
+        if (Keyboard.GetState().IsKeyDown(Keys.F2) && !m_prevKeyState.IsKeyDown(Keys.F2)) ShowDebug = !ShowDebug;
 
-        if (Keyboard.GetState().IsKeyDown(Keys.F) && !PrevKeyState.IsKeyDown(Keys.F))
+        if (Keyboard.GetState().IsKeyDown(Keys.F) && !m_prevKeyState.IsKeyDown(Keys.F))
         {
             if (m_graphics.IsFullScreen)
             {
@@ -167,7 +167,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
             }
         }
 
-        PrevKeyState = Keyboard.GetState();
+        m_prevKeyState = Keyboard.GetState();
 
         UpdateEventSource.Update(gameTime);
 

@@ -9,14 +9,14 @@ using TheGameOfDoomHmmm.Source.Game.GameState;
 
 namespace TheGameOfDoomHmmm.Source.Entity.Entities;
 
-public sealed class Asteroid : Entity
+internal sealed class Asteroid : Entity
 {
     public enum Sizes { Smallest, Small, Medium }
     private readonly float m_rotSpeed;
     private readonly Sizes m_size;
     private bool m_hasExploded;
 
-    public Asteroid(
+    internal Asteroid(
         GameplayState gameState,
         Vector2 position,
         float direction,
@@ -159,9 +159,9 @@ public sealed class Asteroid : Entity
         base.OnDeath();
     }
 
-    public override void OnUpdate(object sender, UpdateEventArgs e)
+    internal override void OnUpdate(UpdateEventArgs e)
     {
-        base.OnUpdate(sender, e);
+        base.OnUpdate(e);
 
         Rotation += m_rotSpeed * e.DeltaTime;
 
@@ -170,7 +170,7 @@ public sealed class Asteroid : Entity
         if (Velocity.Length() > 200) Velocity = Vector2.Normalize(Velocity) * 200;
     }
 
-    public override void OnCollision(Collider other)
+    internal override void OnCollision(Collider other)
     {
         base.OnCollision(other);
 

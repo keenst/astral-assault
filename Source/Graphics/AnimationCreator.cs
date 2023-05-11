@@ -22,10 +22,11 @@ internal static class AnimationCreator
         int reverseAtIdx
     )
     {
-        Animation anim = new Animation();
-
-        anim.HasRotation = hasRotation;
-        anim.IsLooping = shouldLoop;
+        Animation anim = new Animation
+        {
+            HasRotation = hasRotation,
+            IsLooping = shouldLoop
+        };
 
         List<Frame> frames = new List<Frame>();
 

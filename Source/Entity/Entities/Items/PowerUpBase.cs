@@ -1,15 +1,14 @@
+#region
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using TheGameOfDoomHmmm.Source.Entity.Components;
-using TheGameOfDoomHmmm.Source.Game;
 using TheGameOfDoomHmmm.Source.Game.GameState;
-using TheGameOfDoomHmmm.Source.Graphics;
+#endregion
 
 namespace TheGameOfDoomHmmm.Source.Entity.Entities.Items;
 
 public abstract class PowerUpBase : Entity
 {
-    public PowerUpBase(GameplayState gameState, Vector2 position) : base(gameState, position)
+    protected PowerUpBase(GameplayState gameState, Vector2 position) : base(gameState, position)
     {
         Collider = new Collider
             (this)
@@ -21,9 +20,9 @@ public abstract class PowerUpBase : Entity
         InitAnimations();
     }
 
-    public abstract void InitAnimations();
+    protected abstract void InitAnimations();
 
-    public override void OnCollision(Collider other)
+    internal override void OnCollision(Collider other)
     {
         if (other.Parent is Player) Destroy();
     }

@@ -9,7 +9,7 @@ using TheGameOfDoomHmmm.Source.Game;
 
 namespace TheGameOfDoomHmmm.Source.Graphics;
 
-public static class TextRenderer
+internal static class TextRenderer
 {
     private static Game1 m_root;
     private static BitmapFont m_bitmapFont;
@@ -20,43 +20,46 @@ public static class TextRenderer
 
         List<BitmapFontRegion> bitmapFontRegions = new List<BitmapFontRegion>();
 
-        var pixelFont = new Color[177 * 793];
-        var fontThing = AssetManager.Load<Texture2D>("AsepriteFont");
-        fontThing.GetData(pixelFont);
+        Texture2D fontTexture = AssetManager.Load<Texture2D>("AsepriteFont");
+        Color[] fontPixelData = new Color[fontTexture.Width * fontTexture.Height];
+        fontTexture.GetData(fontPixelData);
+
+        int fontTextureWidth = fontTexture.Width;
+        int fontTextureHeight = fontTexture.Height;
 
         int charIdx = 0;
+        const int charHeight = 7;
 
-        for (int y = 1; y < 793; y += 11)
+        const int charWidthSpacing = 11;
+
+        Color endColor = new Color(0, 255, 0, 255);
+
+        for (int y = 1; y < fontTextureHeight; y += charWidthSpacing)
         {
-            for (int x = 1; x < 177; x += 11)
+            for (int x = 1; x < fontTextureWidth; x += charWidthSpacing)
             {
-                int index = (y * 177) + x;
-                int len = 0;
+                int pixelIndex = y * fontTextureWidth + x;
+                int charLen = 0;
 
-                while (pixelFont[index] != new Color(0, 255, 0, 255))
+                while (fontPixelData[pixelIndex] != endColor)
                 {
-                    len++;
-                    index++;
+                    charLen++;
+                    pixelIndex++;
                 }
 
-                bitmapFontRegions.Add
-                (
-                    new BitmapFontRegion
-                    (
-                        new TextureRegion2D(fontThing, x, y, len, 7),
-                        ' ' + charIdx,
-                        0,
-                        0,
-                        len
-                    )
-                );
+                TextureRegion2D charRegion = new TextureRegion2D(fontTexture, x, y, charLen, charHeight);
+                int character = ' ' + charIdx;
+
+                BitmapFontRegion bitmapFontRegion = new BitmapFontRegion(charRegion, character, 0, 0, charLen);
+                bitmapFontRegions.Add(bitmapFontRegion);
 
                 charIdx++;
             }
         }
 
-        m_bitmapFont = new BitmapFont("teeest", bitmapFontRegions, 7);
+        m_bitmapFont = new BitmapFont("test", bitmapFontRegions, charHeight);
     }
+
 
     public static void Draw
     (

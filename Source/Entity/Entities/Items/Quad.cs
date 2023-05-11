@@ -1,10 +1,10 @@
 #region
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using TheGameOfDoomHmmm.Source.Graphics;
 using TheGameOfDoomHmmm.Source.Entity.Components;
 using TheGameOfDoomHmmm.Source.Game;
 using TheGameOfDoomHmmm.Source.Game.GameState;
+using TheGameOfDoomHmmm.Source.Graphics;
 #endregion
 
 namespace TheGameOfDoomHmmm.Source.Entity.Entities.Items;
@@ -12,7 +12,8 @@ namespace TheGameOfDoomHmmm.Source.Entity.Entities.Items;
 internal sealed class Quad : PowerUpBase
 {
     public Quad(GameplayState gameState, Vector2 position) : base(gameState, position) { }
-    public override void InitAnimations()
+
+    protected override void InitAnimations()
     {
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Quad");
 

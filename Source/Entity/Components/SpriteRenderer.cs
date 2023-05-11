@@ -18,12 +18,12 @@ public sealed class SpriteRenderer
         Transition>();
 
     private readonly Animation[] m_animations;
+
+    private readonly Entities.Entity m_baseE;
     private readonly Game1 m_root;
     private readonly Texture2D m_spriteSheet;
 
     private int[] m_animationQueue;
-
-    private readonly Entities.Entity m_baseE;
 
     private int m_currentFrameIndex;
     private int m_indexInQueue;
@@ -83,7 +83,7 @@ public sealed class SpriteRenderer
         get => m_animations[CurrentAnimationIndex];
     }
 
-    internal void OnUpdate(object sender, UpdateEventArgs e)
+    private void OnUpdate(object sender, UpdateEventArgs e)
     {
         int frameLength = CurrentAnimation.Frames[m_currentFrameIndex].Time;
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
@@ -139,14 +139,14 @@ public sealed class SpriteRenderer
         m_lastFrameUpdate = timeNow;
     }
 
-    public void Destroy()
+    internal void Destroy()
     {
         UpdateEventSource.UpdateEvent -= OnUpdate;
     }
 
     internal void Draw(Vector2 position, float rotation, bool isCrosshair)
     {
-        if (m_baseE.m_highlightAlpha != 0f)
+        if (m_baseE.HighlightAlpha != 0f)
         {
             Color[] data = new Color[m_spriteSheet.Width * m_spriteSheet.Height];
             m_spriteSheet.GetData(data);
@@ -157,10 +157,10 @@ public sealed class SpriteRenderer
 
                 Vector4 hmmm = data[i].ToVector4();
 
-                hmmm.X += m_baseE.m_highlightAlpha;
-                hmmm.Y += m_baseE.m_highlightAlpha;
-                hmmm.Z += m_baseE.m_highlightAlpha;
-                hmmm.W += m_baseE.m_highlightAlpha;
+                hmmm.X += m_baseE.HighlightAlpha;
+                hmmm.Y += m_baseE.HighlightAlpha;
+                hmmm.Z += m_baseE.HighlightAlpha;
+                hmmm.W += m_baseE.HighlightAlpha;
 
                 data[i] = new Color(hmmm);
             }
@@ -172,11 +172,11 @@ public sealed class SpriteRenderer
         switch (CurrentAnimation.HasRotation)
         {
         case true:
-            DrawRotatable(position, rotation, isCrosshair, m_baseE.m_highlightAlpha != 0f);
+            DrawRotatable(position, rotation, isCrosshair, m_baseE.HighlightAlpha != 0f);
 
             break;
         case false:
-            DrawStatic(position, isCrosshair, m_baseE.m_highlightAlpha != 0f);
+            DrawStatic(position, isCrosshair, m_baseE.HighlightAlpha != 0f);
 
             break;
         }
