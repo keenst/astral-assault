@@ -33,8 +33,6 @@ public class WaveController : IUpdateEventListener
     
     private void StartNextWave()
     {
-        GameState.ItemController.NewWave();
-        
         _currentWave++;
         
         int enemiesToSpawn = (int)(_currentWave * 1.1F);

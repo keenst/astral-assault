@@ -6,13 +6,9 @@ namespace AstralAssault;
 
 public class Bullet : Entity
 {
-    public bool IsQuadDamage { get; }
-    
-    public Bullet(GameplayState gameState, Vector2 position, float rotation, float speed, bool isQuadDamage) 
+    public Bullet(GameplayState gameState, Vector2 position, float rotation, float speed, BulletType bulletType) 
         :base(gameState, position)
     {
-        IsQuadDamage = isQuadDamage;
-        
         Velocity = new Vector2(
             (float)Math.Cos(rotation),
             (float)Math.Sin(rotation)
@@ -20,7 +16,7 @@ public class Bullet : Entity
 
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Bullet");
         
-        Frame frame = new(new Rectangle(isQuadDamage ? 4 : 0, 0, 4, 4));
+        Frame frame = new(new Rectangle(0, 0, 4, 4));
 
         SpriteRenderer = new SpriteRenderer(spriteSheet, frame, LayerDepth.Foreground);
         
@@ -33,7 +29,13 @@ public class Bullet : Entity
 
         OutOfBoundsBehavior = OutOfBounds.Destroy;
 
-        ContactDamage = isQuadDamage ? 16 : 4;
+        ContactDamage = bulletType switch
+        {
+            BulletType.Light => 4,
+            BulletType.Heavy => 8,
+            _ => throw new ArgumentOutOfRangeException(nameof(bulletType), bulletType, null)
+        };
+        
         IsFriendly = true;
     }
 

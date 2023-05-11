@@ -1,24 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AstralAssault.Items;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
+using MouseButtons = AstralAssault.InputEventSource.MouseButtons;
 
 namespace AstralAssault;
 
-public enum PowerUps
+public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
 {
-    QuadDamage,
-    Haste
-}
-
-public class Player : Entity, IInputEventListener
-{
+    private enum EnergyConversion
+    {
+        Health,
+        Shield,
+        Ammo
+    }
+    
     public float Multiplier = 1;
     
+    public int Ammo = 50;
+    public const int MaxAmmo = 300;
+
+    public float Shield = 100;
+    public const float MaxShield = 100;
+
+    private EnergyConversion _currentEnergyConversion = EnergyConversion.Health;
+    private long _lastConversionUpdate;
+    private const int AmmoConversionInterval = 150;
+    private const int HealthConversionInterval = 200;
+    private const int ShieldConversionInterval = 200;
+
     private Vector2 _cursorPosition;
     private Tuple<Vector2, Vector2> _muzzle = new(Vector2.Zero, Vector2.Zero);
     private bool _lastCannon;
@@ -27,24 +40,17 @@ public class Player : Entity, IInputEventListener
     private long _lastTimeFired;
     private float _delta;
     private readonly ParticleEmitter _particleEmitter;
-    private readonly List<Tuple<long, PowerUps>> _powerUps = new(); // (time of pick up, power up)
 
-    private float _moveSpeed = 200;
-    private float _maxSpeed = 100;
-    private float _tiltSpeed = 200;
+    private const float MoveSpeed = 200;
+    private const float MaxSpeed = 100;
+    private const float TiltSpeed = 200;
     private const float Friction = 30;
     private const float Pi = 3.14F;
     private const float BulletSpeed = 250;
-    private int _shootSpeed = 200;
-    
-    private const int PowerUpDuration = 10 * 1000;
-    private Texture2D _square;
+    private const int ShootSpeed = 200;
 
     public Player(GameplayState gameState, Vector2 position) :base(gameState, position)
     {
-        _square = new Texture2D(GameState.Root.GraphicsDevice, 1, 1);
-        _square.SetData(new[] { Color.White });
-        
         Position = position;
         Rotation = Pi / 2;
 
@@ -183,76 +189,10 @@ public class Player : Entity, IInputEventListener
         
         _thrusterIsOn = false;
         
-        for (int i = 0; i < _powerUps.Count; i++)
-        {
-            Tuple<long, PowerUps> powerUp = _powerUps[i];
-            
-            long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-            if (timeNow - powerUp.Item1 > PowerUpDuration)
-            {
-                _powerUps.Remove(powerUp);
-                i--;
-                continue;
-            }
-
-            string powerUpName = powerUp.Item2 switch
-            {
-                PowerUps.QuadDamage => "quad damage",
-                PowerUps.Haste => "haste",
-                _ => throw new ArgumentOutOfRangeException()
-            };
-            
-            Vector4 color = powerUp.Item2 switch
-            {
-                PowerUps.QuadDamage => Palette.GetColorVector(Palette.Colors.Purple6),
-                PowerUps.Haste => Palette.GetColorVector(Palette.Colors.Red8),
-                _ => throw new ArgumentOutOfRangeException()
-            };
-
-            Vector4 backgroundColor = Palette.GetColorVector(Palette.Colors.Black);
-            Vector4 barColor = ((timeNow - powerUp.Item1) / (float)PowerUpDuration) switch
-            {
-                < 0.25F => Palette.GetColorVector(Palette.Colors.Green7),
-                < 0.5F => Palette.GetColorVector(Palette.Colors.Green4),
-                < 0.75F => Palette.GetColorVector(Palette.Colors.Red8),
-                < 1 => Palette.GetColorVector(Palette.Colors.Red4),
-                _ => Palette.GetColorVector(Palette.Colors.Black)
-            };
-
-            DrawTask lifetimeBackground = new(
-                _square,
-                new Rectangle(0, 0, 1, 1),
-                new Rectangle(1, 28 + i * 12, 2, 8),
-                0,
-                LayerDepth.HUD,
-                new List<IDrawTaskEffect> { new ColorEffect(backgroundColor) },
-                Color.White);
-
-            //int barLength = (int)((timeNow - powerUp.Item1) / (float)PowerUpDuration * 2);
-            int barLength = 8 - (int)Math.Floor((timeNow - powerUp.Item1) / (float)PowerUpDuration * 8);
-            
-            DrawTask lifetimeBar = new(
-                _square,
-                new Rectangle(0, 0, 1, 1),
-                new Rectangle(1, 36 + i * 12 - barLength, 2, barLength),
-                0,
-                LayerDepth.HUD,
-                new List<IDrawTaskEffect> { new ColorEffect(barColor) },
-                Color.White);
-
-            List<DrawTask> powerUpTask = powerUpName.CreateDrawTasks(
-                new Vector2(4, 28 + i * 12),
-                Color.White,
-                LayerDepth.HUD);
-            
-            foreach (DrawTask task in powerUpTask)
-                task.EffectContainer.SetEffect<ColorEffect, Vector4>(color);
-
-            drawTasks.AddRange(powerUpTask);
-            drawTasks.Add(lifetimeBackground);
-            drawTasks.Add(lifetimeBar);
-        }
-
+        drawTasks.AddRange(GetAmmoDrawTasks());
+        drawTasks.AddRange(GetEnergyConverterDrawTasks());
+        drawTasks.AddRange(GetShieldBarDrawTasks());
+        
         return drawTasks;
     }
 
@@ -261,6 +201,7 @@ public class Player : Entity, IInputEventListener
         InputEventSource.KeyboardEvent += OnKeyboardEvent;
         InputEventSource.MouseMoveEvent += OnMouseMoveEvent;
         InputEventSource.MouseButtonEvent += OnMouseButtonEvent;
+        InputEventSource.KeyboardPressedEvent += OnKeyboardPressedEvent;
     }
     
     private void StopListening()
@@ -268,6 +209,7 @@ public class Player : Entity, IInputEventListener
         InputEventSource.KeyboardEvent -= OnKeyboardEvent;
         InputEventSource.MouseMoveEvent -= OnMouseMoveEvent;
         InputEventSource.MouseButtonEvent -= OnMouseButtonEvent;
+        InputEventSource.KeyboardPressedEvent -= OnKeyboardPressedEvent;
         _particleEmitter.StopListening();
     }
 
@@ -277,48 +219,65 @@ public class Player : Entity, IInputEventListener
         Vector2 forward = new Vector2(
             (float)Math.Cos(Rotation), 
             (float)Math.Sin(Rotation)
-        ) * _moveSpeed * _delta;
+        ) * MoveSpeed * _delta;
         
         Velocity = new Vector2(
-            Math.Clamp(Velocity.X + forward.X * yAxis, -_maxSpeed, _maxSpeed),
-            Math.Clamp(Velocity.Y + forward.Y * yAxis, -_maxSpeed, _maxSpeed));
+            Math.Clamp(Velocity.X + forward.X * yAxis, -MaxSpeed, MaxSpeed),
+            Math.Clamp(Velocity.Y + forward.Y * yAxis, -MaxSpeed, MaxSpeed));
 
         // tilting
         Vector2 right = new Vector2(
             (float)Math.Cos(Rotation + Pi / 2), 
             (float)Math.Sin(Rotation + Pi / 2)
-        ) * _tiltSpeed * _delta;
+        ) * TiltSpeed * _delta;
         
         Velocity = new Vector2(
-            Math.Clamp(Velocity.X + right.X * xAxis, -_maxSpeed, _maxSpeed),
-            Math.Clamp(Velocity.Y + right.Y * xAxis, -_maxSpeed, _maxSpeed));
+            Math.Clamp(Velocity.X + right.X * xAxis, -MaxSpeed, MaxSpeed),
+            Math.Clamp(Velocity.Y + right.Y * xAxis, -MaxSpeed, MaxSpeed));
 
-        if (Velocity.Length() > _maxSpeed)
+        if (Velocity.Length() > MaxSpeed)
         {
             Velocity.Normalize();
-            Velocity *= _maxSpeed;
+            Velocity *= MaxSpeed;
         }
-        else if (Velocity.Length() < -_maxSpeed)
+        else if (Velocity.Length() < -MaxSpeed)
         {
             Velocity.Normalize();
-            Velocity *= -_maxSpeed;
+            Velocity *= -MaxSpeed;
         }
     }
 
-    private void HandleFiring()
+    private void HandleFiring(MouseButtons mouseButton)
     {
         if (!_isCrosshairActive) return;
         
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         
-        if (_lastTimeFired + _shootSpeed > timeNow) return;
+        if (_lastTimeFired + ShootSpeed > timeNow) return;
+
+        BulletType bulletType = mouseButton switch
+        {
+            MouseButtons.Left => BulletType.Light,
+            MouseButtons.Right => BulletType.Heavy,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+        
+        if (Ammo < bulletType switch
+        {
+            BulletType.Light => 1,
+            BulletType.Heavy => 2,
+            _ => throw new ArgumentOutOfRangeException()
+        }) return;
+        
+        Ammo -= bulletType switch
+        {
+            BulletType.Light => 1,
+            BulletType.Heavy => 2,
+            _ => throw new ArgumentOutOfRangeException()
+        };
 
         Random rnd = new();
-        string soundName = 
-            (_powerUps.Any(t => t.Item2 is PowerUps.QuadDamage) ? "Quad" : "") + 
-            "Shoot" +
-            rnd.Next(1, 4);
-        
+        string soundName = "Shoot" + rnd.Next(1, 4);
         Jukebox.PlaySound(soundName, 0.5F);
         
         _lastTimeFired = timeNow;
@@ -327,71 +286,96 @@ public class Player : Entity, IInputEventListener
         float yDiff = _cursorPosition.Y - (_lastCannon ? _muzzle.Item1.Y : _muzzle.Item2.Y);
 
         float rot = (float)Math.Atan2(yDiff, xDiff);
-            
+
         GameState.Entities.Add(
             new Bullet(
                 GameState, 
                 _lastCannon ? _muzzle.Item1 : _muzzle.Item2, 
                 rot, 
                 BulletSpeed,
-                _powerUps.Any(t => t.Item2 == PowerUps.QuadDamage)));
+                bulletType));
             
         _lastCannon = !_lastCannon;
+    }
+
+    private List<DrawTask> GetAmmoDrawTasks()
+    {
+        List<DrawTask> drawTasks = new();
+
+        Vector2 position = new(4, 40);
+
+        List<DrawTask> ammoDrawTasks = Ammo
+            .ToString()
+            .CreateDrawTasks(position, Color.White, LayerDepth.HUD, new List<IDrawTaskEffect>());
+        
+        drawTasks.AddRange(ammoDrawTasks);
+        
+        return drawTasks;
+    }
+
+    private List<DrawTask> GetEnergyConverterDrawTasks()
+    {
+        List<DrawTask> drawTasks = new();
+
+        Vector2 position = new(4, 50);
+
+        string currentEnergyConversion = _currentEnergyConversion switch
+        {
+            EnergyConversion.Health => "Health",
+            EnergyConversion.Shield => "Shield",
+            EnergyConversion.Ammo => "Ammo",
+            _ => throw new ArgumentOutOfRangeException()
+        };
+        
+        List<DrawTask> energyConverterDrawTasks = currentEnergyConversion
+            .CreateDrawTasks(position, Color.White, LayerDepth.HUD, new List<IDrawTaskEffect>());
+
+        drawTasks.AddRange(energyConverterDrawTasks);
+        
+        return drawTasks;
+    }
+
+    private List<DrawTask> GetShieldBarDrawTasks()
+    {
+        List<DrawTask> drawTasks = new();
+
+        Vector4 fillColor = Palette.GetColorVector(Palette.Colors.Blue6);
+        drawTasks.AddRange(CreateBarDrawTasks(Shield, MaxShield, fillColor, -20));
+
+        return drawTasks;
     }
 
     public override void OnCollision(Collider other)
     {
         base.OnCollision(other);
 
-        long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        if (other.Parent is not Asteroid) return;
         
-        if (other.Parent is Quad)
+        if (Multiplier > 1)
         {
-            Jukebox.PlaySound("PickUp");
-            
-            if (_powerUps.Any(t => t.Item2 == PowerUps.QuadDamage))
-            {
-                _powerUps.RemoveAll(t => t.Item2 == PowerUps.QuadDamage);
-            }
-            _powerUps.Add(new Tuple<long, PowerUps>(timeNow, PowerUps.QuadDamage));
+            Jukebox.PlaySound("MultiplierBroken");
         }
-        else if (other.Parent is Haste)
-        {
-            Jukebox.PlaySound("PickUp");
             
-            if (_powerUps.Any(t => t.Item2 == PowerUps.Haste))
-            {
-                _powerUps.RemoveAll(t => t.Item2 == PowerUps.Haste);
-            }
-            _powerUps.Add(new Tuple<long, PowerUps>(timeNow, PowerUps.Haste));
-        }
-        else if (other.Parent is MegaHealth)
-        {
-            Jukebox.PlaySound("PickUp");
-            
-            HP = Math.Min(MaxHP, HP + 30);
-        }
-        else if (other.Parent is Asteroid)
-        {
-            if (Multiplier > 1)
-            {
-                Jukebox.PlaySound("MultiplierBroken");
-            }
-            
-            Multiplier = 1;
+        Multiplier = 1;
 
-            Random rnd = new();
+        Random rnd = new();
             
-            string soundName = rnd.Next(3) switch
-            {
-                0 => "Hurt1",
-                1 => "Hurt2",
-                2 => "Hurt3",
-                _ => throw new ArgumentOutOfRangeException()
-            };
+        string soundName = rnd.Next(3) switch
+        {
+            0 => "Hurt1",
+            1 => "Hurt2",
+            2 => "Hurt3",
+            _ => throw new ArgumentOutOfRangeException()
+        };
         
-            Jukebox.PlaySound(soundName, 0.5F);
-        }
+        Jukebox.PlaySound(soundName, 0.5F);
+    }
+
+    public void HandleDamage(float damage)
+    {
+        float remainder = Math.Min(Shield - damage, 0);
+        HP -= Math.Abs(remainder);
+        Shield = Math.Max(Shield - damage, 0);
     }
 
     public override void Destroy()
@@ -441,8 +425,15 @@ public class Player : Entity, IInputEventListener
         {
             yAxis = -1;
         }
-
+        
         HandleMovement(xAxis, yAxis);
+    }
+
+    public void OnKeyboardPressedEvent(object sender, KeyboardEventArgs e)
+    {
+        if (!e.Keys.Contains(Keys.Space)) return;
+
+        _currentEnergyConversion = (EnergyConversion)((int)_currentEnergyConversion + 1).Mod(3);
     }
 
     public void OnMouseMoveEvent(object sender, MouseMoveEventArgs e)
@@ -454,9 +445,9 @@ public class Player : Entity, IInputEventListener
 
     public void OnMouseButtonEvent(object sender, MouseButtonEventArgs e)
     {
-        if (e.Button == InputEventSource.MouseButtons.Left)
+        if (e.Button is MouseButtons.Left or MouseButtons.Right)
         {
-            HandleFiring();
+            HandleFiring(e.Button);
         }
     }
 
@@ -464,48 +455,20 @@ public class Player : Entity, IInputEventListener
     {
         base.OnUpdate(sender, e);
 
-        if (_powerUps.Any(t => t.Item2 == PowerUps.Haste))
-        {
-            _shootSpeed = 100;
-            _maxSpeed = 150;
-            _moveSpeed = 400;
-            _tiltSpeed = 400;
-        }
-        else
-        {
-            _shootSpeed = 200;
-            _maxSpeed = 100;
-            _moveSpeed = 200;
-            _tiltSpeed = 200;
-        }
-        
         _delta = e.DeltaTime;
 
-        // check range to cursor
-        float distance = Vector2.Distance(Position, _cursorPosition);
-        _isCrosshairActive = distance >= 12;
+        HandleEnergyConversion();
+        
+        HandleCrosshair();
+        
+        ApplyFriction();
 
-        // rotate player
-        if (_isCrosshairActive)
-        {
-            float xDiff = _cursorPosition.X - Position.X;
-            float yDiff = _cursorPosition.Y - Position.Y;
+        UpdateMuzzlePositions();
+        UpdateParticleEmitterPosition();
+    }
 
-            Rotation = (float)Math.Atan2(yDiff, xDiff);
-        }
-
-        // apply friction
-        float sign = Math.Sign(Velocity.Length());
-
-        if (sign != 0)
-        {
-            float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
-            
-            Velocity -= 
-                new Vector2((float)Math.Cos(direction), (float)Math.Sin(direction)) * Friction * _delta * sign;
-        }
-
-        // rotate the points for the cannon muzzles
+    private void UpdateMuzzlePositions()
+    {
         Vector2 muzzle1;
         Vector2 muzzle2;
         
@@ -531,7 +494,10 @@ public class Player : Entity, IInputEventListener
         }
 
         _muzzle = new Tuple<Vector2, Vector2>(muzzle1, muzzle2);
+    }
 
+    private void UpdateParticleEmitterPosition()
+    {
         float emitterRotation = (Rotation + Pi) % (2 * Pi);
         Vector2 emitterPosition = new(11, 0);
 
@@ -545,5 +511,82 @@ public class Player : Entity, IInputEventListener
         }
         
         _particleEmitter.SetTransform(emitterPosition, emitterRotation);
+    }
+
+    private void ApplyFriction()
+    {
+        float sign = Math.Sign(Velocity.Length());
+
+        if (sign != 0)
+        {
+            float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
+            
+            Velocity -= 
+                new Vector2((float)Math.Cos(direction), (float)Math.Sin(direction)) * Friction * _delta * sign;
+        }
+    }
+
+    private void HandleCrosshair()
+    {
+        // check range to cursor
+        float distance = Vector2.Distance(Position, _cursorPosition);
+        _isCrosshairActive = distance >= 12;
+
+        // rotate player
+        if (_isCrosshairActive)
+        {
+            float xDiff = _cursorPosition.X - Position.X;
+            float yDiff = _cursorPosition.Y - Position.Y;
+
+            Rotation = (float)Math.Atan2(yDiff, xDiff);
+        }
+    }
+
+    private void HandleEnergyConversion()
+    {
+        switch (_currentEnergyConversion)
+        {
+            case EnergyConversion.Ammo:
+                HandleAmmoConversion();
+                break;
+            case EnergyConversion.Health:
+                HandleHealthConversion();
+                break;
+            case EnergyConversion.Shield:
+                HandleShieldConversion();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private void HandleAmmoConversion()
+    {
+        long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        
+        if (timeNow - _lastConversionUpdate < AmmoConversionInterval) return;
+        _lastConversionUpdate = timeNow;
+
+        Ammo = Math.Min(Ammo + 1, MaxAmmo);
+    }
+
+    private void HandleHealthConversion()
+    {
+        long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        
+        if (timeNow - _lastConversionUpdate < HealthConversionInterval) return;
+        _lastConversionUpdate = timeNow;
+        
+        HP = Math.Min(HP + 0.5F, MaxHP);
+    }
+
+    private void HandleShieldConversion()
+    {
+        long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        
+        if (timeNow - _lastConversionUpdate < ShieldConversionInterval) return;
+        _lastConversionUpdate = timeNow;
+
+        Shield = Math.Min(Shield + 1, MaxShield);
     }
 }

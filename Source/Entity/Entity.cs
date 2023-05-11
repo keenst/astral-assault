@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using AstralAssault.Items;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
@@ -12,6 +11,7 @@ public class Entity : IUpdateEventListener
 {
     public Vector2 Position;
     public Vector2 Velocity;
+    public float ContactDamage;
     protected float Rotation;
     protected Collider Collider;
     protected SpriteRenderer SpriteRenderer;
@@ -20,7 +20,6 @@ public class Entity : IUpdateEventListener
     protected bool IsActor = false;
     protected float MaxHP;
     protected float HP;
-    protected float ContactDamage;
     
     private bool _isHighlighted;
     private long _timeStartedHighlightingMS;
@@ -110,9 +109,15 @@ public class Entity : IUpdateEventListener
     {
         if (!IsActor || other.Parent.IsFriendly == IsFriendly) return;
 
-        HP = Math.Max(0, HP - other.Parent.ContactDamage);
-
-        if (this is Asteroid && other.Parent is MegaHealth or Haste or Quad) return;
+        if (this is Player)
+        {
+            Player player = (Player)this;
+            player.HandleDamage(other.Parent.ContactDamage);
+        }
+        else
+        {
+            HP = Math.Max(0, HP - other.Parent.ContactDamage);
+        }
 
         _isHighlighted = true;
         _timeStartedHighlightingMS = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
@@ -146,7 +151,8 @@ public class Entity : IUpdateEventListener
             }
         }
         
-        if (IsActor) drawTasks.AddRange(CreateHealthBarDrawTasks());
+        Vector4 fullColor = Palette.GetColorVector(Palette.Colors.Green7);
+        if (IsActor) drawTasks.AddRange(CreateBarDrawTasks(HP, MaxHP, fullColor));
         drawTasks.Add(SpriteRenderer.CreateDrawTask(Position, Rotation));
 
         return drawTasks;
@@ -172,15 +178,15 @@ public class Entity : IUpdateEventListener
         _healthBarTexture.SetData(data);
     }
 
-    private List<DrawTask> CreateHealthBarDrawTasks()
+    protected List<DrawTask> CreateBarDrawTasks(float value, float maxValue, Vector4 fillColor, int yOffset = 20)
     {
         const int width = 20;
         const int height = 3;
 
-        int filled = (int)Math.Ceiling(HP / MaxHP * width);
+        int filled = (int)Math.Ceiling(value / maxValue * width);
         
         int x = (int)Position.X - width / 2;
-        int y = (int)Position.Y - 20;
+        int y = (int)Position.Y - yOffset;
         
         Rectangle outline = new(x - 1, y - 1, width + 2, height + 2);
         Rectangle emptyHealthBar = new(x, y, width, height);
@@ -188,8 +194,7 @@ public class Entity : IUpdateEventListener
 
         Vector4 outlineColor = Palette.GetColorVector(Palette.Colors.Black);
         Vector4 emptyColor = Palette.GetColorVector(Palette.Colors.Red6);
-        Vector4 fullColor = Palette.GetColorVector(Palette.Colors.Green7);
-        
+
         Rectangle source = new(0, 0, 1, 1);
         
         DrawTask background = new(
@@ -216,7 +221,7 @@ public class Entity : IUpdateEventListener
             fullHealthBar,
             0, 
             LayerDepth.HUD, 
-            new List<IDrawTaskEffect> { new ColorEffect(fullColor) }, 
+            new List<IDrawTaskEffect> { new ColorEffect(fillColor) }, 
             Color.LimeGreen);
         
         return new List<DrawTask> { background, empty, full };

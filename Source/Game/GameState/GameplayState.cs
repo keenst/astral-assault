@@ -11,7 +11,6 @@ public class GameplayState : GameState, IUpdateEventListener
     public readonly List<Entity> Entities;
     public readonly CollisionSystem CollisionSystem = new();
     public WaveController WaveController;
-    public ItemController ItemController;
 
     public Player Player => (Player) Entities.Find(entity => entity is Player);
 
@@ -25,9 +24,7 @@ public class GameplayState : GameState, IUpdateEventListener
     public GameplayState(Game1 root) : base(root)
     {
         Entities = new List<Entity>();
-        ItemController = new ItemController(this);
         WaveController = new WaveController(this, Root);
-        ItemController.StartListening();
     }
 
     public override List<DrawTask> GetDrawTasks()
@@ -95,7 +92,6 @@ public class GameplayState : GameState, IUpdateEventListener
     public override void Exit()
     {
         WaveController.StopListening();
-        ItemController.StopListening();
         while (Entities.Count > 0) Entities[0].Destroy();
         
         UpdateEventSource.UpdateEvent -= OnUpdate;
