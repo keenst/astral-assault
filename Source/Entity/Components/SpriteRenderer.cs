@@ -107,12 +107,15 @@ public sealed class SpriteRenderer
 
         if (m_animationQueue == null)
         {
-            if (!CurrentAnimation.IsLooping)
+            if (!CurrentAnimation.IsLooping && ((m_currentFrameIndex + 1) == CurrentAnimation.Frames.Length))
             {
+                AnimDone = true;
+
                 return;
             }
 
             m_currentFrameIndex = (m_currentFrameIndex + 1) % CurrentAnimation.Frames.Length;
+
             m_lastFrameUpdate = timeNow;
 
             return;
@@ -124,10 +127,7 @@ public sealed class SpriteRenderer
             CurrentAnimationIndex = m_animationQueue[++m_indexInQueue];
             m_currentFrameIndex = 0;
         }
-        else
-        {
-            m_currentFrameIndex = (m_currentFrameIndex + 1) % CurrentAnimation.Frames.Length;
-        }
+        else m_currentFrameIndex = (m_currentFrameIndex + 1) % CurrentAnimation.Frames.Length;
 
         if ((CurrentAnimationIndex == m_targetAnimationIndex) &&
             m_isTransitioning)
@@ -279,5 +279,13 @@ public sealed class SpriteRenderer
             throw new InvalidOperationException("Animation conditions already initialized");
 
         foreach (string s in name) m_animationConditions.Add(s, 0);
+    }
+
+    public float GetAnimationCondition(string name)
+    {
+        if (!m_animationConditions.ContainsKey(name))
+            throw new ArgumentException($"Animation condition '{name}' does not exist");
+
+        return m_animationConditions[name];
     }
 }

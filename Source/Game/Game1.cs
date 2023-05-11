@@ -82,7 +82,7 @@ public sealed class Game1 : Microsoft.Xna.Framework.Game
                 b = (Bullet)c1.Parent;
             }
 
-            switch (b.m_shootBy)
+            switch (b.ShootBy)
             {
             case Player when e is Player or Quad or Haste or MegaHealth:
             case ShipOfDoom when e is ShipOfDoom or Quad or Haste or MegaHealth or Asteroid: return true;

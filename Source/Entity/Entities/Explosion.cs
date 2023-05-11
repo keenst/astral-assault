@@ -1,4 +1,5 @@
 ﻿#region
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TheGameOfDoomHmmm.Source.Entity.Components;
@@ -18,11 +19,6 @@ public sealed class Explosion : Entity
 
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Explosion");
 
-        Animation nothing = new Animation
-        (
-            new[] { new Frame(new Rectangle(0, 0, 4, 4)) }, false, true
-        );
-
         Animation explode = AnimationCreator.CreateAnimFromSpriteSheet
         (
             96,
@@ -30,7 +26,7 @@ public sealed class Explosion : Entity
             0,
             12,
             12,
-            new[] { 30 },
+            new[] { 60 },
             false,
             false,
             false,
@@ -42,13 +38,9 @@ public sealed class Explosion : Entity
         (
             this,
             spriteSheet,
-            new[] { nothing, explode },
-            new[]
-            {
-                new Transition(1, 0, new[] { 0 }, "lel", 0),
-                new Transition(0, 1, new[] { 1 }, "lel", 1),
-            },
-            new[] { "lel" },
+            new[] { explode },
+            null,
+            null,
             GameState.Root
         );
 
@@ -63,14 +55,12 @@ public sealed class Explosion : Entity
         GameState.CollisionSystem.AddCollider(Collider);
 
         OutOfBoundsBehavior = OutOfBounds.Destroy;
-
-        SpriteRenderer.SetAnimationCondition("lel", 1);
     }
 
-    public override void OnUpdate(object sender, UpdateEventArgs e)
+    internal override void OnUpdate(UpdateEventArgs e)
     {
         if (SpriteRenderer.AnimDone) Destroy();
     }
 
-    public override void OnCollision(Collider other) { }
+    internal override void OnCollision(Collider other) { }
 }
