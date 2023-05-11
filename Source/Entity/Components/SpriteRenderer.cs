@@ -32,6 +32,7 @@ public sealed class SpriteRenderer
     private Texture2D m_spriteSheet2;
     private int m_startAnimationIndex;
     private int m_targetAnimationIndex;
+    public bool AnimDone;
 
     internal SpriteRenderer(
         Entities.Entity baseE,
@@ -106,7 +107,10 @@ public sealed class SpriteRenderer
 
         if (m_animationQueue == null)
         {
-            if (!CurrentAnimation.IsLooping) return;
+            if (!CurrentAnimation.IsLooping)
+            {
+                return;
+            }
 
             m_currentFrameIndex = (m_currentFrameIndex + 1) % CurrentAnimation.Frames.Length;
             m_lastFrameUpdate = timeNow;
@@ -120,7 +124,10 @@ public sealed class SpriteRenderer
             CurrentAnimationIndex = m_animationQueue[++m_indexInQueue];
             m_currentFrameIndex = 0;
         }
-        else m_currentFrameIndex = (m_currentFrameIndex + 1) % CurrentAnimation.Frames.Length;
+        else
+        {
+            m_currentFrameIndex = (m_currentFrameIndex + 1) % CurrentAnimation.Frames.Length;
+        }
 
         if ((CurrentAnimationIndex == m_targetAnimationIndex) &&
             m_isTransitioning)

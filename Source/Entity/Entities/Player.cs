@@ -91,6 +91,11 @@ public sealed class Player : Entity, IInputEventListener
         }
         else SpriteRenderer.SetAnimationCondition("Tilt", 0);
 
+        if (Array.IndexOf(e.Keys, Keys.G) >= 0)
+        {
+            GameState.Entities.Add(new Explosion(GameState, new Vector2(16, 16), Pi/4f, 250));
+        }
+
         if (Array.IndexOf(e.Keys, Keys.W) >= 0) yAxis = 1;
         else if (Array.IndexOf(e.Keys, Keys.S) >= 0) yAxis = -1;
 
