@@ -7,9 +7,7 @@ namespace AstralAssault;
 public class EnemySpawner : IUpdateEventListener
 {
     public int EnemiesKilled { get; set; }
-    
-    private readonly long _timeStarted;
-    
+
     private readonly GameplayState _gameState;
     private readonly DebrisController _debrisController;
 
@@ -24,8 +22,6 @@ public class EnemySpawner : IUpdateEventListener
         UpdateEventSource.UpdateEvent += OnUpdate;
         
         _debrisController = new DebrisController(gameState);
-        
-        _timeStarted = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
     }
 
     private void SpawnEnemy()
@@ -77,7 +73,6 @@ public class EnemySpawner : IUpdateEventListener
         
         SpawnEnemy();
 
-        long timeSinceStart = timeNow - _timeStarted;
         _spawnInterval = BaseSpawnInterval * MathF.Pow(0.999F, EnemiesKilled);
         
         _lastSpawnTime = timeNow;
