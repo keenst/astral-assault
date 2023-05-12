@@ -148,6 +148,8 @@ public class Asteroid : Entity
         };
         
         GameState.Root.Score += (int)(score * GameState.Player.Multiplier);
+
+        GameState.EnemySpawner.EnemiesKilled++;
         
         base.OnDeath();
     }

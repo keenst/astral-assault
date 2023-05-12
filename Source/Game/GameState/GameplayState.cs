@@ -10,7 +10,7 @@ public class GameplayState : GameState, IUpdateEventListener
 {
     public readonly List<Entity> Entities;
     public readonly CollisionSystem CollisionSystem = new();
-    public WaveController WaveController;
+    public EnemySpawner EnemySpawner;
 
     public Player Player => (Player) Entities.Find(entity => entity is Player);
 
@@ -24,7 +24,7 @@ public class GameplayState : GameState, IUpdateEventListener
     public GameplayState(Game1 root) : base(root)
     {
         Entities = new List<Entity>();
-        WaveController = new WaveController(this, Root);
+        EnemySpawner = new EnemySpawner(this);
     }
 
     public override List<DrawTask> GetDrawTasks()
@@ -36,7 +36,7 @@ public class GameplayState : GameState, IUpdateEventListener
             drawTasks.AddRange(entity.GetDrawTasks());
         }
 
-        drawTasks.AddRange(WaveController.GetDrawTasks());
+        drawTasks.AddRange(EnemySpawner.GetDrawTasks());
 
         string scoreText = $"Score: {Root.Score}";
         Color textColor = Palette.GetColor(Palette.Colors.Grey9);
@@ -91,7 +91,7 @@ public class GameplayState : GameState, IUpdateEventListener
 
     public override void Exit()
     {
-        WaveController.StopListening();
+        EnemySpawner.StopListening();
         while (Entities.Count > 0) Entities[0].Destroy();
         
         UpdateEventSource.UpdateEvent -= OnUpdate;
