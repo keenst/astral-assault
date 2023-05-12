@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 
 namespace AstralAssault;
@@ -13,7 +14,8 @@ public class EnemySpawner : IUpdateEventListener
 
     private const float BaseSpawnInterval = 6000;
     private float _spawnInterval = BaseSpawnInterval;
-    private long _lastSpawnTime;
+    private long _lastAsteroidSpawnTime;
+    private long _lastMissileSpawnTime;
 
     public EnemySpawner(GameplayState gameState)
     {
@@ -24,7 +26,28 @@ public class EnemySpawner : IUpdateEventListener
         _debrisController = new DebrisController(gameState);
     }
 
-    private void SpawnEnemy()
+    private void SpawnAsteroid()
+    {
+        Random rnd = new();
+        
+        Vector2 position = GenerateEnemyPosition();
+        Asteroid.Sizes size = (Asteroid.Sizes)rnd.Next(0, 3);
+
+        Vector2 gameCenter = new(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F);
+        float angleToCenter = MathF.Atan2(gameCenter.Y - position.Y, gameCenter.X - position.X);
+        angleToCenter += MathHelper.ToRadians(rnd.Next(-45, 45));
+        
+        _gameState.Entities.Add(new Asteroid(_gameState, position, angleToCenter, size, _debrisController));
+    }
+
+    private void SpawnMissile()
+    {
+        Vector2 position = GenerateEnemyPosition();
+        
+        _gameState.Entities.Add(new Missile(_gameState, position));
+    }
+
+    private static Vector2 GenerateEnemyPosition()
     {
         Random rnd = new();
         int side = rnd.Next(0, 4);
@@ -47,14 +70,7 @@ public class EnemySpawner : IUpdateEventListener
             _ => throw new ArgumentOutOfRangeException()
         };
         
-        Vector2 position = new(x, y);
-        Asteroid.Sizes size = (Asteroid.Sizes)rnd.Next(0, 3);
-
-        Vector2 gameCenter = new(Game1.TargetWidth / 2F, Game1.TargetHeight / 2F);
-        float angleToCenter = MathF.Atan2(gameCenter.Y - position.Y, gameCenter.X - position.X);
-        angleToCenter += MathHelper.ToRadians(rnd.Next(-45, 45));
-        
-        _gameState.Entities.Add(new Asteroid(_gameState, position, angleToCenter, size, _debrisController));
+        return new Vector2(x, y);
     }
 
     public List<DrawTask> GetDrawTasks()
@@ -69,13 +85,20 @@ public class EnemySpawner : IUpdateEventListener
     public void OnUpdate(object sender, UpdateEventArgs e)
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-        if (timeNow - _lastSpawnTime < _spawnInterval) return;
         
-        SpawnEnemy();
+        if (timeNow - _lastAsteroidSpawnTime > _spawnInterval)
+        {
+            _lastAsteroidSpawnTime = timeNow;
+            SpawnAsteroid();
+        }
 
-        _spawnInterval = BaseSpawnInterval * MathF.Pow(0.999F, EnemiesKilled);
-        
-        _lastSpawnTime = timeNow;
+        if (timeNow - _lastMissileSpawnTime > _spawnInterval * 3)
+        {
+            _lastMissileSpawnTime = timeNow;
+            SpawnMissile();
+        }
+
+        _spawnInterval = BaseSpawnInterval * MathF.Pow(0.999F, EnemiesKilled / 100F);
     }
 
     public void StopListening()

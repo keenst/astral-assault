@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
@@ -20,6 +21,7 @@ public class Entity : IUpdateEventListener
     protected bool IsActor = false;
     protected float MaxHP;
     protected float HP;
+    protected int HealthBarYOffset = 20;
     
     private bool _isHighlighted;
     private long _timeStartedHighlightingMS;
@@ -152,7 +154,7 @@ public class Entity : IUpdateEventListener
         }
         
         Vector4 fullColor = Palette.GetColorVector(Palette.Colors.Green7);
-        if (IsActor) drawTasks.AddRange(CreateBarDrawTasks(HP, MaxHP, fullColor));
+        if (IsActor) drawTasks.AddRange(CreateBarDrawTasks(HP, MaxHP, fullColor, HealthBarYOffset));
         drawTasks.Add(SpriteRenderer.CreateDrawTask(Position, Rotation));
 
         return drawTasks;
@@ -178,7 +180,7 @@ public class Entity : IUpdateEventListener
         _healthBarTexture.SetData(data);
     }
 
-    protected List<DrawTask> CreateBarDrawTasks(float value, float maxValue, Vector4 fillColor, int yOffset = 20)
+    protected List<DrawTask> CreateBarDrawTasks(float value, float maxValue, Vector4 fillColor, int yOffset)
     {
         const int width = 20;
         const int height = 3;

@@ -60,7 +60,7 @@ public class SpriteRenderer : IUpdateEventListener
         LayerDepth layerDepth)
     {
         Animation animation = new(
-            new Frame[] { frame }, 
+            new[] { frame }, 
             frame.HasRotations);
         
         _animations = new[] { animation };
