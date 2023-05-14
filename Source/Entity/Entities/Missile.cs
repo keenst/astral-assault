@@ -72,6 +72,8 @@ public class Missile : Entity
     private float GetRotationToPlayer()
     {
         Player player = GameState.Player;
+
+        if (player is null) return Rotation;
         
         float xDiff = player.Position.X - Position.X;
         float yDiff = player.Position.Y - Position.Y;
