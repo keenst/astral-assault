@@ -92,13 +92,19 @@ public class EnemySpawner : IUpdateEventListener
             SpawnAsteroid();
         }
 
-        if (timeNow - _lastMissileSpawnTime > _spawnInterval * 3)
+        if (timeNow - _lastMissileSpawnTime > _spawnInterval * 1.5F)
         {
             _lastMissileSpawnTime = timeNow;
-            SpawnMissile();
+
+            int amountToSpawn = (int)MathF.Pow(1.2F, EnemiesKilled / 5F);
+
+            for (int i = 0; i < amountToSpawn; i++)
+            {
+                SpawnMissile();   
+            }
         }
 
-        _spawnInterval = BaseSpawnInterval * MathF.Pow(0.999F, EnemiesKilled / 100F);
+        _spawnInterval = BaseSpawnInterval * MathF.Pow(0.999F, EnemiesKilled / 1000F);
     }
 
     public void StopListening()
