@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -13,6 +14,7 @@ public class GameplayState : GameState, IUpdateEventListener
     public EnemySpawner EnemySpawner;
 
     public Player Player => (Player) Entities.Find(entity => entity is Player);
+    public int EnemiesAlive => Entities.Count(entity => entity is not AstralAssault.Player and not Crosshair);
 
     private static readonly Vector4 MultiplierBrokenColor = new(1, 0, 0, 1);
     private static readonly Vector4 MultiplierIncreaseColor = new(1, 1, 0, 1);
