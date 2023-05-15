@@ -19,8 +19,8 @@ public class EnemySpawner : IUpdateEventListener
     private long _lastAsteroidSpawnTime;
     private long _lastMissileSpawnTime;
     
-    private List<QueuedMissile> _missileQueue = new();
-    private const int MissileSpawnDelay = 1600;
+    private readonly List<QueuedMissile> _missileQueue = new();
+    private const int MissileWarningDuration = 1600;
 
     private readonly Texture2D _missileWarningTexture;
 
@@ -108,7 +108,7 @@ public class EnemySpawner : IUpdateEventListener
             for (int i = 0; i < amountToSpawn; i++)
             {
                 Vector2 position = GenerateEnemyPosition();
-                QueuedMissile queuedMissile = new(timeNow + MissileSpawnDelay, position);
+                QueuedMissile queuedMissile = new(timeNow + MissileWarningDuration, position);
                 _missileQueue.Add(queuedMissile);
             }
         }
@@ -129,11 +129,11 @@ public class EnemySpawner : IUpdateEventListener
         List<DrawTask> drawTasks = new();
         
         const int frameCount = 32;
-        const int timePerFrame = MissileSpawnDelay / frameCount;
+        const int timePerFrame = MissileWarningDuration / frameCount;
         
         foreach (QueuedMissile queuedMissile in _missileQueue)
         {
-            long timeSpawned = queuedMissile.TimeToLaunchMS - MissileSpawnDelay;
+            long timeSpawned = queuedMissile.TimeToLaunchMS - MissileWarningDuration;
             int timeSinceSpawned = (int)(DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - timeSpawned);
             int spriteIndex = timeSinceSpawned / timePerFrame;
 
