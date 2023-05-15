@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace AstralAssault;
 
@@ -18,6 +19,11 @@ public class EnemySpawner : IUpdateEventListener
     private float _missileSpawnInterval = BaseMissileSpawnInterval;
     private long _lastAsteroidSpawnTime;
     private long _lastMissileSpawnTime;
+    
+    private List<QueuedMissile> _missileQueue = new();
+    private const int MissileSpawnDelay = 1200;
+
+    private readonly Texture2D _missileWarningTexture;
 
     public EnemySpawner(GameplayState gameState)
     {
@@ -26,6 +32,8 @@ public class EnemySpawner : IUpdateEventListener
         UpdateEventSource.UpdateEvent += OnUpdate;
         
         _debrisController = new DebrisController(gameState);
+
+        _missileWarningTexture = AssetManager.Load<Texture2D>("MissileWarning");
     }
 
     private void SpawnAsteroid()
@@ -42,10 +50,8 @@ public class EnemySpawner : IUpdateEventListener
         _gameState.Entities.Add(new Asteroid(_gameState, position, angleToCenter, size, _debrisController));
     }
 
-    private void SpawnMissile()
+    private void SpawnMissile(Vector2 position)
     {
-        Vector2 position = GenerateEnemyPosition();
-        
         _gameState.Entities.Add(new Missile(_gameState, position));
     }
 
@@ -79,7 +85,7 @@ public class EnemySpawner : IUpdateEventListener
     {
         List<DrawTask> drawTasks = _debrisController.GetDrawTasks();
         
-        
+        drawTasks.AddRange(GetMissileWarningDrawTasks());
         
         return drawTasks;
     }
@@ -102,14 +108,16 @@ public class EnemySpawner : IUpdateEventListener
 
             for (int i = 0; i < amountToSpawn; i++)
             {
-                SpawnMissile();   
+                Vector2 position = GenerateEnemyPosition();
+                QueuedMissile queuedMissile = new(timeNow + MissileSpawnDelay, position);
+                _missileQueue.Add(queuedMissile);
             }
         }
 
+        HandleQueuedMissiles();
+
         _asteroidSpawnInterval = BaseAsteroidSpawnInterval * MathF.Pow(0.98F, EnemiesKilled);
         _missileSpawnInterval = BaseMissileSpawnInterval * MathF.Pow(0.98F, EnemiesKilled);
-        
-        Debug.WriteLine(_gameState.Entities.Count + " : " + _gameState.EnemiesAlive);
 
         if (_gameState.EnemiesAlive == 0)
         {
@@ -117,6 +125,67 @@ public class EnemySpawner : IUpdateEventListener
         }
     }
 
+    private List<DrawTask> GetMissileWarningDrawTasks()
+    {
+        List<DrawTask> drawTasks = new();
+        
+        const int frameCount = 32;
+        const int timePerFrame = MissileSpawnDelay / frameCount;
+        
+        foreach (QueuedMissile queuedMissile in _missileQueue)
+        {
+            long timeSpawned = queuedMissile.TimeToLaunchMS - MissileSpawnDelay;
+            int timeSinceSpawned = (int)(DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - timeSpawned);
+            int spriteIndex = timeSinceSpawned / timePerFrame;
+
+            Rectangle sourceRectangle = new(24 * spriteIndex, 0, 24, 24);
+            
+            drawTasks.Add(new DrawTask(
+                _missileWarningTexture,
+                sourceRectangle, 
+                GetMissileWarningPosition(queuedMissile.Position), 
+                0,
+                LayerDepth.HUD,
+                new List<IDrawTaskEffect>(),
+                Color.White,
+                new Vector2(12, 12)));
+        }
+
+        return drawTasks;
+    }
+    
+    private Vector2 GetMissileWarningPosition(Vector2 missileSpawnPoint)
+    {
+        int x = Math.Clamp((int)missileSpawnPoint.X, 24, Game1.TargetWidth - 24);
+        int y = Math.Clamp((int)missileSpawnPoint.Y, 24, Game1.TargetHeight - 24);
+        
+        return new Vector2(x, y);
+    }
+
+    private void HandleQueuedMissiles()
+    {
+        if (_missileQueue.Count == 0) return;
+        
+        long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        
+        List<QueuedMissile> missilesToRemove = new();
+        
+        Debug.WriteLine(_missileQueue.Count);
+        
+        foreach (QueuedMissile queuedMissile in _missileQueue)
+        {
+            if (timeNow < queuedMissile.TimeToLaunchMS) continue;
+            
+            SpawnMissile(queuedMissile.Position);
+            missilesToRemove.Add(queuedMissile);
+        }
+        
+        foreach (QueuedMissile queuedMissile in missilesToRemove)
+        {
+            _missileQueue.Remove(queuedMissile);
+        }
+    }
+    
     public void StopListening()
     {
         UpdateEventSource.UpdateEvent -= OnUpdate;
