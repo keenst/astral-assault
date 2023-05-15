@@ -20,18 +20,23 @@ public class Entity
     protected float ContactDamage;
     internal float HighlightAlpha;
     protected float HP;
+    protected float MaxHP;
     protected bool IsActor = false;
 
     private Texture2D m_healthBarTexture;
 
     private bool m_isHighlighted;
     private long m_timeStartedHighlightingMS;
-    protected float MaxHP;
     protected OutOfBounds OutOfBoundsBehavior = OutOfBounds.Wrap;
     internal Vector2 Position;
     protected float Rotation;
     protected SpriteRenderer SpriteRenderer;
     internal Vector2 Velocity;
+
+    internal long TimeSinceSpawned
+    {
+        get => DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - m_timeSpawned;
+    }
 
     protected Entity(GameplayState gameState, Vector2 position)
     {
@@ -42,9 +47,17 @@ public class Entity
         if (this is not Bullet) CreateHealthBarTexture();
     }
 
-    internal long TimeSinceSpawned
+    internal void ApplyFriction(UpdateEventArgs e)
     {
-        get => DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond - m_timeSpawned;
+        // apply friction
+        float sign = Math.Sign(Velocity.Length());
+
+        if (sign == 0) return;
+
+        float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
+
+        Velocity -=
+            Vector2.UnitX.RotateVector(direction) * 0.3f * e.DeltaTime * sign;
     }
 
     internal virtual void OnUpdate(UpdateEventArgs e)

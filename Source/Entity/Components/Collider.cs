@@ -38,7 +38,7 @@ public sealed class Collider
         )
     ) <= (Radius + other.Radius);
 
-    internal static void ResolveCollision1(Collider a, Collider b)
+    internal static void ResolveCollision(Collider a, Collider b)
     {
         if (!a.m_isSolid || !b.m_isSolid || (a.Parent.TimeSinceSpawned <= 512)) return;
 

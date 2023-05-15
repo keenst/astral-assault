@@ -12,11 +12,9 @@ namespace TheGameOfDoomHmmm.Source.Entity.Entities;
 
 public sealed class Explosion : Entity
 {
-    public Explosion(GameplayState gameState, Vector2 position, float rotation, float speed)
+    public Explosion(GameplayState gameState, Vector2 position)
         : base(gameState, position)
     {
-        Velocity = Vector2.UnitX.RotateVector(rotation) * speed;
-
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Explosion");
 
         Animation explode = AnimationCreator.CreateAnimFromSpriteSheet
@@ -49,7 +47,7 @@ public sealed class Explosion : Entity
             this
         )
         {
-            Radius = 2
+            Radius = 1
         };
 
         GameState.CollisionSystem.AddCollider(Collider);

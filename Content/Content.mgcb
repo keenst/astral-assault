@@ -276,3 +276,9 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Assets/Shoot3.ogg
+
+#begin Shaders/Highlight.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/Highlight.fx

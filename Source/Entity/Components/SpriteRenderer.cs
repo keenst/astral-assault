@@ -12,16 +12,15 @@ namespace TheGameOfDoomHmmm.Source.Entity.Components;
 public sealed class SpriteRenderer
 {
     private const float Pi = 3.14F;
+    private readonly Animation[] m_animations;
     private readonly Dictionary<string, float> m_animationConditions = new Dictionary<string, float>();
 
     private readonly Dictionary<Tuple<int, int>, Transition> m_animationPaths = new Dictionary<Tuple<int, int>,
         Transition>();
 
-    private readonly Animation[] m_animations;
-
-    private readonly Entities.Entity m_baseE;
     private readonly Game1 m_root;
     private readonly Texture2D m_spriteSheet;
+    private readonly Entities.Entity m_baseE;
 
     private int[] m_animationQueue;
 
@@ -32,7 +31,14 @@ public sealed class SpriteRenderer
     private Texture2D m_spriteSheet2;
     private int m_startAnimationIndex;
     private int m_targetAnimationIndex;
-    public bool AnimDone;
+    internal bool AnimDone;
+
+    private int CurrentAnimationIndex { get; set; }
+
+    private Animation CurrentAnimation
+    {
+        get => m_animations[CurrentAnimationIndex];
+    }
 
     internal SpriteRenderer(
         Entities.Entity baseE,
@@ -74,13 +80,6 @@ public sealed class SpriteRenderer
         CurrentAnimationIndex = 0;
 
         UpdateEventSource.UpdateEvent += OnUpdate;
-    }
-
-    private int CurrentAnimationIndex { get; set; }
-
-    private Animation CurrentAnimation
-    {
-        get => m_animations[CurrentAnimationIndex];
     }
 
     private void OnUpdate(object sender, UpdateEventArgs e)
@@ -137,11 +136,6 @@ public sealed class SpriteRenderer
         }
 
         m_lastFrameUpdate = timeNow;
-    }
-
-    internal void Destroy()
-    {
-        UpdateEventSource.UpdateEvent -= OnUpdate;
     }
 
     internal void Draw(Vector2 position, float rotation, bool isCrosshair)
@@ -281,11 +275,8 @@ public sealed class SpriteRenderer
         foreach (string s in name) m_animationConditions.Add(s, 0);
     }
 
-    public float GetAnimationCondition(string name)
+    internal void Destroy()
     {
-        if (!m_animationConditions.ContainsKey(name))
-            throw new ArgumentException($"Animation condition '{name}' does not exist");
-
-        return m_animationConditions[name];
+        UpdateEventSource.UpdateEvent -= OnUpdate;
     }
 }

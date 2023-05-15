@@ -31,7 +31,7 @@ public sealed class CollisionSystem
                     ))
                     continue;
 
-                Collider.ResolveCollision1(collider, other);
+                Collider.ResolveCollision(collider, other);
 
                 Tuple<Collider, Collider> colliderPair = new Tuple<Collider, Collider>(collider, other);
                 currentCollisions.Add(colliderPair);

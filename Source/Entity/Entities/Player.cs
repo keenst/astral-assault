@@ -91,11 +91,6 @@ public sealed class Player : Entity, IInputEventListener
         }
         else SpriteRenderer.SetAnimationCondition("Tilt", 0);
 
-        if (Array.IndexOf(e.Keys, Keys.G) >= 0)
-        {
-            GameState.Entities.Add(new Explosion(GameState, new Vector2(16, 16), Pi/4f, 250));
-        }
-
         if (Array.IndexOf(e.Keys, Keys.W) >= 0) yAxis = 1;
         else if (Array.IndexOf(e.Keys, Keys.S) >= 0) yAxis = -1;
 
@@ -226,16 +221,7 @@ public sealed class Player : Entity, IInputEventListener
             Rotation = (float)Math.Atan2(yDiff, xDiff);
         }
 
-        // apply friction
-        float sign = Math.Sign(Velocity.Length());
-
-        if (sign != 0)
-        {
-            float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
-
-            Velocity -=
-                Vector2.UnitX.RotateVector(direction) * Friction * m_delta * sign;
-        }
+        ApplyFriction(e);
 
         // rotate the points for the cannon muzzles
         float rot = Pi / 8 * (float)Math.Round(Rotation / (Pi / 8));
@@ -245,6 +231,81 @@ public sealed class Player : Entity, IInputEventListener
             Position + new Vector2(10, -8).RotateVector(rot),
             Position + new Vector2(8, 10).RotateVector(rot)
         );
+    }
+    
+    internal override void Draw()
+    {
+        base.Draw();
+
+        for (int i = 0; i < m_powerUps.Count; i++)
+        {
+            Tuple<long, PowerUps> powerUp = m_powerUps[i];
+
+            long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+
+            if ((timeNow - powerUp.Item1) > PowerUpDuration)
+            {
+                m_powerUps.Remove(powerUp);
+                i--;
+
+                continue;
+            }
+
+            string powerUpName = powerUp.Item2 switch
+            {
+                PowerUps.QuadDamage => "quad damage",
+                PowerUps.Haste => "haste",
+                var _ => throw new ArgumentOutOfRangeException()
+            };
+
+            Vector4 color = powerUp.Item2 switch
+            {
+                PowerUps.QuadDamage => Palette.GetColorVector(Palette.Colors.Purple6),
+                PowerUps.Haste => Palette.GetColorVector(Palette.Colors.Red8),
+                var _ => throw new ArgumentOutOfRangeException()
+            };
+
+            Vector4 backgroundColor = Palette.GetColorVector(Palette.Colors.Black);
+            Vector4 barColor = ((timeNow - powerUp.Item1) / (float)PowerUpDuration) switch
+            {
+                < 0.25F => Palette.GetColorVector(Palette.Colors.Green7),
+                < 0.5F => Palette.GetColorVector(Palette.Colors.Green4),
+                < 0.75F => Palette.GetColorVector(Palette.Colors.Red8),
+                < 1 => Palette.GetColorVector(Palette.Colors.Red4),
+                var _ => Palette.GetColorVector(Palette.Colors.Black)
+            };
+
+            m_square.DrawTexture2D
+            (
+                new Rectangle(0, 0, 1, 1),
+                new Rectangle(0, 28 + i * 12, 2, 8),
+                0,
+                new Color(backgroundColor),
+                LayerOrdering.Powerups
+            );
+
+            //int barLength = (int)((timeNow - powerUp.Item1) / (float)PowerUpDuration * 2);
+            int barLength = 8 - (int)Math.Floor((timeNow - powerUp.Item1) / (float)PowerUpDuration * 8);
+
+            m_square.DrawTexture2D
+            (
+                new Rectangle(0, 0, 1, 1),
+                new Rectangle(0, 36 + i * 12 - barLength, 2, barLength),
+                0,
+                new Color(barColor),
+                LayerOrdering.Powerups
+            );
+
+            powerUpName.Draw
+            (
+                new Vector2(4, 28 + i * 12),
+                new Color(color),
+                0f,
+                new Vector2(0, 0),
+                1f,
+                LayerOrdering.Powerups
+            );
+        }
     }
 
     internal override void OnCollision(Collider other)
@@ -324,13 +385,6 @@ public sealed class Player : Entity, IInputEventListener
         base.OnDeath();
     }
 
-    internal override void Destroy()
-    {
-        StopListening();
-
-        base.Destroy();
-    }
-
     private void StopListening()
     {
         InputEventSource.KeyboardEvent -= OnKeyboardEvent;
@@ -338,79 +392,11 @@ public sealed class Player : Entity, IInputEventListener
         InputEventSource.MouseButtonEvent -= OnMouseButtonEvent;
     }
 
-    internal override void Draw()
+    internal override void Destroy()
     {
-        base.Draw();
+        StopListening();
 
-        for (int i = 0; i < m_powerUps.Count; i++)
-        {
-            Tuple<long, PowerUps> powerUp = m_powerUps[i];
-
-            long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-
-            if ((timeNow - powerUp.Item1) > PowerUpDuration)
-            {
-                m_powerUps.Remove(powerUp);
-                i--;
-
-                continue;
-            }
-
-            string powerUpName = powerUp.Item2 switch
-            {
-                PowerUps.QuadDamage => "quad damage",
-                PowerUps.Haste => "haste",
-                var _ => throw new ArgumentOutOfRangeException()
-            };
-
-            Vector4 color = powerUp.Item2 switch
-            {
-                PowerUps.QuadDamage => Palette.GetColorVector(Palette.Colors.Purple6),
-                PowerUps.Haste => Palette.GetColorVector(Palette.Colors.Red8),
-                var _ => throw new ArgumentOutOfRangeException()
-            };
-
-            Vector4 backgroundColor = Palette.GetColorVector(Palette.Colors.Black);
-            Vector4 barColor = ((timeNow - powerUp.Item1) / (float)PowerUpDuration) switch
-            {
-                < 0.25F => Palette.GetColorVector(Palette.Colors.Green7),
-                < 0.5F => Palette.GetColorVector(Palette.Colors.Green4),
-                < 0.75F => Palette.GetColorVector(Palette.Colors.Red8),
-                < 1 => Palette.GetColorVector(Palette.Colors.Red4),
-                var _ => Palette.GetColorVector(Palette.Colors.Black)
-            };
-
-            m_square.DrawTexture2D
-            (
-                new Rectangle(0, 0, 1, 1),
-                new Rectangle(0, 28 + i * 12, 2, 8),
-                0,
-                new Color(backgroundColor),
-                LayerOrdering.Powerups
-            );
-
-            //int barLength = (int)((timeNow - powerUp.Item1) / (float)PowerUpDuration * 2);
-            int barLength = 8 - (int)Math.Floor((timeNow - powerUp.Item1) / (float)PowerUpDuration * 8);
-
-            m_square.DrawTexture2D
-            (
-                new Rectangle(0, 0, 1, 1),
-                new Rectangle(0, 36 + i * 12 - barLength, 2, barLength),
-                0,
-                new Color(barColor),
-                LayerOrdering.Powerups
-            );
-
-            powerUpName.Draw
-            (
-                new Vector2(4, 28 + i * 12),
-                new Color(color),
-                0f,
-                new Vector2(0, 0),
-                1f,
-                LayerOrdering.Powerups
-            );
-        }
+        base.Destroy();
     }
 
     private void HandleMovement(int xAxis, int yAxis)

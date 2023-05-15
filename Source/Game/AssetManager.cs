@@ -11,7 +11,7 @@ internal static class AssetManager
 {
     private static readonly Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
     private static readonly Dictionary<string, SoundEffect> SoundEffects = new Dictionary<string, SoundEffect>();
-    private static readonly Dictionary<string, SpriteFont> SpriteFonts = new Dictionary<string, SpriteFont>();
+    private static readonly Dictionary<string, Effect> SpriteEffects = new Dictionary<string, Effect>();
     private static Game1 m_root;
 
     public static void Init(Game1 root)
@@ -34,12 +34,12 @@ internal static class AssetManager
             activeDictionary = SoundEffects as Dictionary<string, T>;
             activeDirectory = "Assets";
         }
-        else if (typeof(T) == typeof(SpriteFont))
+        else if (typeof(T) == typeof(Effect))
         {
-            activeDictionary = SpriteFonts as Dictionary<string, T>;
-            activeDirectory = "Fonts";
+            activeDictionary = SpriteEffects as Dictionary<string, T>;
+            activeDirectory = "Shaders";
         }
-        else throw new ArgumentException("T must be Texture2D, SoundEffect, BitmapFont, or Effect");
+        else throw new ArgumentException("T must be Texture2D, SoundEffect, or SpriteEffect");
 
         if (activeDictionary.TryGetValue(path, out T load))
             return load;

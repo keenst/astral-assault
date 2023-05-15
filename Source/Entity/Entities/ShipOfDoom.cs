@@ -24,7 +24,7 @@ internal sealed class ShipOfDoom : Entity
         : base(gameState, position)
     {
         Random rnd = new Random();
-        int speed = rnd.Next(30, 100);
+        int speed = rnd.Next(30, 55);
 
         Velocity = Vector2.UnitX.RotateVector(direction) * speed;
 
@@ -131,16 +131,7 @@ internal sealed class ShipOfDoom : Entity
 
         Velocity += Vector2.UnitX.RotateVector(angle) * 0.1f;
 
-        // apply friction
-        float sign = Math.Sign(Velocity.Length());
-
-        if (sign != 0)
-        {
-            float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
-
-            Velocity -=
-                Vector2.UnitX.RotateVector(direction) * 0.3f * e.DeltaTime * sign;
-        }
+        ApplyFriction(e);
 
         // rotate the points for the cannon muzzles
         float rot = MathF.PI / 8 * (float)Math.Round(Rotation / (MathF.PI / 8));
@@ -205,6 +196,8 @@ internal sealed class ShipOfDoom : Entity
         };
 
         Jukebox.PlaySound(explosionSound);
+
+        GameState.Entities.Add(new Explosion(GameState, new Vector2(16, 16)));
 
         GameState.Player.Multiplier += 0.5F;
 
