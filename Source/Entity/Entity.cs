@@ -92,6 +92,25 @@ public class Entity
             break;
         }
 
+        case OutOfBounds.Bounce:
+        {
+            Velocity = Position.X switch
+            {
+                < 0 => Vector2.Reflect(Velocity, Vector2.UnitX),
+                > Game1.TargetWidth => Vector2.Reflect(Velocity, -Vector2.UnitX),
+                var _ => Velocity
+            };
+
+            Velocity = Position.Y switch
+            {
+                < 0 => Vector2.Reflect(Velocity, -Vector2.UnitY),
+                > Game1.TargetHeight => Vector2.Reflect(Velocity, Vector2.UnitY),
+                var _ => Velocity
+            };
+
+            break;
+        }
+
         default:
         {
             throw new ArgumentOutOfRangeException();
@@ -186,5 +205,5 @@ public class Entity
         );
     }
 
-    protected enum OutOfBounds { DoNothing, Wrap, Destroy }
+    protected enum OutOfBounds { DoNothing, Wrap, Bounce, Destroy }
 }

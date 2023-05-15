@@ -1,5 +1,6 @@
 #region
 using System;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using TheGameOfDoomHmmm.Source.Entity.Entities.Items;
 using TheGameOfDoomHmmm.Source.Game.GameState;
@@ -65,28 +66,16 @@ internal sealed class ItemController : IUpdateEventListener
             isTooCloseToPlayer = false;
         } while (isTooCloseToPlayer);
 
-        Entity.Entities.Entity item = m_rnd.Next(3) switch
+        bool powerupExistsInWorld = false;
+        Entity.Entities.Entity item;
+
+        item = m_rnd.Next(3) switch
         {
             0 => new Quad(m_gameState, position),
             1 => new Haste(m_gameState, position),
             2 => new MegaHealth(m_gameState, position),
             var _ => throw new ArgumentOutOfRangeException()
         };
-
-        bool powerupExistsInWorld = m_gameState.Entities.IndexOf(item) != -1;
-
-        while (powerupExistsInWorld)
-        {
-            item = m_rnd.Next(3) switch
-            {
-                0 => new Quad(m_gameState, position),
-                1 => new Haste(m_gameState, position),
-                2 => new MegaHealth(m_gameState, position),
-                var _ => throw new ArgumentOutOfRangeException()
-            };
-
-            powerupExistsInWorld = m_gameState.Entities.IndexOf(item) != -1;
-        }
 
         m_gameState.Entities.Add(item);
     }

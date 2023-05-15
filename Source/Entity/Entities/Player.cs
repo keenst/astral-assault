@@ -67,7 +67,7 @@ public sealed class Player : Entity, IInputEventListener
 
         GameState.CollisionSystem.AddCollider(Collider);
 
-        OutOfBoundsBehavior = OutOfBounds.Wrap;
+        OutOfBoundsBehavior = OutOfBounds.Bounce;
 
         IsActor = true;
         MaxHP = 50;
