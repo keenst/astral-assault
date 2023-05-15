@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -169,9 +168,7 @@ public class EnemySpawner : IUpdateEventListener
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         
         List<QueuedMissile> missilesToRemove = new();
-        
-        Debug.WriteLine(_missileQueue.Count);
-        
+
         foreach (QueuedMissile queuedMissile in _missileQueue)
         {
             if (timeNow < queuedMissile.TimeToLaunchMS) continue;
