@@ -12,8 +12,10 @@ public class EnemySpawner : IUpdateEventListener
     private readonly GameplayState _gameState;
     private readonly DebrisController _debrisController;
 
-    private const float BaseSpawnInterval = 6000;
-    private float _spawnInterval = BaseSpawnInterval;
+    private const float BaseAsteroidSpawnInterval = 24000;
+    private const float BaseMissileSpawnInterval = 36000;
+    private float _asteroidSpawnInterval = BaseAsteroidSpawnInterval;
+    private float _missileSpawnInterval = BaseMissileSpawnInterval;
     private long _lastAsteroidSpawnTime;
     private long _lastMissileSpawnTime;
 
@@ -86,13 +88,13 @@ public class EnemySpawner : IUpdateEventListener
     {
         long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         
-        if (timeNow - _lastAsteroidSpawnTime > _spawnInterval)
+        if (timeNow - _lastAsteroidSpawnTime > _asteroidSpawnInterval)
         {
             _lastAsteroidSpawnTime = timeNow;
             SpawnAsteroid();
         }
 
-        if (timeNow - _lastMissileSpawnTime > _spawnInterval * 1.5F)
+        if (timeNow - _lastMissileSpawnTime > _missileSpawnInterval)
         {
             _lastMissileSpawnTime = timeNow;
 
@@ -104,7 +106,15 @@ public class EnemySpawner : IUpdateEventListener
             }
         }
 
-        _spawnInterval = BaseSpawnInterval * MathF.Pow(0.999F, EnemiesKilled / 1000F);
+        _asteroidSpawnInterval = BaseAsteroidSpawnInterval * MathF.Pow(0.98F, EnemiesKilled);
+        _missileSpawnInterval = BaseMissileSpawnInterval * MathF.Pow(0.98F, EnemiesKilled);
+        
+        Debug.WriteLine(_gameState.Entities.Count + " : " + _gameState.EnemiesAlive);
+
+        if (_gameState.EnemiesAlive == 0)
+        {
+            _asteroidSpawnInterval = 0;
+        }
     }
 
     public void StopListening()

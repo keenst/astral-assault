@@ -31,6 +31,9 @@ public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
     private const int AmmoConversionInterval = 150;
     private const int HealthConversionInterval = 200;
     private const int ShieldConversionInterval = 200;
+    private const float AmmoConversionAmount = 2;
+    private const float HealthConversionAmount = 2;
+    private const float ShieldConversionAmount = 3;
 
     private Vector2 _cursorPosition;
     private Tuple<Vector2, Vector2> _muzzle = new(Vector2.Zero, Vector2.Zero);
@@ -567,7 +570,7 @@ public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
         if (timeNow - _lastConversionUpdate < AmmoConversionInterval) return;
         _lastConversionUpdate = timeNow;
 
-        Ammo = Math.Min(Ammo + 1, MaxAmmo);
+        Ammo = (int)Math.Min(Ammo + AmmoConversionAmount, MaxAmmo);
     }
 
     private void HandleHealthConversion()
@@ -577,7 +580,7 @@ public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
         if (timeNow - _lastConversionUpdate < HealthConversionInterval) return;
         _lastConversionUpdate = timeNow;
         
-        HP = Math.Min(HP + 0.5F, MaxHP);
+        HP = Math.Min(HP + HealthConversionAmount, MaxHP);
     }
 
     private void HandleShieldConversion()
@@ -587,6 +590,6 @@ public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
         if (timeNow - _lastConversionUpdate < ShieldConversionInterval) return;
         _lastConversionUpdate = timeNow;
 
-        Shield = Math.Min(Shield + 1, MaxShield);
+        Shield = Math.Min(Shield + ShieldConversionAmount, MaxShield);
     }
 }
