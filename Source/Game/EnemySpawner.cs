@@ -20,7 +20,7 @@ public class EnemySpawner : IUpdateEventListener
     private long _lastMissileSpawnTime;
     
     private List<QueuedMissile> _missileQueue = new();
-    private const int MissileSpawnDelay = 1200;
+    private const int MissileSpawnDelay = 1600;
 
     private readonly Texture2D _missileWarningTexture;
 
