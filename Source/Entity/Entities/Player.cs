@@ -1,6 +1,7 @@
 ﻿#region
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -190,6 +191,18 @@ public sealed class Player : Entity, IInputEventListener
     {
         base.OnUpdate(e);
 
+        m_delta = e.DeltaTime;
+
+        // apply friction
+        float sign = Math.Sign(Velocity.Length());
+
+        if (sign != 0)
+        {
+            float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
+            Velocity -=
+                Vector2.UnitX.RotateVector(direction) * 0.3f * e.DeltaTime * sign;
+        }
+
         bool haste = false;
 
         foreach (Tuple<long, PowerUps> powerUp in m_powerUps)
@@ -206,8 +219,6 @@ public sealed class Player : Entity, IInputEventListener
         m_moveSpeed = haste ? 400 : 200;
         m_tiltSpeed = haste ? 400 : 200;
 
-        m_delta = e.DeltaTime;
-
         // check range to cursor
         float distance = Vector2.Distance(Position, m_cursorPosition);
         m_isCrosshairActive = distance >= 12;
@@ -221,8 +232,6 @@ public sealed class Player : Entity, IInputEventListener
             Rotation = (float)Math.Atan2(yDiff, xDiff);
         }
 
-        ApplyFriction(e);
-
         // rotate the points for the cannon muzzles
         float rot = Pi / 8 * (float)Math.Round(Rotation / (Pi / 8));
 
@@ -232,7 +241,7 @@ public sealed class Player : Entity, IInputEventListener
             Position + new Vector2(8, 10).RotateVector(rot)
         );
     }
-    
+
     internal override void Draw()
     {
         base.Draw();
@@ -266,14 +275,43 @@ public sealed class Player : Entity, IInputEventListener
             };
 
             Vector4 backgroundColor = Palette.GetColorVector(Palette.Colors.Black);
-            Vector4 barColor = ((timeNow - powerUp.Item1) / (float)PowerUpDuration) switch
+            float progress = (timeNow - powerUp.Item1) / (float)PowerUpDuration;
+            Vector4 barColor;
+
+            if (progress < 0.25F)
             {
-                < 0.25F => Palette.GetColorVector(Palette.Colors.Green7),
-                < 0.5F => Palette.GetColorVector(Palette.Colors.Green4),
-                < 0.75F => Palette.GetColorVector(Palette.Colors.Red8),
-                < 1 => Palette.GetColorVector(Palette.Colors.Red4),
-                var _ => Palette.GetColorVector(Palette.Colors.Black)
-            };
+                barColor = Palette.GetColorVector(Palette.Colors.Green7);
+            }
+            else if (progress < 0.5F)
+            {
+                barColor = Vector4.Lerp
+                (
+                    Palette.GetColorVector(Palette.Colors.Green7),
+                    Palette.GetColorVector(Palette.Colors.Green4),
+                    (progress - 0.25F) / 0.25F
+                );
+            }
+            else if (progress < 0.75F)
+            {
+                barColor = Vector4.Lerp
+                (
+                    Palette.GetColorVector(Palette.Colors.Green4),
+                    Palette.GetColorVector(Palette.Colors.Red8),
+                    (progress - 0.5F) / 0.25F
+                );
+            }
+            else if (progress < 1)
+            {
+                barColor = Vector4.Lerp(
+                    Palette.GetColorVector(Palette.Colors.Red8),
+                    Palette.GetColorVector(Palette.Colors.Red4),
+                    (progress - 0.75F) / 0.25F
+                );
+            }
+            else
+            {
+                barColor = Palette.GetColorVector(Palette.Colors.Red4);
+            }
 
             m_square.DrawTexture2D
             (
@@ -285,8 +323,10 @@ public sealed class Player : Entity, IInputEventListener
             );
 
             //int barLength = (int)((timeNow - powerUp.Item1) / (float)PowerUpDuration * 2);
-            int barLength = 8 - (int)Math.Floor((timeNow - powerUp.Item1) / (float)PowerUpDuration * 8);
+            int barLength = (int)Math.Floor(8 * (1 - (timeNow - powerUp.Item1) / (float)PowerUpDuration));
 
+            Debug.WriteLine(barLength);
+            
             m_square.DrawTexture2D
             (
                 new Rectangle(0, 0, 1, 1),

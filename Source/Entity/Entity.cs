@@ -47,19 +47,6 @@ public class Entity
         if (this is not Bullet) CreateHealthBarTexture();
     }
 
-    internal void ApplyFriction(UpdateEventArgs e)
-    {
-        // apply friction
-        float sign = Math.Sign(Velocity.Length());
-
-        if (sign == 0) return;
-
-        float direction = (float)Math.Atan2(Velocity.Y, Velocity.X);
-
-        Velocity -=
-            Vector2.UnitX.RotateVector(direction) * 0.3f * e.DeltaTime * sign;
-    }
-
     internal virtual void OnUpdate(UpdateEventArgs e)
     {
         if (IsActor && (HP <= 0))
