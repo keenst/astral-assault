@@ -69,6 +69,13 @@ public class Missile : Entity
         } 
     }
 
+    protected override void OnDeath()
+    {
+        GameState.ExplosionController.SpawnExplosion(Position);
+        
+        base.OnDeath();
+    }
+
     private float GetRotationToPlayer()
     {
         Player player = GameState.Player;

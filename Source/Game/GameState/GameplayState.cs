@@ -22,11 +22,14 @@ public class GameplayState : GameState, IUpdateEventListener
     private Vector4 _multiplierColor = MultiplierDefaultColor;
     private float _prevMultiplier = 1;
     
+    public readonly DebrisController DebrisController;
+    public readonly ExplosionController ExplosionController = new();
     
     public GameplayState(Game1 root) : base(root)
     {
         Entities = new List<Entity>();
         EnemySpawner = new EnemySpawner(this);
+        DebrisController = new DebrisController(this);
     }
 
     public override List<DrawTask> GetDrawTasks()
@@ -39,45 +42,9 @@ public class GameplayState : GameState, IUpdateEventListener
         }
 
         drawTasks.AddRange(EnemySpawner.GetDrawTasks());
-
-        string scoreText = $"Score: {Root.Score}";
-        Color textColor = Palette.GetColor(Palette.Colors.Grey9);
-        List<DrawTask> scoreTasks = scoreText.CreateDrawTasks(new Vector2(4, 4), textColor, LayerDepth.HUD);
-        drawTasks.AddRange(scoreTasks);
-        
-        string multiplierText = 
-            $"Score multi.: X{Player.Multiplier.ToString("0.0", CultureInfo.GetCultureInfo("en-US"))}";
-        
-        List<DrawTask> multiplierTasks = multiplierText.CreateDrawTasks(
-            new Vector2(480 - multiplierText.Length * 8 - 4, 4), 
-            textColor, 
-            LayerDepth.HUD,
-            new List<IDrawTaskEffect> { new ColorEffect(_multiplierColor) });
-        drawTasks.AddRange(multiplierTasks);
-
-        if (!Root.ShowDebug) return drawTasks;
-        
-        foreach (Collider collider in CollisionSystem.Colliders)
-        {
-            int width = collider.Rectangle.Width;
-            int height = collider.Rectangle.Height;
-                
-            Texture2D rect = new(Root.GraphicsDevice, width, height);
-
-            Color[] data = new Color[width * height];
-                
-            Array.Fill(data, new Color(Color.White, 0.2F));
-            rect.SetData(data);
-            
-            drawTasks.Add(new DrawTask(
-                rect, 
-                collider.Rectangle.Location.ToVector2(), 
-                0, 
-                LayerDepth.Debug, 
-                new List<IDrawTaskEffect>(),
-                Color.Blue,
-                Vector2.Zero));
-        }
+        drawTasks.AddRange(DebrisController.GetDrawTasks());
+        drawTasks.AddRange(ExplosionController.GetDrawTasks());
+        drawTasks.AddRange(GetScoreDrawTasks());
 
         return drawTasks;
     }
@@ -114,5 +81,27 @@ public class GameplayState : GameState, IUpdateEventListener
         {
             _multiplierColor = Vector4.Lerp(_multiplierColor, MultiplierDefaultColor, e.DeltaTime * 2);
         }
+    }
+
+    private List<DrawTask> GetScoreDrawTasks()
+    {
+        List<DrawTask> drawTasks = new();
+        
+        string scoreText = $"Score: {Root.Score}";
+        Color textColor = Palette.GetColor(Palette.Colors.Grey9);
+        List<DrawTask> scoreTasks = scoreText.CreateDrawTasks(new Vector2(4, 4), textColor, LayerDepth.HUD);
+        drawTasks.AddRange(scoreTasks);
+        
+        string multiplierText = 
+            $"Score multi.: X{Player.Multiplier.ToString("0.0", CultureInfo.GetCultureInfo("en-US"))}";
+        
+        List<DrawTask> multiplierTasks = multiplierText.CreateDrawTasks(
+            new Vector2(480 - multiplierText.Length * 8 - 4, 4), 
+            textColor, 
+            LayerDepth.HUD,
+            new List<IDrawTaskEffect> { new ColorEffect(_multiplierColor) });
+        drawTasks.AddRange(multiplierTasks);
+
+        return drawTasks;
     }
 }

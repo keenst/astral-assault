@@ -7,7 +7,6 @@ namespace AstralAssault;
 
 public class Asteroid : Entity
 {
-    private readonly DebrisController _debrisController;
     private readonly float _rotSpeed;
     private readonly Sizes _size;
     private bool _hasExploded;
@@ -23,12 +22,9 @@ public class Asteroid : Entity
         GameplayState gameState, 
         Vector2 position, 
         float direction, 
-        Sizes size, 
-        DebrisController debrisController) 
+        Sizes size) 
         :base(gameState, position)
     {
-        _debrisController = debrisController;
-        
         _size = size;
 
         Random rnd = new();
@@ -129,13 +125,13 @@ public class Asteroid : Entity
                 angleToPlayer += (float)rnd.NextDouble() * MathF.PI / 1 - MathF.PI / 2;
                 
                 GameState.Entities.Add(
-                    new Asteroid(GameState, Position, angleToPlayer, _size - 1, _debrisController));
+                    new Asteroid(GameState, Position, angleToPlayer, _size - 1));
             }
         }
         
         _hasExploded = true;
 
-        _debrisController.SpawnDebris(Position, (int)_size);
+        GameState.DebrisController.SpawnDebris(Position, (int)_size);
         
         GameState.Player.Multiplier += 0.1F;
 

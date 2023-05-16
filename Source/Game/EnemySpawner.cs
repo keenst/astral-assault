@@ -10,7 +10,6 @@ public class EnemySpawner : IUpdateEventListener
     public int EnemiesKilled { get; set; }
 
     private readonly GameplayState _gameState;
-    private readonly DebrisController _debrisController;
 
     private const float BaseAsteroidSpawnInterval = 24000;
     private const float BaseMissileSpawnInterval = 36000;
@@ -29,8 +28,6 @@ public class EnemySpawner : IUpdateEventListener
         _gameState = gameState;
 
         UpdateEventSource.UpdateEvent += OnUpdate;
-        
-        _debrisController = new DebrisController(gameState);
 
         _missileWarningTexture = AssetManager.Load<Texture2D>("MissileWarning");
     }
@@ -46,7 +43,7 @@ public class EnemySpawner : IUpdateEventListener
         float angleToCenter = MathF.Atan2(gameCenter.Y - position.Y, gameCenter.X - position.X);
         angleToCenter += MathHelper.ToRadians(rnd.Next(-45, 45));
         
-        _gameState.Entities.Add(new Asteroid(_gameState, position, angleToCenter, size, _debrisController));
+        _gameState.Entities.Add(new Asteroid(_gameState, position, angleToCenter, size));
     }
 
     private void SpawnMissile(Vector2 position)
@@ -56,11 +53,7 @@ public class EnemySpawner : IUpdateEventListener
 
     public List<DrawTask> GetDrawTasks()
     {
-        List<DrawTask> drawTasks = _debrisController.GetDrawTasks();
-        
-        drawTasks.AddRange(GetMissileWarningDrawTasks());
-        
-        return drawTasks;
+        return GetMissileWarningDrawTasks();
     }
 
     public void OnUpdate(object sender, UpdateEventArgs e)
