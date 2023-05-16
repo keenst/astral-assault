@@ -204,7 +204,7 @@ public class Entity : IUpdateEventListener
             source, 
             outline,
             0, 
-            LayerDepth.HUD, 
+            LayerDepth.Healthbar, 
             new List<IDrawTaskEffect> { new ColorEffect(outlineColor) },
             Color.Black);
         
@@ -213,7 +213,7 @@ public class Entity : IUpdateEventListener
             source, 
             emptyHealthBar,
             0, 
-            LayerDepth.HUD, 
+            LayerDepth.Healthbar, 
             new List<IDrawTaskEffect> { new ColorEffect(emptyColor) },
             Color.Red);
         
@@ -222,7 +222,7 @@ public class Entity : IUpdateEventListener
             source, 
             fullHealthBar,
             0, 
-            LayerDepth.HUD, 
+            LayerDepth.Healthbar, 
             new List<IDrawTaskEffect> { new ColorEffect(fillColor) }, 
             Color.LimeGreen);
         

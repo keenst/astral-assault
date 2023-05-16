@@ -6,6 +6,7 @@ public enum LayerDepth
     Debris,
     ThrusterFlame,
     Foreground,
+    Healthbar,
     HUD,
     Crosshair,
     Debug
