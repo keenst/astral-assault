@@ -30,7 +30,7 @@ public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
     private const int AmmoBarWidth = 46;
     private const int AmmoBarHeight = 16;
     private const int AmmoBarX = 4;
-    private const int AmmoBarY = Game1.TargetHeight - AmmoBarHeight - 14;
+    private const int AmmoBarY = Game1.TargetHeight - AmmoBarHeight - 4;
     
     private readonly Texture2D _energyConverterTexture;
     private const int EnergyConverterWidth = 25;

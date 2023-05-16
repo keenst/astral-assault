@@ -123,10 +123,6 @@ public class Game1 : Game
                 _graphics.IsFullScreen = true;
                 _graphics.ApplyChanges();
             }
-            
-            //ScaleX = _graphics.PreferredBackBufferWidth / (float)TargetWidth;
-            //ScaleY = _graphics.PreferredBackBufferHeight / (float)TargetHeight;
-            //_scale = Matrix.CreateScale(new Vector3(ScaleX, ScaleY, 1));
         }
 
         _prevKeyState = Keyboard.GetState();
@@ -144,12 +140,7 @@ public class Game1 : Game
         GraphicsDevice.Clear(BackgroundColor);
 
         List<DrawTask> drawTasks = new();
-        
-        string fullscreenText = "Press F for fullscreen";
-        List<DrawTask> fullscreenTextTasks = 
-            fullscreenText.CreateDrawTasks(new Vector2(4, 258), Color.White, LayerDepth.Background);
-        drawTasks.AddRange(fullscreenTextTasks);
-        
+
         drawTasks.AddRange(GameStateMachine.GetDrawTasks());
         
         drawTasks = drawTasks.OrderBy(dt => (int)dt.LayerDepth).ToList();
