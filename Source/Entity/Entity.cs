@@ -12,9 +12,9 @@ public class Entity : IUpdateEventListener
 {
     public Vector2 Position;
     public Vector2 Velocity;
-    public float ContactDamage;
+    protected float ContactDamage;
     protected float Rotation;
-    protected Collider Collider;
+    public Collider Collider;
     protected SpriteRenderer SpriteRenderer;
     protected readonly GameplayState GameState;
     protected OutOfBounds OutOfBoundsBehavior = OutOfBounds.Wrap;

@@ -14,10 +14,10 @@ public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
     private enum EnergyConversion
     {
         Health,
-        Shield,
-        Ammo
+        Ammo,
+        Shield
     }
-    
+
     public float Multiplier = 1;
     
     public int Ammo = 50;
@@ -25,7 +25,19 @@ public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
 
     public float Shield = 100;
     public const float MaxShield = 100;
-
+    
+    private readonly Texture2D _ammoBarTexture;
+    private const int AmmoBarWidth = 46;
+    private const int AmmoBarHeight = 16;
+    private const int AmmoBarX = 4;
+    private const int AmmoBarY = Game1.TargetHeight - AmmoBarHeight - 14;
+    
+    private readonly Texture2D _energyConverterTexture;
+    private const int EnergyConverterWidth = 25;
+    private const int EnergyConverterHeight = 43;
+    private const int EnergyConverterX = 4;
+    private const int EnergyConverterY = AmmoBarY - EnergyConverterHeight - 4;
+    
     private EnergyConversion _currentEnergyConversion = EnergyConversion.Health;
     private long _lastConversionUpdate;
     private const int AmmoConversionInterval = 150;
@@ -42,7 +54,7 @@ public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
     private bool _thrusterIsOn;
     private long _lastTimeFired;
     private float _delta;
-    private readonly ParticleEmitter _particleEmitter;
+    private ParticleEmitter _particleEmitter;
 
     private const float MoveSpeed = 200;
     private const float MaxSpeed = 100;
@@ -56,11 +68,26 @@ public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
     {
         Position = position;
         Rotation = Pi / 2;
+        
+        _energyConverterTexture = AssetManager.Load<Texture2D>("EnergyConverter");
+        _ammoBarTexture = AssetManager.Load<Texture2D>("AmmoBar");
 
         InitSpriteRenderer();
+        InitParticleEmitter();
+        InitCollider();
         
         StartListening();
-        
+
+        OutOfBoundsBehavior = OutOfBounds.Wrap;
+
+        IsActor = true;
+        MaxHP = 50;
+        HP = MaxHP;
+        IsFriendly = true;
+    }
+
+    private void InitCollider()
+    {
         Collider = new Collider(
             this, 
             new Rectangle(
@@ -69,7 +96,10 @@ public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
             true,
             10);
         GameState.CollisionSystem.AddCollider(Collider);
+    }
 
+    private void InitParticleEmitter()
+    {
         Texture2D particleSpriteSheet = AssetManager.Load<Texture2D>("Particle");
         
         Rectangle[] textureSources =
@@ -107,17 +137,8 @@ public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
             Rotation,
             particleProperties,
             LayerDepth.ThrusterFlame);
-        
-        _particleEmitter.StartSpawning();
-
-        OutOfBoundsBehavior = OutOfBounds.Wrap;
-
-        IsActor = true;
-        MaxHP = 50;
-        HP = MaxHP;
-        IsFriendly = true;
     }
-
+    
     private void InitSpriteRenderer()
     {
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Player");
@@ -192,8 +213,8 @@ public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
         
         _thrusterIsOn = false;
         
-        drawTasks.AddRange(GetAmmoDrawTasks());
-        drawTasks.AddRange(GetEnergyConverterDrawTasks());
+        drawTasks.AddRange(GetAmmoBarDrawTasks());
+        drawTasks.Add(GetEnergyConverterDrawTask());
         drawTasks.AddRange(GetShieldBarDrawTasks());
         
         return drawTasks;
@@ -301,41 +322,32 @@ public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
         _lastCannon = !_lastCannon;
     }
 
-    private List<DrawTask> GetAmmoDrawTasks()
+    private List<DrawTask> GetAmmoBarDrawTasks()
     {
-        List<DrawTask> drawTasks = new();
+        DrawTask emptyDrawTask = new(
+            _ammoBarTexture,
+            new Rectangle(0, 0, AmmoBarWidth, AmmoBarHeight),
+            new Vector2(AmmoBarX, AmmoBarY),
+            0,
+            LayerDepth.HUD,
+            new List<IDrawTaskEffect>(),
+            Color.White,
+            Vector2.Zero);
 
-        Vector2 position = new(4, 40);
+        const int margin = 3;
+        int width = (int)(Ammo / (float)MaxAmmo * (AmmoBarWidth - margin * 2));
 
-        List<DrawTask> ammoDrawTasks = Ammo
-            .ToString()
-            .CreateDrawTasks(position, Color.White, LayerDepth.HUD, new List<IDrawTaskEffect>());
-        
-        drawTasks.AddRange(ammoDrawTasks);
-        
-        return drawTasks;
-    }
+        DrawTask fullDrawTask = new(
+            _ammoBarTexture,
+            new Rectangle(0, AmmoBarHeight, width + margin, AmmoBarHeight),
+            new Vector2(AmmoBarX, AmmoBarY),
+            0,
+            LayerDepth.HUD,
+            new List<IDrawTaskEffect>(),
+            Color.White,
+            Vector2.Zero);
 
-    private List<DrawTask> GetEnergyConverterDrawTasks()
-    {
-        List<DrawTask> drawTasks = new();
-
-        Vector2 position = new(4, 50);
-
-        string currentEnergyConversion = _currentEnergyConversion switch
-        {
-            EnergyConversion.Health => "Health",
-            EnergyConversion.Shield => "Shield",
-            EnergyConversion.Ammo => "Ammo",
-            _ => throw new ArgumentOutOfRangeException()
-        };
-        
-        List<DrawTask> energyConverterDrawTasks = currentEnergyConversion
-            .CreateDrawTasks(position, Color.White, LayerDepth.HUD, new List<IDrawTaskEffect>());
-
-        drawTasks.AddRange(energyConverterDrawTasks);
-        
-        return drawTasks;
+        return new List<DrawTask>() { emptyDrawTask, fullDrawTask };
     }
 
     private List<DrawTask> GetShieldBarDrawTasks()
@@ -346,6 +358,27 @@ public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
         drawTasks.AddRange(CreateBarDrawTasks(Shield, MaxShield, fillColor, -20));
 
         return drawTasks;
+    }
+    
+    private DrawTask GetEnergyConverterDrawTask()
+    {
+        int spriteIndex = (int)_currentEnergyConversion;
+        
+        Rectangle source = new(
+            EnergyConverterWidth * spriteIndex, 
+            0, 
+            EnergyConverterWidth, 
+            EnergyConverterHeight);
+
+        return new DrawTask(
+            _energyConverterTexture,
+            source,
+            new Vector2(EnergyConverterX, EnergyConverterY),
+            0,
+            LayerDepth.HUD,
+            new List<IDrawTaskEffect>(),
+            Color.White,
+            Vector2.Zero);
     }
 
     public override void OnCollision(Collider other)
