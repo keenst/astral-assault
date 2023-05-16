@@ -54,32 +54,6 @@ public class EnemySpawner : IUpdateEventListener
         _gameState.Entities.Add(new Missile(_gameState, position));
     }
 
-    private static Vector2 GenerateEnemyPosition()
-    {
-        Random rnd = new();
-        int side = rnd.Next(0, 4);
-
-        int x = side switch
-        {
-            0 => 0,
-            1 => Game1.TargetWidth,
-            2 => rnd.Next(0, Game1.TargetWidth),
-            3 => rnd.Next(0, Game1.TargetWidth),
-            _ => throw new ArgumentOutOfRangeException()
-        };
-        
-        int y = side switch
-        {
-            0 => rnd.Next(0, Game1.TargetHeight),
-            1 => rnd.Next(0, Game1.TargetHeight),
-            2 => 0,
-            3 => Game1.TargetHeight,
-            _ => throw new ArgumentOutOfRangeException()
-        };
-        
-        return new Vector2(x, y);
-    }
-
     public List<DrawTask> GetDrawTasks()
     {
         List<DrawTask> drawTasks = _debrisController.GetDrawTasks();
@@ -152,14 +126,6 @@ public class EnemySpawner : IUpdateEventListener
 
         return drawTasks;
     }
-    
-    private Vector2 GetMissileWarningPosition(Vector2 missileSpawnPoint)
-    {
-        int x = Math.Clamp((int)missileSpawnPoint.X, 24, Game1.TargetWidth - 24);
-        int y = Math.Clamp((int)missileSpawnPoint.Y, 24, Game1.TargetHeight - 24);
-        
-        return new Vector2(x, y);
-    }
 
     private void HandleQueuedMissiles()
     {
@@ -186,5 +152,39 @@ public class EnemySpawner : IUpdateEventListener
     public void StopListening()
     {
         UpdateEventSource.UpdateEvent -= OnUpdate;
+    }
+    
+    private static Vector2 GetMissileWarningPosition(Vector2 missileSpawnPoint)
+    {
+        int x = Math.Clamp((int)missileSpawnPoint.X, 24, Game1.TargetWidth - 24);
+        int y = Math.Clamp((int)missileSpawnPoint.Y, 24, Game1.TargetHeight - 24);
+        
+        return new Vector2(x, y);
+    }
+    
+    private static Vector2 GenerateEnemyPosition()
+    {
+        Random rnd = new();
+        int side = rnd.Next(0, 4);
+
+        int x = side switch
+        {
+            0 => 0,
+            1 => Game1.TargetWidth,
+            2 => rnd.Next(0, Game1.TargetWidth),
+            3 => rnd.Next(0, Game1.TargetWidth),
+            _ => throw new ArgumentOutOfRangeException()
+        };
+        
+        int y = side switch
+        {
+            0 => rnd.Next(0, Game1.TargetHeight),
+            1 => rnd.Next(0, Game1.TargetHeight),
+            2 => 0,
+            3 => Game1.TargetHeight,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+        
+        return new Vector2(x, y);
     }
 }
