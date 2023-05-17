@@ -20,18 +20,21 @@ public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
 
     public float Multiplier = 1;
     
-    public int Ammo = 50;
+    private const int LightAmmoCost = 1;
+    private const int HeavyAmmoCost = 4;
+    
     public const int MaxAmmo = 300;
+    public int Ammo = 50;
 
-    public float Shield = 100;
-    public const float MaxShield = 100;
+    public const float MaxShield = 40;
+    public float Shield = MaxShield;
     
     private readonly Texture2D _ammoBarTexture;
     private const int AmmoBarWidth = 46;
     private const int AmmoBarHeight = 16;
     private const int AmmoBarX = 4;
     private const int AmmoBarY = Game1.TargetHeight - AmmoBarHeight - 4;
-    
+
     private readonly Texture2D _energyConverterTexture;
     private const int EnergyConverterWidth = 25;
     private const int EnergyConverterHeight = 43;
@@ -288,15 +291,15 @@ public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
         
         if (Ammo < bulletType switch
         {
-            BulletType.Light => 1,
-            BulletType.Heavy => 2,
+            BulletType.Light => LightAmmoCost,
+            BulletType.Heavy => HeavyAmmoCost,
             _ => throw new ArgumentOutOfRangeException()
         }) return;
         
         Ammo -= bulletType switch
         {
-            BulletType.Light => 1,
-            BulletType.Heavy => 2,
+            BulletType.Light => LightAmmoCost,
+            BulletType.Heavy => HeavyAmmoCost,
             _ => throw new ArgumentOutOfRangeException()
         };
 
