@@ -145,30 +145,6 @@ public class Game1 : Game
         
         drawTasks = drawTasks.OrderBy(dt => (int)dt.LayerDepth).ToList();
 
-        if (ShowDebug)
-        {
-            long timeNow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-            
-            if (_lastStatUpdate + StatUpdateInterval < timeNow)
-            {
-                _frameRate = 1 / (float)gameTime.ElapsedGameTime.TotalSeconds;
-                _renderTime = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-        
-                _lastStatUpdate = timeNow;
-            }
-            
-            string frameRate = Math.Round(_frameRate).ToString();
-            string renderTime = _renderTime.ToString();
-            
-            List<DrawTask> frameRateTask = 
-                frameRate.CreateDrawTasks(Vector2.Zero, Color.Yellow, LayerDepth.Debug);
-            List<DrawTask> renderTimeTask = 
-                renderTime.CreateDrawTasks(new Vector2(0, 9), Color.Yellow, LayerDepth.Debug);
-            
-            drawTasks.AddRange(frameRateTask);
-            drawTasks.AddRange(renderTimeTask);
-        }
-        
         _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointWrap);
         
         foreach (DrawTask drawTask in drawTasks)
