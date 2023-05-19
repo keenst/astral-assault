@@ -21,6 +21,8 @@ public class EnemySpawner : IUpdateEventListener
     private readonly List<QueuedMissile> _missileQueue = new();
     private const int MissileWarningDuration = 1600;
 
+    private const int MissileWarningMargin = 16;
+
     private readonly Texture2D _missileWarningTexture;
 
     public EnemySpawner(GameplayState gameState)
@@ -149,8 +151,8 @@ public class EnemySpawner : IUpdateEventListener
     
     private static Vector2 GetMissileWarningPosition(Vector2 missileSpawnPoint)
     {
-        int x = Math.Clamp((int)missileSpawnPoint.X, 24, Game1.TargetWidth - 24);
-        int y = Math.Clamp((int)missileSpawnPoint.Y, 24, Game1.TargetHeight - 24);
+        int x = Math.Clamp((int)missileSpawnPoint.X, MissileWarningMargin, Game1.TargetWidth - MissileWarningMargin);
+        int y = Math.Clamp((int)missileSpawnPoint.Y, MissileWarningMargin, Game1.TargetHeight - MissileWarningMargin);
         
         return new Vector2(x, y);
     }
