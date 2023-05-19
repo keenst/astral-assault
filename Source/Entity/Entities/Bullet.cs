@@ -15,8 +15,9 @@ public class Bullet : Entity
             ) * speed;
 
         Texture2D spriteSheet = AssetManager.Load<Texture2D>("Bullet");
-        
-        Frame frame = new(new Rectangle(0, 0, 4, 4));
+
+        int spriteIndex = bulletType == BulletType.Heavy ? 1 : 0;
+        Frame frame = new(new Rectangle(4 * spriteIndex, 0, 4, 4));
 
         SpriteRenderer = new SpriteRenderer(spriteSheet, frame, LayerDepth.Foreground);
         
@@ -29,13 +30,8 @@ public class Bullet : Entity
 
         OutOfBoundsBehavior = OutOfBounds.Destroy;
 
-        ContactDamage = bulletType switch
-        {
-            BulletType.Light => 4,
-            BulletType.Heavy => 8,
-            _ => throw new ArgumentOutOfRangeException(nameof(bulletType), bulletType, null)
-        };
-        
+        ContactDamage = bulletType == BulletType.Light ? 4 : 8;
+
         IsFriendly = true;
     }
 
