@@ -62,16 +62,33 @@ public class Missile : Entity
     public override void OnCollision(Collider other)
     {
         base.OnCollision(other);
-
-        if (other.Parent is Player)
+        
+        switch (other.Parent)
         {
-            OnDeath();
-        } 
+            case Player:
+            {
+                OnDeath();
+                break;
+            }
+            case Bullet:
+            {
+                Random rnd = new();
+                string soundName = "Hurt" + rnd.Next(1, 4);
+                
+                Jukebox.PlaySound(soundName, 0.5F);
+                break;
+            }
+        }
     }
 
     protected override void OnDeath()
     {
         GameState.ExplosionController.SpawnExplosion(Position);
+        
+        Random rnd = new();
+        string soundName = "Explosion" + rnd.Next(1, 4);
+        
+        Jukebox.PlaySound(soundName, 0.5F);
         
         base.OnDeath();
     }
