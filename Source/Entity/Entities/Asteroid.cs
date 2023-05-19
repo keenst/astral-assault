@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -171,13 +170,7 @@ public class Asteroid : Entity
         
         Random rnd = new();
         
-        string soundName = rnd.Next(3) switch
-        {
-            0 => "Hurt1",
-            1 => "Hurt2",
-            2 => "Hurt3",
-            _ => throw new ArgumentOutOfRangeException()
-        };
+        string soundName = "Hurt" + rnd.Next(1, 4);
         
         Jukebox.PlaySound(soundName, 0.5F);
     }
