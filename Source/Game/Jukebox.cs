@@ -17,13 +17,12 @@ public static class Jukebox
         SoundEffects.Add("Shoot1", AssetManager.Load<SoundEffect>("Shoot1"));
         SoundEffects.Add("Shoot2", AssetManager.Load<SoundEffect>("Shoot2"));
         SoundEffects.Add("Shoot3", AssetManager.Load<SoundEffect>("Shoot3"));
-        SoundEffects.Add("QuadShoot1", AssetManager.Load<SoundEffect>("QuadShoot1"));
-        SoundEffects.Add("QuadShoot2", AssetManager.Load<SoundEffect>("QuadShoot2"));
-        SoundEffects.Add("QuadShoot3", AssetManager.Load<SoundEffect>("QuadShoot3"));
+        SoundEffects.Add("HeavyShoot1", AssetManager.Load<SoundEffect>("HeavyShoot1"));
+        SoundEffects.Add("HeavyShoot2", AssetManager.Load<SoundEffect>("HeavyShoot2"));
+        SoundEffects.Add("HeavyShoot3", AssetManager.Load<SoundEffect>("HeavyShoot3"));
         SoundEffects.Add("Hurt1", AssetManager.Load<SoundEffect>("Hurt1"));
         SoundEffects.Add("Hurt2", AssetManager.Load<SoundEffect>("Hurt2"));
         SoundEffects.Add("Hurt3", AssetManager.Load<SoundEffect>("Hurt3"));
-        SoundEffects.Add("PickUp", AssetManager.Load<SoundEffect>("PickUp"));
         SoundEffects.Add("MultiplierBroken", AssetManager.Load<SoundEffect>("MultiplierBroken1"));
         SoundEffects.Add("RestartGame", AssetManager.Load<SoundEffect>("RestartGame1"));
     }

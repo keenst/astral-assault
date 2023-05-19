@@ -171,19 +171,19 @@
 
 #begin Assets/HeavyShoot1.ogg
 /importer:OggImporter
-/processor:SongProcessor
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Assets/HeavyShoot1.ogg
 
 #begin Assets/HeavyShoot2.ogg
 /importer:OggImporter
-/processor:SongProcessor
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Assets/HeavyShoot2.ogg
 
 #begin Assets/HeavyShoot3.ogg
 /importer:OggImporter
-/processor:SongProcessor
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Assets/HeavyShoot3.ogg
 

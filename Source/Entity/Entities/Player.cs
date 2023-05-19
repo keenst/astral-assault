@@ -304,7 +304,7 @@ public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
         };
 
         Random rnd = new();
-        string soundName = "Shoot" + rnd.Next(1, 4);
+        string soundName = (bulletType == BulletType.Heavy ? "Heavy" : "") + "Shoot" + rnd.Next(1, 4);
         Jukebox.PlaySound(soundName, 0.5F);
         
         _lastTimeFired = timeNow;
