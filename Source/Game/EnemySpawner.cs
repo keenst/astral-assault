@@ -20,8 +20,10 @@ public class EnemySpawner : IUpdateEventListener
     
     private readonly List<QueuedMissile> _missileQueue = new();
     private const int MissileWarningDuration = 1600;
-
     private const int MissileWarningMargin = 16;
+
+    private readonly long _timeStarted = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+    private const int TimeBeforeFirstMissileSpawn = 10000;
 
     private readonly Texture2D _missileWarningTexture;
 
@@ -67,8 +69,9 @@ public class EnemySpawner : IUpdateEventListener
             _lastAsteroidSpawnTime = timeNow;
             SpawnAsteroid();
         }
-
-        if (timeNow - _lastMissileSpawnTime > _missileSpawnInterval)
+        
+        if (timeNow - _lastMissileSpawnTime > _missileSpawnInterval && 
+            timeNow - _timeStarted > TimeBeforeFirstMissileSpawn)
         {
             _lastMissileSpawnTime = timeNow;
 
