@@ -21,9 +21,9 @@ public class Player : Entity, IInputEventListener, IKeyboardPressedEventListener
     public float Multiplier = 1;
     
     private const int LightAmmoCost = 1;
-    private const int HeavyAmmoCost = 4;
+    private const int HeavyAmmoCost = 5;
     
-    public const int MaxAmmo = 300;
+    public const int MaxAmmo = 200;
     public int Ammo = 50;
 
     public const float MaxShield = 40;

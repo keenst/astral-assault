@@ -75,7 +75,7 @@ public class EnemySpawner : IUpdateEventListener
         {
             _lastMissileSpawnTime = timeNow;
 
-            int amountToSpawn = (int)MathF.Pow(1.2F, EnemiesKilled / 5F);
+            int amountToSpawn = (int)MathF.Pow(1.02F, EnemiesKilled);
 
             for (int i = 0; i < amountToSpawn; i++)
             {
@@ -87,7 +87,7 @@ public class EnemySpawner : IUpdateEventListener
 
         HandleQueuedMissiles();
 
-        _asteroidSpawnInterval = BaseAsteroidSpawnInterval * MathF.Pow(0.98F, EnemiesKilled);
+        _asteroidSpawnInterval = BaseAsteroidSpawnInterval * MathF.Pow(0.96F, EnemiesKilled);
         _missileSpawnInterval = BaseMissileSpawnInterval * MathF.Pow(0.98F, EnemiesKilled);
 
         if (_gameState.EnemiesAlive == 0)
