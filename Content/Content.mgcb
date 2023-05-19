@@ -169,17 +169,23 @@
 /processorParam:Quality=Best
 /build:Assets/GameOverSound.ogg
 
-#begin Assets/Haste.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Assets/Haste.png
+#begin Assets/HeavyShoot1.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Assets/HeavyShoot1.ogg
+
+#begin Assets/HeavyShoot2.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Assets/HeavyShoot2.ogg
+
+#begin Assets/HeavyShoot3.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Assets/HeavyShoot3.ogg
 
 #begin Assets/Hurt1.ogg
 /importer:OggImporter
@@ -198,30 +204,6 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Assets/Hurt3.ogg
-
-#begin Assets/LightAmmo.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Assets/LightAmmo.png
-
-#begin Assets/MegaHealth.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Assets/MegaHealth.png
 
 #begin Assets/Missile.png
 /importer:TextureImporter
@@ -265,12 +247,6 @@
 /processorParam:TextureFormat=Color
 /build:Assets/Particle.png
 
-#begin Assets/PickUp.ogg
-/importer:OggImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Assets/PickUp.ogg
-
 #begin Assets/Player.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -282,36 +258,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Assets/Player.png
-
-#begin Assets/Quad.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Assets/Quad.png
-
-#begin Assets/QuadShoot1.ogg
-/importer:OggImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Assets/QuadShoot1.ogg
-
-#begin Assets/QuadShoot2.ogg
-/importer:OggImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Assets/QuadShoot2.ogg
-
-#begin Assets/QuadShoot3.ogg
-/importer:OggImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Assets/QuadShoot3.ogg
 
 #begin Assets/Restart.png
 /importer:TextureImporter
