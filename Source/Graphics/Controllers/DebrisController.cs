@@ -42,26 +42,21 @@ public class DebrisController
             particleProperties,
             LayerDepth.Debris);
     }
-    
+
     public void SpawnDebris(Vector2 position, int asteroidSize)
     {
         int amount = _rnd.Next(4, (1 + asteroidSize) * 4);
-        
+
         float angleFromPlayer = MathF.Atan2(
             position.Y - _gameplayState.Player.Position.Y,
             position.X - _gameplayState.Player.Position.X);
 
         _particleEmitter.SetTransform(position, angleFromPlayer);
         _particleEmitter.StartSpawning(amount);
-        
-        int score = (Asteroid.Sizes)asteroidSize switch
-        {
-            Asteroid.Sizes.Smallest => 100,
-            Asteroid.Sizes.Small => 300,
-            Asteroid.Sizes.Medium => 700,
-            _ => 0
-        };
+    }
 
+    public void SpawnScoreText(Vector2 position, int score)
+    {
         _scores.Add(new Tuple<long, Tuple<Vector2, int>>(
             DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond,
             new Tuple<Vector2, int>(position, score)));

@@ -90,6 +90,16 @@ public class Missile : Entity
         
         Jukebox.PlaySound(soundName, 0.5F);
         
+        GameState.Player.Multiplier += 0.5F;
+
+        const int score = 1200;
+        
+        GameState.DebrisController.SpawnScoreText(Position, score);
+
+        GameState.Root.Score += (int)(score * GameState.Player.Multiplier);
+
+        GameState.EnemySpawner.EnemiesKilled++;
+        
         base.OnDeath();
     }
 

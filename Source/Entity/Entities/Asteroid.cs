@@ -130,8 +130,6 @@ public class Asteroid : Entity
         
         _hasExploded = true;
 
-        GameState.DebrisController.SpawnDebris(Position, (int)_size);
-        
         GameState.Player.Multiplier += 0.1F;
 
         int score = _size switch
@@ -142,6 +140,9 @@ public class Asteroid : Entity
             _ => 0
         };
         
+        GameState.DebrisController.SpawnDebris(Position, (int)_size);
+        GameState.DebrisController.SpawnScoreText(Position, score);
+
         GameState.Root.Score += (int)(score * GameState.Player.Multiplier);
 
         GameState.EnemySpawner.EnemiesKilled++;
