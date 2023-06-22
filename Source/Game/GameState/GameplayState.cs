@@ -15,7 +15,7 @@ public class GameplayState : GameState
     public readonly List<Entity> Entities;
     public readonly CollisionSystem CollisionSystem = new();
     private readonly WaveController _waveController;
-    private readonly BackgroundRenderer _backgroundRenderer = new();
+    private readonly BackgroundRenderer _backgroundRenderer;
     
     public Player Player => (Player) Entities.Find(entity => entity is Player);
     
@@ -24,6 +24,8 @@ public class GameplayState : GameState
 
     public GameplayState(Game1 root) : base(root)
     {
+        _backgroundRenderer = new BackgroundRenderer(root);
+        
         Entities = new List<Entity>();
         
         _waveController = new WaveController(this);

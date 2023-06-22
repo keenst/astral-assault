@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -14,21 +16,42 @@ public class BackgroundRenderer
         Bottom,
         Left
     }
-    
+
+    [Flags]
+    private enum Direction
+    {
+        Horizontal,
+        Vertical
+    }
+
+    private readonly Dictionary<Side, int> _baseSpawnSideWeights = new()
+    {
+        { Side.Top, ScreenWidth },
+        { Side.Right, ScreenHeight },
+        { Side.Bottom, ScreenWidth },
+        { Side.Left, ScreenHeight }
+    };
+
     private const int ScreenWidth = Game1.TargetWidth;
     private const int ScreenHeight = Game1.TargetHeight;
+    
     private const int MaxNebulae = 10;
+    private const int MaxStars = 150;
 
     private readonly Vector2 _parallaxOffset;
     private readonly Texture2D _nebulaTexture;
-    private readonly List<Nebula> _nebulae = new();
+    private readonly Texture2D _starTexture;
     private readonly Random _rnd = new();
+    
+    private readonly List<Nebula> _nebulae = new();
+    private readonly List<Vector3> _stars = new();
     
     private Vector2 _currentOffset;
 
-    public BackgroundRenderer()
+    public BackgroundRenderer(Game root)
     {
         _nebulaTexture = AssetManager.Load<Texture2D>("Nebula1");
+        _starTexture = CreateStarTexture(root);
         
         float xOffset = RandomFloat(-1, 1);
         float yOffset = RandomFloat(-1, 1);
@@ -39,6 +62,11 @@ public class BackgroundRenderer
         for (int i = 0; i < MaxNebulae; i++)
         {
             SpawnInitialNebula();
+        }
+        
+        for (int i = 0; i < MaxStars; i++)
+        {
+            SpawnInitialStar();
         }
     }
 
@@ -58,6 +86,18 @@ public class BackgroundRenderer
             drawTasks.Add(nebulaTask);
         }
 
+        foreach (Vector3 star in _stars)
+        {
+            DrawTask starTask = new(
+                _starTexture,
+                GetScreenPosition(new Point((int)star.X, (int)star.Y)).ToVector2(),
+                0,
+                LayerDepth.Background,
+                new List<IDrawTaskEffect>());
+            
+            drawTasks.Add(starTask);
+        }
+
         return drawTasks;
     }
     
@@ -65,6 +105,12 @@ public class BackgroundRenderer
     {
         _currentOffset += _parallaxOffset * deltaTime;
         
+        HandleRemoving();
+        HandleSpawning();
+    }
+
+    private void HandleRemoving()
+    {
         foreach (Nebula nebula in _nebulae)
         {
             Point position = GetScreenPosition(nebula.Position - _nebulaTexture.Bounds.Size / new Point(2, 2));
@@ -75,10 +121,30 @@ public class BackgroundRenderer
             _nebulae.Remove(nebula);
             break;
         }
-        
+
+        foreach (Vector3 star in _stars)
+        {
+            Point position = GetScreenPosition(new Point((int)star.X, (int)star.Y));
+
+            if (position.X is >= 0 and <= ScreenWidth && 
+                position.Y is >= 0 and <= ScreenHeight) 
+                continue;
+            
+            _stars.Remove(star);
+            break;
+        }
+    }
+    
+    private void HandleSpawning()
+    {
         if (_nebulae.Count < MaxNebulae)
         {
             SpawnNebula();
+        }
+
+        if (_stars.Count < MaxStars)
+        {
+            SpawnStar();
         }
     }
 
@@ -107,90 +173,158 @@ public class BackgroundRenderer
         return sides;
     }
     
-    private Point GetSpawnPosition(Side side)
+    private bool GetSpawnPosition(Side side, int width, int height, out Point position, int padding = 0)
     {
-        for (int i = 0; i < 10; i++)
+        GetSideRanges(side, width, height, out int minX, out int maxX, out int minY, out int maxY);
+        Direction direction = GetDirectionFromSide(side) ^ Direction.Horizontal;
+
+        HashSet<int> checkedNumbers = new();
+        
+        int rangeLength = direction == Direction.Vertical ? maxX - minX : maxY - minY;
+        
+        do
         {
-            int x;
-            int y;
-
-            switch (side)
+            if (checkedNumbers.Count >= rangeLength)
             {
-                case Side.Top:
-                    x = _rnd.Next(0, ScreenWidth);
-                    y = -31;
-                    break;
-                case Side.Right:
-                    x = ScreenWidth + 31;
-                    y = _rnd.Next(0, ScreenHeight);
-                    break;
-                case Side.Bottom:
-                    x = _rnd.Next(0, ScreenWidth);
-                    y = ScreenHeight + 31;
-                    break;
-                case Side.Left:
-                    x = -31;
-                    y = _rnd.Next(0, ScreenHeight);
-                    break;
-                default:
-                    x = 0;
-                    y = 0;
-                    break;
+                position = Point.Zero;
+                return false;
             }
 
-            Point position = new(x, y);
+            int randomNum = direction == Direction.Vertical 
+                ? _rnd.Next(minX, maxX) 
+                : _rnd.Next(minY, maxY);
+            
+            if (checkedNumbers.Contains(randomNum)) continue;
 
-            if (CanSpawnNebulaOnPoint(position))
-            {
-                return position;
-            }
-        }
+            checkedNumbers.Add(randomNum);
+            
+            position = direction == Direction.Vertical
+                ? new Point(randomNum, minY) 
+                : new Point(minX, randomNum);
 
-        return new Point(0, 0);
+            if (padding == 0) return true;
+
+            if (CanSpawnOnPoint(position, width + padding, height + padding)) return true;
+        } while (true);
     }
 
-    private void GetSideRanges(Side side, out int minX, out int maxX, out int minY, out int maxY)
+    private static void GetSideRanges(
+        Side side, 
+        int width, 
+        int height, 
+        out int minX, 
+        out int maxX, 
+        out int minY, 
+        out int maxY)
     {
         switch (side)
         {
             case Side.Top:
-                minX = -31;
-                maxX = ScreenWidth + 31;
-                minY = -31;
-                maxY = -31;
+                minX = 0;
+                maxX = ScreenWidth;
+                minY = -(height / 2 - 1);
+                maxY = minY;
                 break;
             case Side.Right:
-                minX = ScreenWidth + 31;
-                maxX = ScreenWidth + 31;
-                minY = -31;
-                maxY = ScreenHeight + 31;
+                minX = ScreenWidth + (width / 2 - 1);
+                maxX = minX;
+                minY = 0;
+                maxY = ScreenHeight;
                 break;
             case Side.Bottom:
-                minX = -31;
-                maxX = ScreenWidth + 31;
-                minY = ScreenHeight + 31;
-                maxY = ScreenHeight + 31;
+                minX = 0;
+                maxX = ScreenWidth;
+                minY = ScreenHeight + (height / 2 - 1);
+                maxY = minY;
                 break;
             case Side.Left:
-                minX = -31;
-                maxX = -31;
-                minY = -31;
-                maxY = ScreenHeight + 31;
+                minX = -(width / 2 - 1);
+                maxX = minX;
+                minY = 0;
+                maxY = ScreenHeight;
                 break;
             default:
-                minX = 0;
-                maxX = 0;
-                minY = 0;
-                maxY = 0;
-                break;
+                throw new ArgumentOutOfRangeException(nameof(side), side, null);
         }
+    }
+
+    private Side PickSpawnSide(Side[] sides)
+    {
+        Dictionary<Side, float> sideWeights = new();
+        
+        foreach (Side side in sides)
+        {
+            Direction direction = GetDirectionFromSide(side);
+
+            float multiplier = direction switch
+            {
+                Direction.Horizontal => MathF.Abs(_parallaxOffset.X),
+                Direction.Vertical => MathF.Abs(_parallaxOffset.Y),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            sideWeights.Add(side, _baseSpawnSideWeights[side] * multiplier);
+        }
+
+        float sumOfWeights = sideWeights.Values.Sum();
+        
+        float random = RandomFloat(0, sumOfWeights);
+        foreach (Side side in sides)
+        {
+            if (random < sideWeights[side])
+            {
+                return side;
+            }
+            random -= sideWeights[side];
+        }
+        
+        throw new Exception("Was unable to find spawn side");
+    }
+
+    private void SpawnStar()
+    {
+        Side[] sides = GetSpawnSides();
+        Side side = PickSpawnSide(sides);
+
+        if (!GetSpawnPosition(side, 1, 1, out Point position)) return;
+        
+        Point virtualPosition = GetVirtualPosition(position);
+        
+        _stars.Add(new Vector3(virtualPosition.X, virtualPosition.Y, RandomFloat(-1, 1)));
+    }
+    
+    private void SpawnInitialStar()
+    {
+        int x;
+        int y;
+
+        int iterations = 0;
+        
+        bool positionIsTaken;
+        do
+        {
+            Debug.WriteLine($"SpawnInitialStar loop iteration {++iterations}");
+            
+            positionIsTaken = false;
+
+            x = _rnd.Next(ScreenWidth);
+            y = _rnd.Next(ScreenHeight);
+
+            if (!CanSpawnOnPoint(new Point(x, y), 4, 4))
+            {
+                positionIsTaken = true;
+            }
+        } while (positionIsTaken);
+        
+        _stars.Add(new Vector3(x, y, RandomFloat(-1, 1)));
     }
 
     private void SpawnNebula()
     {
         Side[] sides = GetSpawnSides();
-        Side side = sides[_rnd.Next(2)];
-        Point position = GetSpawnPosition(side);
+        Side side = PickSpawnSide(sides);
+
+        if (!GetSpawnPosition(side, 64, 64, out Point position, 64)) return;
 
         _nebulae.Add(new Nebula(GetVirtualPosition(position)));
     }
@@ -200,15 +334,19 @@ public class BackgroundRenderer
         int x;
         int y;
         
+        int iterations = 0;
+        
         bool positionIsTaken;
         do
         {
+            Debug.WriteLine($"SpawnInitialNebula loop iteration {++iterations}");
+            
             positionIsTaken = false;
             
             x = _rnd.Next(ScreenWidth);
             y = _rnd.Next(ScreenHeight);
 
-            if (!CanSpawnNebulaOnPoint(new Point(x, y)))
+            if (!CanSpawnOnPoint(new Point(x, y), 128, 128))
             {
                 positionIsTaken = true;
             }
@@ -217,10 +355,14 @@ public class BackgroundRenderer
         _nebulae.Add(new Nebula(new Point(x, y)));
     }
 
-    private bool CanSpawnNebulaOnPoint(Point position)
+    private bool CanSpawnOnPoint(Point position, int checkWidth, int checkHeight)
     {
         Point virtualPosition = GetVirtualPosition(new Point(position.X, position.Y));
-        Rectangle checkRange = new(virtualPosition.X - 64, virtualPosition.Y - 64, 128, 128);
+        Rectangle checkRange = new(
+            virtualPosition.X - checkWidth / 2, 
+            virtualPosition.Y - checkHeight / 2, 
+            checkWidth, 
+            checkHeight);
 
         foreach (Nebula nebula in _nebulae)
         {
@@ -247,6 +389,26 @@ public class BackgroundRenderer
         return new Point(x, y);
     }
 
+    private static Texture2D CreateStarTexture(Game root)
+    {
+        Color[] data = { Color.White };
+        Texture2D texture = new(root.GraphicsDevice, 1, 1);
+        texture.SetData(data);
+        return texture;
+    }
+
+    private static Direction GetDirectionFromSide(Side side)
+    {
+        return side switch
+        {
+            Side.Top => Direction.Vertical,
+            Side.Right => Direction.Horizontal,
+            Side.Bottom => Direction.Vertical,
+            Side.Left => Direction.Horizontal,
+            _ => throw new ArgumentOutOfRangeException(nameof(side), side, null)
+        };
+    }
+    
     private float RandomFloat(float minValue, float maxValue)
     {
         return _rnd.NextSingle() * (maxValue - minValue) + minValue;
