@@ -38,6 +38,13 @@ public class BackgroundRenderer
     private const int MaxNebulae = 10;
     private const int MaxStars = 150;
 
+    private const float ZMin = -1;
+    private const float ZMax = 1;
+    
+    private const float ParallaxSpeedMin = 0.2F;
+    private const float ParallaxSpeedMax = 2;
+    private const float NebulaParallax = 0;
+    
     private readonly Vector2 _parallaxOffset;
     private readonly Texture2D _nebulaTexture;
     private readonly Texture2D _starTexture;
@@ -78,7 +85,7 @@ public class BackgroundRenderer
         {
             DrawTask nebulaTask = new(
                 _nebulaTexture, 
-                GetScreenPosition(nebula.Position).ToVector2(), 
+                GetScreenPosition(nebula.Position, NebulaParallax).ToVector2(), 
                 0, 
                 LayerDepth.Background, 
                 new List<IDrawTaskEffect>());
@@ -90,7 +97,7 @@ public class BackgroundRenderer
         {
             DrawTask starTask = new(
                 _starTexture,
-                GetScreenPosition(new Point((int)star.X, (int)star.Y)).ToVector2(),
+                GetScreenPosition(new Point((int)star.X, (int)star.Y), star.Z).ToVector2(),
                 0,
                 LayerDepth.Background,
                 new List<IDrawTaskEffect>());
@@ -113,7 +120,8 @@ public class BackgroundRenderer
     {
         foreach (Nebula nebula in _nebulae)
         {
-            Point position = GetScreenPosition(nebula.Position - _nebulaTexture.Bounds.Size / new Point(2, 2));
+            Point virtualPosition = nebula.Position - _nebulaTexture.Bounds.Size / new Point(2, 2);
+            Point position = GetScreenPosition(virtualPosition, NebulaParallax);
             Rectangle nebulaRectangle = new(position, _nebulaTexture.Bounds.Size);
             
             if (nebulaRectangle.Intersects(new Rectangle(Point.Zero, new Point(ScreenWidth, ScreenHeight)))) continue;
@@ -124,7 +132,7 @@ public class BackgroundRenderer
 
         foreach (Vector3 star in _stars)
         {
-            Point position = GetScreenPosition(new Point((int)star.X, (int)star.Y));
+            Point position = GetScreenPosition(new Point((int)star.X, (int)star.Y), star.Z);
 
             if (position.X is >= 0 and <= ScreenWidth && 
                 position.Y is >= 0 and <= ScreenHeight) 
@@ -204,7 +212,7 @@ public class BackgroundRenderer
 
             if (padding == 0) return true;
 
-            if (CanSpawnOnPoint(position, width + padding, height + padding)) return true;
+            if (CanSpawnOnPoint(position, width + padding, height + padding, 0)) return true;
         } while (true);
     }
 
@@ -287,10 +295,12 @@ public class BackgroundRenderer
         Side side = PickSpawnSide(sides);
 
         if (!GetSpawnPosition(side, 1, 1, out Point position)) return;
+
+        float parallax = RandomFloat(ZMin, ZMax);
         
-        Point virtualPosition = GetVirtualPosition(position);
+        Point virtualPosition = GetVirtualPosition(position, parallax);
         
-        _stars.Add(new Vector3(virtualPosition.X, virtualPosition.Y, RandomFloat(-1, 1)));
+        _stars.Add(new Vector3(virtualPosition.X, virtualPosition.Y, parallax));
     }
     
     private void SpawnInitialStar()
@@ -299,6 +309,8 @@ public class BackgroundRenderer
         int y;
 
         int iterations = 0;
+
+        float parallax = RandomFloat(ZMin, ZMax);
         
         bool positionIsTaken;
         do
@@ -310,13 +322,13 @@ public class BackgroundRenderer
             x = _rnd.Next(ScreenWidth);
             y = _rnd.Next(ScreenHeight);
 
-            if (!CanSpawnOnPoint(new Point(x, y), 4, 4))
+            if (!CanSpawnOnPoint(new Point(x, y), 4, 4, parallax))
             {
                 positionIsTaken = true;
             }
         } while (positionIsTaken);
         
-        _stars.Add(new Vector3(x, y, RandomFloat(-1, 1)));
+        _stars.Add(new Vector3(x, y, parallax));
     }
 
     private void SpawnNebula()
@@ -326,7 +338,7 @@ public class BackgroundRenderer
 
         if (!GetSpawnPosition(side, 64, 64, out Point position, 64)) return;
 
-        _nebulae.Add(new Nebula(GetVirtualPosition(position)));
+        _nebulae.Add(new Nebula(GetVirtualPosition(position, NebulaParallax)));
     }
 
     private void SpawnInitialNebula()
@@ -346,7 +358,7 @@ public class BackgroundRenderer
             x = _rnd.Next(ScreenWidth);
             y = _rnd.Next(ScreenHeight);
 
-            if (!CanSpawnOnPoint(new Point(x, y), 128, 128))
+            if (!CanSpawnOnPoint(new Point(x, y), 128, 128, NebulaParallax))
             {
                 positionIsTaken = true;
             }
@@ -355,9 +367,9 @@ public class BackgroundRenderer
         _nebulae.Add(new Nebula(new Point(x, y)));
     }
 
-    private bool CanSpawnOnPoint(Point position, int checkWidth, int checkHeight)
+    private bool CanSpawnOnPoint(Point position, int checkWidth, int checkHeight, float parallax)
     {
-        Point virtualPosition = GetVirtualPosition(new Point(position.X, position.Y));
+        Point virtualPosition = GetVirtualPosition(new Point(position.X, position.Y), parallax);
         Rectangle checkRange = new(
             virtualPosition.X - checkWidth / 2, 
             virtualPosition.Y - checkHeight / 2, 
@@ -375,17 +387,17 @@ public class BackgroundRenderer
         return true;
     }
 
-    private Point GetScreenPosition(Point position)
+    private Point GetScreenPosition(Point position, float parallax)
     {
-        int x = position.X - (int)_currentOffset.X;
-        int y = position.Y - (int)_currentOffset.Y;
+        int x = (int)(position.X - _currentOffset.X * GetParallaxSpeedMultiplier(parallax));
+        int y = (int)(position.Y - _currentOffset.Y * GetParallaxSpeedMultiplier(parallax));
         return new Point(x, y);
     }
 
-    private Point GetVirtualPosition(Point screenPosition)
+    private Point GetVirtualPosition(Point screenPosition, float parallax)
     {
-        int x = screenPosition.X + (int)_currentOffset.X;
-        int y = screenPosition.Y + (int)_currentOffset.Y;
+        int x = (int)(screenPosition.X + _currentOffset.X * GetParallaxSpeedMultiplier(parallax));
+        int y = (int)(screenPosition.Y + _currentOffset.Y * GetParallaxSpeedMultiplier(parallax));
         return new Point(x, y);
     }
 
@@ -407,6 +419,12 @@ public class BackgroundRenderer
             Side.Left => Direction.Horizontal,
             _ => throw new ArgumentOutOfRangeException(nameof(side), side, null)
         };
+    }
+
+    private static float GetParallaxSpeedMultiplier(float parallax)
+    {
+        parallax = (parallax + 1) / 2;
+        return parallax * (ParallaxSpeedMax - ParallaxSpeedMin) + ParallaxSpeedMin;
     }
     
     private float RandomFloat(float minValue, float maxValue)
