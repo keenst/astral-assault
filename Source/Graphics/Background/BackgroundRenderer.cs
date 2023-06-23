@@ -305,26 +305,11 @@ public class BackgroundRenderer
     
     private void SpawnInitialStar()
     {
-        int x;
-        int y;
-
-        float parallax = RandomFloat(ZMin, ZMax);
+        int x = _rnd.Next(ScreenWidth);
+        int y = _rnd.Next(ScreenHeight);
+        float z = RandomFloat(ZMin, ZMax);
         
-        bool positionIsTaken;
-        do
-        {
-            positionIsTaken = false;
-
-            x = _rnd.Next(ScreenWidth);
-            y = _rnd.Next(ScreenHeight);
-
-            if (!CanSpawnOnPoint(new Point(x, y), 4, 4, parallax))
-            {
-                positionIsTaken = true;
-            }
-        } while (positionIsTaken);
-        
-        _stars.Add(new Vector3(x, y, parallax));
+        _stars.Add(new Vector3(x, y, z));
     }
 
     private void SpawnNebula()
