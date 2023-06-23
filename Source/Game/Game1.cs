@@ -32,6 +32,7 @@ public class Game1 : Game
     private RenderTarget2D _renderTarget;
     private static readonly Effect HighlightEffect = AssetManager.Load<Effect>("Highlight");
     private static readonly Effect ColorEffect = AssetManager.Load<Effect>("Color");
+    private static readonly Effect StarsEffect = AssetManager.Load<Effect>("Stars");
 
     // display
     private static readonly Color BackgroundColor = new(28, 23, 41);
@@ -175,6 +176,12 @@ public class Game1 : Game
                         ColorEffect.Parameters["newColor"].SetValue(colorEffect.Color);
                         ColorEffect.CurrentTechnique.Passes[0].Apply();
                         break;
+                    
+                    case StarsEffect starsEffect:
+                        StarsEffect.CurrentTechnique.Passes[1].Apply();
+                        StarsEffect.Parameters["starPositions"].SetValue(starsEffect.StarPositions);
+                        StarsEffect.CurrentTechnique.Passes[0].Apply();
+                        break;
                 }
             }
 
@@ -190,6 +197,7 @@ public class Game1 : Game
             
             HighlightEffect.CurrentTechnique.Passes[1].Apply();
             ColorEffect.CurrentTechnique.Passes[1].Apply();
+            StarsEffect.CurrentTechnique.Passes[1].Apply();
         }
         
         _spriteBatch.End();

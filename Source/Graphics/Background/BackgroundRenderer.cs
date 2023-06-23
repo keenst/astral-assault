@@ -46,19 +46,21 @@ public class BackgroundRenderer
 
     private readonly Vector2 _parallaxOffset;
     private readonly Texture2D _nebulaTexture;
-    private readonly Texture2D _starTexture;
     private readonly Random _rnd = new();
     
     private readonly List<Nebula> _nebulae = new();
     private readonly List<Vector3> _stars = new();
+
+    private readonly RenderTarget2D _starRenderTarget;
     
     private Vector2 _currentOffset;
 
     public BackgroundRenderer(Game root)
     {
-        _nebulaTexture = AssetManager.Load<Texture2D>("Nebula1");
-        _starTexture = CreateStarTexture(root);
+        _starRenderTarget = SetupStarRenderTarget(root);
         
+        _nebulaTexture = AssetManager.Load<Texture2D>("Nebula1");
+
         float xOffset = RandomFloat(-1, 1);
         float yOffset = RandomFloat(-1, 1);
         _parallaxOffset = new Vector2(xOffset, yOffset);
@@ -92,18 +94,29 @@ public class BackgroundRenderer
             drawTasks.Add(nebulaTask);
         }
 
-        foreach (Vector3 star in _stars)
+        Vector2 screenSize = new(ScreenWidth, ScreenHeight);
+        List<Vector2> starPositions = _stars.Select(v => GetScreenPosition(v).ToVector2() / screenSize).ToList();
+        if (starPositions.Count < MaxStars)
         {
-            DrawTask starTask = new(
-                _starTexture,
-                GetScreenPosition(star).ToVector2(),
-                0,
-                LayerDepth.Background,
-                new List<IDrawTaskEffect>());
-            
-            drawTasks.Add(starTask);
+            for (int i = 0; i < MaxStars - starPositions.Count; i++)
+            {
+                starPositions.Add(Vector2.Zero);
+            }
         }
 
+        StarsEffect starsEffect = new(starPositions.ToArray());
+
+        DrawTask stars = new(
+            _starRenderTarget, 
+            Vector2.Zero, 
+            0, 
+            LayerDepth.Background, 
+            new List<IDrawTaskEffect> { starsEffect },
+            Color.White,
+            Vector2.Zero);
+
+        drawTasks.Add(stars);
+        
         return drawTasks;
     }
     
@@ -113,6 +126,19 @@ public class BackgroundRenderer
         
         HandleRemoving();
         HandleSpawning();
+    }
+    
+    private static RenderTarget2D SetupStarRenderTarget(Game root)
+    {
+        return new RenderTarget2D(
+            root.GraphicsDevice, 
+            ScreenWidth, 
+            ScreenHeight, 
+            false, 
+            SurfaceFormat.Color, 
+            DepthFormat.None, 
+            0, 
+            RenderTargetUsage.DiscardContents);
     }
 
     private void HandleRemoving()
@@ -373,14 +399,6 @@ public class BackgroundRenderer
         int x = (int)(screenPosition.X + _currentOffset.X * GetParallaxSpeedMultiplier(screenPosition.Z));
         int y = (int)(screenPosition.Y + _currentOffset.Y * GetParallaxSpeedMultiplier(screenPosition.Z));
         return new Vector3(x, y, screenPosition.Z);
-    }
-
-    private static Texture2D CreateStarTexture(Game root)
-    {
-        Color[] data = { Color.White };
-        Texture2D texture = new(root.GraphicsDevice, 1, 1);
-        texture.SetData(data);
-        return texture;
     }
 
     private static Direction GetDirectionFromSide(Side side)

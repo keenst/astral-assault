@@ -169,3 +169,9 @@
 /processorParam:DebugMode=Auto
 /build:Shaders/Highlight.fx
 
+#begin Shaders/Stars.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/Stars.fx
+
