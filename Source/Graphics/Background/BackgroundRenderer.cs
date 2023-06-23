@@ -193,12 +193,6 @@ public class BackgroundRenderer
         
         do
         {
-            if (checkedNumbers.Count >= rangeLength)
-            {
-                position = Vector3.Zero;
-                return false;
-            }
-
             int randomNum = direction == Direction.Vertical 
                 ? _rnd.Next(minX, maxX) 
                 : _rnd.Next(minY, maxY);
@@ -214,7 +208,10 @@ public class BackgroundRenderer
             if (padding == 0) return true;
 
             if (CanSpawnOnPoint(position, width + padding, height + padding)) return true;
-        } while (true);
+        } while (checkedNumbers.Count < rangeLength);
+        
+        position = Vector3.Zero;
+        return false;
     }
 
     private static void GetSideRanges(
