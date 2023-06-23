@@ -308,15 +308,11 @@ public class BackgroundRenderer
         int x;
         int y;
 
-        int iterations = 0;
-
         float parallax = RandomFloat(ZMin, ZMax);
         
         bool positionIsTaken;
         do
         {
-            Debug.WriteLine($"SpawnInitialStar loop iteration {++iterations}");
-            
             positionIsTaken = false;
 
             x = _rnd.Next(ScreenWidth);
@@ -346,13 +342,9 @@ public class BackgroundRenderer
         int x;
         int y;
         
-        int iterations = 0;
-        
         bool positionIsTaken;
         do
         {
-            Debug.WriteLine($"SpawnInitialNebula loop iteration {++iterations}");
-            
             positionIsTaken = false;
             
             x = _rnd.Next(ScreenWidth);
